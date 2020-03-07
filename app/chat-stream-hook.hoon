@@ -210,9 +210,14 @@
       %http-response-data
       !>  ^-  (unit octs)
       %-  some
-      %-  as-octt:mimes:html
-      (en-json:html json)
+      (make-stream-data json)
   ==
+::
+++  make-stream-data
+  |=  =json
+  ^-  octs
+  %-  as-octt:mimes:html
+  :(weld "data:" (en-json:html json) "\0a\0a")
 ::
 ::  actions
 ::
@@ -356,8 +361,7 @@
   ^-  simple-payload:http
   :-  [200 header-list]
   %-  some
-  %-  as-octt:mimes:html
-  %-  en-json:html
+  %-  make-stream-data
   %-  update-to-json:chat-json
   :-  %messages
   :^  source  *@ud  *@ud

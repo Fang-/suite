@@ -179,7 +179,7 @@
       %agent
       [our.bowl %chat-store]
       %watch
-      [%mailbox (scot %p our.bowl) source]
+      [%mailbox source]
   ==
 ::
 ++  leave-source
@@ -369,7 +369,6 @@
     %envelopes
     (scot %s (new:si | initial-messages))
     ~.0
-    (scot %p our.bowl)
     (snoc source %noun)
   ==
 ::
@@ -447,7 +446,7 @@
     ::
       !>  ^-  chat-action
       :-  %message
-      :-  [(scot %p our.bowl) source]
+      :-  source
       ^-  envelope
       ::NOTE  this would be rudimentary spam protection...
       ::      if only chat-store rejected duplicate uid messages

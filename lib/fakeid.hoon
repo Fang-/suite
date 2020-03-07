@@ -98,7 +98,9 @@
     (cookies-from-request inbound-request)
   =/  session-cookie  (~(get by cookies) cookie-name)
   ?~  session-cookie  ~
-  (get-session (slav %uv (crip u.session-cookie)))
+  =/  key=(unit session-key)  (slaw %uv (crip u.session-cookie))
+  ?~  key  ~
+  (get-session u.key)
 ::
 ::TODO  into /lib/server
 ++  cookies-from-request
@@ -108,7 +110,8 @@
     ::TODO  support multiple 'Cookie' headers, as allowed by http2
     %-  ~(gas by *(map cord cord))
     header-list.request.inbound-request
-  %+  rash  (~(gut by headers) 'cookie' '')
+  =-  (fall - *(map tape tape))
+  %+  rush  (~(gut by headers) 'cookie' '')
   %+  cook
     ~(gas by *(map tape tape))
   %+  more  mic

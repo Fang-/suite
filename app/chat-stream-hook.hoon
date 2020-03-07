@@ -117,8 +117,12 @@
   ++  on-agent
     |=  [=wire =sign:agent:gall]
     ^-  (quip card _this)
-    ?.  ?=([%chat-updates ^] wire)  [~ this]
-    ?+  -.sign  (on-agent:def wire sign)
+    ?:  ?=(%poke-ack -.sign)
+      ?~  p.sign  [~ this]
+      %-  (slog leaf+"failed poke on {(spud wire)}" u.p.sign)
+      [~ this]
+    ?.  ?=([%chat-updates ^] wire)  (on-agent:def wire sign)
+    ?-  -.sign
         %kick
       [[(watch-source:do t.wire)]~ this]
     ::

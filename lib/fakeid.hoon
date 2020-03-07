@@ -59,12 +59,13 @@
 ++  get-session
   |=  =session-key
   .^  (unit session)
+    %gx
     (scot %p our.bowl)
     %fakeid-store
     (scot %da now.bowl)
     %session
     (scot %uv session-key)
-    %noun
+    /noun
   ==
 ::
 ::  http server helpers

@@ -16,7 +16,7 @@
 ::
 /-  *chat-store
 /+  default-agent, verb, dbug,
-    fakeid, *server, chat-json
+    fid=fakeid, *server, chat-json
 ::
 |%
 +$  state-0
@@ -161,7 +161,7 @@
   --
 ::
 |_  =bowl:gall
-+*  dofid  ~(. fakeid bowl)
++*  fakeid  ~(. fid bowl)
 ::
 ::  config
 ::
@@ -335,14 +335,14 @@
   ::  find or create session for request
   ::
   =/  who=(unit session:fakeid)
-    (session-from-request:dofid inbound-request)
+    (session-from-request:fakeid inbound-request)
   =/  [out=(unit card) =session-key:fakeid =session:fakeid]
     ?^  who  [~ *session-key:fakeid u.who]
     =<  [`card session-key session]
-    (new-session:dofid identity-duration)
+    (new-session:fakeid identity-duration)
   =/  =header-list:http
     ?^  who  ~
-    (set-session-cookie:dofid session-key until.session)
+    (set-session-cookie:fakeid session-key until.session)
   ::  keep track of all addresses this session has connected from
   ::
   =.  guests

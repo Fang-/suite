@@ -310,6 +310,11 @@
   ^-  (quip card _state)
   =-  =^  [card=(unit card) simple-payload:http]  state
         -
+      =.  headers.response-header
+        :-  'content-type'^'text/event-stream'
+        :-  'cache-control'^'no-cache'
+        :-  'connection'^'keep-alive'
+        headers.response-header
       :_  state
       =/  header=cage  [%http-response-header !>(response-header)]
       =/  data=cage    [%http-response-data !>(data)]

@@ -82,6 +82,9 @@
       (give-simple-payload:app:server eyre-id [[200 headers] ~])
     ::  else, pass through to inner agent, but tack on cors headers in response
     ::
+    ::    this relies on the agent sending response headers immediately, and
+    ::    exclusively to the current request.
+    ::
     =^  cards  agent  (on-poke:ag mark vase)
     =.  cards
       %+  turn  cards

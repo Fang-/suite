@@ -63,7 +63,9 @@
   ++  on-init
     ^-  (quip card _this)
     :_  this
-    [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]~
+    :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
+        kick-heartbeat:do
+    ==
   ::
   ++  on-save  !>(state)
   ::
@@ -152,11 +154,16 @@
   ++  on-arvo
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
-    ?.  ?=([%e %bound *] sign-arvo)
-      (on-arvo:def wire sign-arvo)
-    ~?  !accepted.sign-arvo
-      [dap.bowl 'bind rejected!' binding.sign-arvo]
-    [~ this]
+    ?+  sign-arvo  (on-arvo:def wire sign-arvo)
+        [%e %bound *]
+      ~?  !accepted.sign-arvo
+        [dap.bowl 'bind rejected!' binding.sign-arvo]
+      [~ this]
+    ::
+        [%b %wake *]
+      ?.  ?=([%heartbeat ~] wire)  (on-arvo:def wire sign-arvo)
+      [send-heartbeat:do this]
+    ==
   ::
   ++  on-peek   on-peek:def
   ++  on-fail   on-fail:def
@@ -170,8 +177,35 @@
 ++  identity-duration   ~d7
 ++  initial-messages    25
 ++  max-message-length  280
+++  heartbeat-timer     ~s30
 ::
 ::  card builders
+::
+++  kick-heartbeat
+  ^-  card
+  [%pass /heartbeat %arvo %b %wait (add now.bowl heartbeat-timer)]
+::
+++  send-heartbeat
+  ^-  (list card)
+  :-  kick-heartbeat
+  =/  viewers=(list eyre-id)
+    %~  tap  in
+    %+  roll  ~(val by viewers)
+    |=  [s=(set eyre-id) o=(set eyre-id)]
+    (~(uni in o) s)
+  ?:  =(0 (lent viewers))  ~
+  :_  ~
+  :*  %give
+      %fact
+    ::
+      %+  turn  viewers
+      |=  =eyre-id
+      /http-response/[eyre-id]
+    ::
+      %http-response-data
+      !>  ^-  (unit octs)
+      `[1 '\0a']
+  ==
 ::
 ++  watch-source
   |=  =source

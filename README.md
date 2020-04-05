@@ -1,11 +1,11 @@
-Various apps, tools, and crazy experiments.  
-Usage encouraged! Issues welcome! Support unguaranteed!
+various apps, tools, and crazy experiments.  
+usage encouraged! issues welcome! provided "as is"!
 
-### Userspace infrastructure
+### userspace infrastructure
 
 - **fakeid**: store + helpers for generating and tracking fake local identities
-- **corsac**: store + helpers for permissioning and handling HTTP CORS requests
+- **corsac**: store + helpers for permissioning and handling http cors requests
 
-### Application enhancers
+### application enhancers
 
 - **chat-stream-hook**: allows unauthenticated randos to partake in chat over http

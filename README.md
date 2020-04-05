@@ -10,3 +10,7 @@ usage encouraged! issues welcome! provided "as is"!
 ### application enhancers
 
 - **chat-stream-hook**: allows unauthenticated randos to partake in chat over http
+
+### applications
+
+- **djay**: backend for synced viewing of youtube videos, sourced from a chat channel

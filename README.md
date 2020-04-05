@@ -5,6 +5,7 @@ usage encouraged! issues welcome! provided "as is"!
 
 - **fakeid**: store + helpers for generating and tracking fake local identities
 - **corsac**: store + helpers for permissioning and handling http cors requests
+- **podium**: helper app for exposing subscriptions over unauthenticated http
 
 ### application enhancers
 

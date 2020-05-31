@@ -218,7 +218,11 @@
   ::TODO  maybe add fakeid session if they don't have it yet?
   :_  state
   %+  give-simple-payload:app  eyre-id
-  :-  [200 ~]
+  :-  :-  200
+      :~  'Content-Type'^'text/event-stream'
+          'Cache-Control'^'no-cache'
+          'Connection'^'keep-alive'
+      ==
   %-  some
   %-  make-stream-data
   .^  json

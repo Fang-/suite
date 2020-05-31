@@ -48,7 +48,9 @@
   ++  on-init
     ^-  (quip card _this)
     :_  this
-    [%pass /connect %arvo %e %connect [~ /podium] dap.bowl]~
+    :~  [%pass /connect %arvo %e %connect [~ /podium] dap.bowl]
+        kick-heartbeat:do
+    ==
   ::
   ++  on-save  !>(state)
   ::
@@ -129,6 +131,10 @@
       ~?  !accepted.sign-arvo
         [dap.bowl 'bind rejected!' binding.sign-arvo]
       [~ this]
+    ::
+        [%b %wake *]
+      ?.  ?=([%heartbeat ~] wire)  (on-arvo:def wire sign-arvo)
+      [send-heartbeat:do this]
     ==
   ::
   ++  on-peek  on-peek:def
@@ -136,6 +142,35 @@
   --
 ::
 |_  =bowl:gall
+++  heartbeat-timer  ~s20
+::
+++  kick-heartbeat
+  ^-  card
+  [%pass /heartbeat %arvo %b %wait (add now.bowl heartbeat-timer)]
+::
+++  send-heartbeat
+  ^-  (list card)
+  :-  kick-heartbeat
+  =/  viewers=(list eyre-id)
+    ::  jug source eyre-id
+    %~  tap  in
+    %+  roll  ~(val by podium)
+    |=  [s=(set eyre-id) o=(set eyre-id)]
+    (~(uni in o) s)
+  ?:  =(0 (lent viewers))  ~
+  :_  ~
+  :*  %give
+      %fact
+    ::
+      %+  turn  viewers
+      |=  =eyre-id
+      /http-response/[eyre-id]
+    ::
+      %http-response-data
+      !>  ^-  (unit octs)
+      `[1 '\0a']
+  ==
+::
 ++  expose-card
   |=  =source
   ^-  card

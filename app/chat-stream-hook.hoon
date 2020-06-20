@@ -392,9 +392,10 @@
   =/  =header-list:http
     ?^  who  ~
     (set-session-cookie:fakeid session-key until.session)
-  ::  keep track of all addresses this session has connected from
+  ::  keep track of all addresses this session has connected from,
+  ::  but never track localhost requests
   ::
-  =.  guests
+  =?  guests  !=(.127.0.0.1 address.inbound-request)
     %+  ~(put ju guests)
       name.session
     address.inbound-request

@@ -14,17 +14,19 @@
 ::
 ::    usage: poke with an action. ie :chat-stream-hook [%stream /urbit-help]
 ::
-/-  *chat-store
-/+  default-agent, verb, dbug,
-    fid=fakeid, corsac, *server, chat-json
+/+  chat-store,
+    default-agent, verb, dbug,
+    fid=fakeid, corsac, *server
 ::
 |%
 +$  state-0
   $:  %0
       streams=(set source)
       viewers=(jug source eyre-id)
-      tmp=(set eyre-id)
+      tmp=(set eyre-id)  ::TODO  remove
       ::TODO  we need to expire these to avoid a space-leak
+      ::      probably clean up expired ids every +identity-duration
+      ::TODO  shouldn't this live in fakeid-store instead? but how update?
       guests=(map ship (set address:eyre))
       banned=(set address:eyre)
   ==
@@ -146,7 +148,7 @@
       ::
           %chat-update
         =^  cards  state
-          (handle-chat-update:do t.wire !<(chat-update vase))
+          (handle-chat-update:do t.wire !<(update:chat-store vase))
         [cards this]
       ==
     ==
@@ -298,7 +300,7 @@
 ::  outgoing flows
 ::
 ++  handle-chat-update
-  |=  [=source upd=chat-update]
+  |=  [=source upd=update:chat-store]
   ^-  (quip card _state)
   ?.  ?=(?(%message %messages) -.upd)
     [~ state]
@@ -310,7 +312,7 @@
         %message   [envelope.upd]~
         %messages  envelopes.upd
       ==
-    |=  envelope
+    |=  envelope:chat-store
     ?.  ?=(%text -.letter)      ~
     ?.  (lte (met 3 author) 8)  ~
     %+  rush  text.letter
@@ -323,7 +325,7 @@
     ::  forward update to all viewers
     ::
     %+  send-to-viewers  source
-    (update-to-json:chat-json upd)
+    (update:enjs:chat-store upd)
   =^  caz  state
     (ban-comet i.banlist)
   $(banlist t.banlist, cards (weld caz cards))
@@ -404,17 +406,19 @@
   :-  [200 header-list]
   %-  some
   %-  make-stream-data
-  %-  update-to-json:chat-json
+  %-  update:enjs:chat-store
   :-  %messages
   :^  source  *@ud  *@ud
-  .^  (list envelope)  ::  oldest first
+  %-  flop
+  %+  scag  initial-messages
+  =<  envelopes  ::  newest-first
+  %-  need
+  .^  (unit mailbox:chat-store)
     %gx
     (scot %p our.bowl)
     %chat-store
     (scot %da now.bowl)
-    %envelopes
-    (scot %s (new:si | initial-messages))
-    ~.0
+    %mailbox
     (snoc source %noun)
   ==
 ::
@@ -481,7 +485,7 @@
   --
 ::
 ++  send-message
-  |=  [=source as=ship =letter]
+  |=  [=source as=ship =letter:chat-store]
   ^-  card
   :*  %pass
       [%send source]
@@ -490,10 +494,10 @@
       %poke
       %chat-action
     ::
-      !>  ^-  chat-action
+      !>  ^-  action:chat-store
       :-  %message
       :-  source
-      ^-  envelope
+      ^-  envelope:chat-store
       ::NOTE  this would be rudimentary spam protection...
       ::      if only chat-store rejected duplicate uid messages
       ::      (at least chat-cli doesn't render such messages)

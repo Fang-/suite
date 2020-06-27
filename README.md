@@ -14,3 +14,4 @@ usage encouraged! issues welcome! provided "as is"!
 ### applications
 
 - **djay**: backend for synced viewing of youtube videos, sourced from a chat channel
+- **bard**: interactive storyteller for use with `|link`

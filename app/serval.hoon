@@ -152,7 +152,7 @@
   ++  on-poke
     |=  [=mark =vase]
     ^-  (quip card _this)
-    ?+  mark  (on-poke:def mark vase)
+    ?+  mark  ~&(state (on-poke:def mark vase))
         %handle-http-request
       =^  cards  state
         %-  handle-http-request:do

@@ -1,4 +1,4 @@
-::  duiker: bittorrent file discovery
+::  duiker: bittorrent magnet link sharing
 ::
 ::    duiker is a torrent tracker, in the sense of sharing torrent links.
 ::
@@ -341,7 +341,6 @@
         ::TODO  dedupe with +on-action
         ::
         =+  bum=(met 3 base-url)
-        ~&  [%submitted-trackers trackers.magnet]
         %+  skip  trackers.magnet
         |=(t=@t =(base-url (end 3 bum t)))
       :_  state
@@ -638,7 +637,7 @@
         ^-  shoe-effect:shoe
         :^    %table
             ~[t+'n' t+'name' t+'from' t+'s' t+'c' t+'l']
-          ~[1 64 8 3 2 2]
+          ~[1 58 14 3 2 2]
         %+  fuse  (turn (gulf 0 9) (lead %ud))
         %+  turn
           (swag [(mul page.query 10) 10] items)

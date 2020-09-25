@@ -248,7 +248,7 @@
   =/  stale=(list [=peer-id peer])
     %+  skim  ~(tap by peers.file)
     |=  [* peer]
-    (lth (add last-seen expire-dr) now.bowl)
+    (lth (add last-seen expire-dr:config) now.bowl)
   |-
   ?~  stale  file
   =,  i.stale

@@ -229,6 +229,7 @@
 ++  config
   |%
   ++  interval-dr   ~m60
+  ++  expire-dr     (add interval-dr ~m15)
   ++  interval      (div interval-dr ~s1)
   ++  min-interval  (div ~m5 ~s1)
   ++  defwant       30
@@ -247,10 +248,7 @@
   =/  stale=(list [=peer-id peer])
     %+  skim  ~(tap by peers.file)
     |=  [* peer]
-    (lth last-seen :(sub now.bowl interval-dr:config ~m5))
-    ::  last-seen < (now - (60-5))
-    ::  150 < 170 - 55
-    ::  want to find the ones where lats-seen is less than the treshhold
+    (lth (add last-seen expire-dr) now.bowl)
   |-
   ?~  stale  file
   =,  i.stale

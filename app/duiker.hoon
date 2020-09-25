@@ -521,7 +521,7 @@
         :~(' ' [`%un ~ ~]^"generating magnet links for submission:")
         :~('1) start the torrent creation process in your torrent client')
         :~  '2) for the tracker, input your '
-            [`%br ~ ~]^"personal"
+            [`%br `%r ~]^"personal"
             ' tracker url:'
         ==
         :~((cat 3 '   ' (tracker-url src.bowl)))
@@ -541,7 +541,6 @@
         :~('<       first page')
         :~('>       last page')
         :~('0-9     view file details')
-        :~('t       view personal tracker url')
         ~
         :~(' ' [`%un ~ ~]^"file search:")
         :~('/text   search for filenames containing text')
@@ -636,8 +635,8 @@
       ::
         ^-  shoe-effect:shoe
         :^    %table
-            ~[t+'n' t+'name' t+'from' t+'s' t+'c' t+'l']
-          ~[1 58 14 3 2 2]
+            ~[t+'n' t+'name' t+'from' t+'s' t+'l' t+'c']
+          ~[1 59 14 2 2 2]
         %+  fuse  (turn (gulf 0 9) (lead %ud))
         %+  turn
           (swag [(mul page.query 10) 10] items)
@@ -647,8 +646,8 @@
         :~  t+(need name)
             p+from
             ud+(scry @ud %gx %serval /file/(scot %ux i)/seeders/atom)
-            ud+(scry @ud %gx %serval /file/(scot %ux i)/completed/atom)
             ud+(scry @ud %gx %serval /file/(scot %ux i)/leechers/atom)
+            ud+(scry @ud %gx %serval /file/(scot %ux i)/completed/atom)
     ==  ==
   ::
   ++  tag

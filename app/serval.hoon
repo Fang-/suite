@@ -147,9 +147,9 @@
     |=  =vase
     |^  ^-  (quip card _this)
         =/  loaded  !<(state-v vase)
+        ~&  [dap.bowl %load -.loaded -.state]
         =?  loaded  ?=(%0 -.loaded)
           (state-0-to-1 loaded)
-        ~&  [dap.bowl %load (generate-announce-path:do our.bowl)]
         ?>  ?=(%1 -.loaded)
         [~ this(state loaded)]
     ::
@@ -439,7 +439,7 @@
         |(completed.stat ?=(%completed event))
       ::
         %+  add  seedtime.stat
-        ?.  &(completed.stat knew =(0 left.peer) =(0 left))
+        ?.  &(knew =(0 left.peer) =(0 left))
           ~s0
         (sub now.bowl last-seen.peer)
     ==

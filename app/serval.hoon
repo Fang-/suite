@@ -32,8 +32,8 @@
     server, default-agent, verb, dbug
 ::
 |%
-+$  state-0
-  $:  %0
++$  state-1
+  $:  %1
       files=(map file-id file)
       stats=(mip ship file-id stat)
       ::  secrets for generating unique announce urls
@@ -68,6 +68,7 @@
   $:  uploaded=@ud
       downloaded=@ud
       completed=_|
+      seedtime=@dr
   ==
 ::
 +$  announce
@@ -121,7 +122,7 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -143,11 +144,44 @@
     ==
   ++  on-save  !>(state)
   ++  on-load
-    |=  old=vase
-    ^-  (quip card _this)
-    =.  state  !<(state-0 old)
-    ~&  [dap.bowl %load (generate-announce-path:do our.bowl)]
-    [[kick-peer-timer:do]~ this]
+    |=  =vase
+    |^  ^-  (quip card _this)
+        =/  loaded  !<(state-v vase)
+        =?  loaded  ?=(%0 -.loaded)
+          (state-0-to-1 loaded)
+        ~&  [dap.bowl %load (generate-announce-path:do our.bowl)]
+        ?>  ?=(%1 -.loaded)
+        [~ this(state loaded)]
+    ::
+    +$  state-v
+      $%  state-0
+          state-1
+      ==
+    ::
+    +$  state-0
+      $:  %0
+          files=(map file-id file)
+          stats=(mip ship file-id stat-0)
+          base-secret=@
+          ship-secret=(map ship @)
+      ==
+    ::
+    +$  stat-0
+      $:  uploaded=@ud
+          downloaded=@ud
+          completed=_|
+      ==
+    ::
+    ++  state-0-to-1
+      |=  state-0
+      ^-  state-1
+      =-  [%1 files - base-secret ship-secret]
+      %-  ~(run by stats)
+      |=  f=(map file-id stat-0)
+      %-  ~(run by f)
+      |=  stat-0
+      [uploaded downloaded completed ~s0]
+    --
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -377,6 +411,8 @@
   ::
   =/  =file
     (~(gut by files) file-id *file)
+  =/  knew=?
+    (~(has by peers.file) peer-id)
   =/  =peer
     (~(gut by peers.file) peer-id *peer)
   =/  =stat
@@ -384,29 +420,29 @@
   ::  update stats based off of previously reported values (for this peer-id)
   ::
   =?  stat  &(!?=(%started event) (~(has by peers.file) peer-id))
-    =/  new-up=@ud
-      ?:  (gte uploaded uploaded.peer)
-        %+  add  uploaded.stat
-        (sub uploaded uploaded.peer)
-      ~&  [%sketchy-stat-report ship]
-      %+  sub  uploaded.stat
-      %+  min  uploaded.stat  ::  prevent underflow
-      (sub uploaded.peer uploaded)
-    =/  new-down=@ud
-      ?:  (gte downloaded downloaded.peer)
-        %+  add  downloaded.stat
-        (sub downloaded downloaded.peer)
-      ~&  [%sketchy-stat-report ship]
-      %+  sub  downloaded.stat
-      %+  min  downloaded.stat  ::  prevent underflow
-      (sub downloaded.peer downloaded)
-    :: ~&  [%per up=uploaded.peer down=downloaded.peer]
-    :: ~&  [%ann up=uploaded down=downloaded]
-    :: ~&  [%had up=uploaded.stat down=downloaded.stat]
-    :: ~&  [%new up=new-up down=new-down]
-    :+  new-up
-      new-down
-    |(completed.stat ?=(%completed event))
+    :*  ?:  (gte uploaded uploaded.peer)
+          %+  add  uploaded.stat
+          (sub uploaded uploaded.peer)
+        ~&  [%strange-stat-report ship]
+        %+  sub  uploaded.stat
+        %+  min  uploaded.stat  ::  prevent underflow
+        (sub uploaded.peer uploaded)
+      ::
+        ?:  (gte downloaded downloaded.peer)
+          %+  add  downloaded.stat
+          (sub downloaded downloaded.peer)
+        ~&  [%sketchy-stat-report ship]
+        %+  sub  downloaded.stat
+        %+  min  downloaded.stat  ::  prevent underflow
+        (sub downloaded.peer downloaded)
+      ::
+        |(completed.stat ?=(%completed event))
+      ::
+        %+  add  seedtime.stat
+        ?.  &(completed.stat knew =(0 left.peer) =(0 left))
+          ~s0
+        (sub now.bowl last-seen.peer)
+    ==
   ::  update peer based off announce arguments
   ::
   =.  peer

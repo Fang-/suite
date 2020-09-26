@@ -14,7 +14,7 @@
 ::TODO  refactor this for local-first by the time app distribution becomes real
 ::
 :: /+  serval  ::TODO
-/+  torn,
+/+  torn, *pal,
     shoe, default-agent, verb, dbug
 ::
 |%
@@ -683,22 +683,4 @@
 ++  lead  |*(h=* |*(* [+>+< +<]))                          ::  put head
 ++  late  |*(t=* |*(* [+< +>+<]))                          ::  put tail
 ::
-::TODO  personal /lib/pal?
-::
-++  fuse                                                ::  cons contents
-  |*  [a=(list) b=(list)]
-  :: ^-  (list _?>(?=([^ ^] [a b]) [i.a i.b]))  ::TODO  why does this not work?
-  ^-  (list [_?>(?=(^ a) i.a) _?>(?=(^ b) i.b)])
-  ?~  a  ~
-  ?~  b  ~
-  :-  [i.a i.b]
-  $(a t.a, b t.b)
-::
-++  opt
-  |*  =rule
-  ;~(pose rule (easy ~))
-::
-++  may
-  |*  [=rule else=*]
-  ;~(pose rule (easy else))
 --

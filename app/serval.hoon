@@ -28,14 +28,14 @@
 ::  /x/stat/[ship]               %noun  total stats for ship
 ::  /x/stat/[ship]/[file-id]     %noun  stats for ship on file
 ::
-/+  benc, torn,
+/+  benc, torn, *pal,
     server, default-agent, verb, dbug
 ::
 |%
 +$  state-0
   $:  %0
       files=(map file-id file)
-      stats=(map ship (map file-id stat))
+      stats=(mip ship file-id stat)
       ::  secrets for generating unique announce urls
       ::
       base-secret=@
@@ -624,27 +624,5 @@
       ?~  name  ~
       ["name" [%byt (trip u.name)]]~
   ==
-::
-++  lead  |*(h=* |*(* [+>+< +<]))                          ::  put head
-++  late  |*(t=* |*(* [+< +>+<]))                          ::  put tail
-::
-++  bi  ::  mip engine
-  =|  a=(tree (pair * (tree (pair))))  ::  (map * (map))
-  |@
-  ++  get
-    |*  [b=* c=*]
-    (~(get by (~(gut by a) b ~)) c)
-  ::
-  ++  gut
-    |*  [b=* c=* d=*]
-    (~(gut by (~(gut by a) b ~)) c d)
-  ::
-  ++  put
-    |*  [b=* c=* d=*]
-    %+  ~(put by a)  b
-    %.  [c d]
-    %~  put  by
-    (~(gut by a) b ~)
-  --
 --
 

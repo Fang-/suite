@@ -1,7 +1,7 @@
 ::  serval: interacting with the simple http/s bittorrent tracker
 ::
 /+  torn
-^?
+::
 |_  =bowl:gall
 ++  scry
   |*  [=mold =path]

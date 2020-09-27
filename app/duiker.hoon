@@ -13,7 +13,7 @@
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
 ::
-/+  serval, torn, *pal,
+/+  srvl=serval, torn, *pal,
     shoe, default-agent, verb, dbug
 ::
 |%
@@ -154,6 +154,8 @@
   --
 ::
 |_  =bowl:gall
++*  serval  ~(. srvl bowl)
+::
 ++  base-url  'https://urb.pal.dev/serval'
 ::
 ++  on-action

@@ -324,9 +324,9 @@
         (truncate-info-hash:torn info-hash.magnet)
       =/  ninja=@p
         ?~  fil=(~(get by files.db) file-id)
-          our.bowl
+          src.bowl
         from.u.fil
-      ?.  =(our.bowl ninja)
+      ?.  =(src.bowl ninja)
         =-  [[-]~ state]
         %-  failure:msg:render
         "this file was already submitted by {(scow %p ninja)}"

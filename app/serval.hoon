@@ -18,7 +18,6 @@
 ::       - i get around to actually doing it
 ::
 ::TODO  move some data structures/functions into /lib/torn?
-::TODO  track seedtime
 ::
 ::  scry endpoints:
 ::  /x/file/[file-id]/seeders    %atom  seeder count
@@ -245,11 +244,20 @@
     ::
         [%stats @ ?(~ [@ ~])]
       ?~  who=(slaw %p i.t.t.path)  [~ ~]
-      ?~  t.t.t.path
-        ::TODO  do summation here, maybe? [up, down, count, completed]
-        ``noun+!>((~(gut by stats) u.who *(map file-id stat)))
-      ?~  fid=(slaw %ux i.t.t.t.path)  [~ ~]
-      ``noun+!>((~(gut bi stats) u.who u.fid *stat))
+      ?^  t.t.t.path
+        ?~  fid=(slaw %ux i.t.t.t.path)  [~ ~]
+        ``noun+!>((~(gut bi stats) u.who u.fid *stat))
+      =/  all=(list stat)
+        ~(val by (~(gut by stats) u.who *(map file-id stat)))
+      :^  ~  ~  %noun
+      !>  ^-  [files=@ud uploaded=@ud downloaded=@ud completed=@ud seedtime=@dr]
+      :-  (lent all)
+      %+  roll  all
+      |=  [stat [up=@ud down=@ud comp=@ud time=@dr]]
+      :^    (add up uploaded)
+          (add down downloaded)
+        ?:(completed +(comp) comp)
+      (add time seedtime)
     ==
   ::
   ++  on-leave  on-leave:def

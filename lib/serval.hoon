@@ -3,6 +3,8 @@
 /+  torn
 ::
 |_  =bowl:gall
+::  reads
+::
 ++  scry
   |*  [=mold =path]
   .^(mold %gx (scot %p our.bowl) %serval (scot %da now.bowl) path)
@@ -35,4 +37,21 @@
     ::TODO  stat type into lib?
     ,[uploaded=@ud downloaded=@ud completed=? seedtime=@dr]
   /stat/(scot %p ship)/(scot %ux file-id)
+::
+::  writes
+::
+++  action
+  |=  [=wire =vase]  ::TODO  action type into lib?
+  ^-  card:agent:gall
+  [%pass [%serval wire] %agent [our.bowl %serval] %poke %serval-action vase]
+::
+++  set-filename
+  |=  [=file-id:torn name=@t]
+  %+  action  /filename
+  !>([%filename file-id name])
+::
+++  set-ship-secret
+  |=  [=ship secret=@]
+  %+  action  /secret/(scot %p ship)
+  !>([%ship-secret ship secret])
 --

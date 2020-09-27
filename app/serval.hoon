@@ -114,7 +114,13 @@
   $:  complete=@ud
       incomplete=@ud
       downloaded=@ud
-      name=(unit @t)  ::TODO  configurable with poke
+      name=(unit @t)
+  ==
+::
++$  action
+  $%  [%base-secret new=@]
+      [%ship-secret =ship new=@]
+      [%filename =file-id name=@t]
   ==
 ::
 +$  card     card:agent:gall
@@ -185,17 +191,26 @@
   ++  on-poke
     |=  [=mark =vase]
     ^-  (quip card _this)
-    ?+  mark  ~&(state (on-poke:def mark vase))
+    ?+  mark  (on-poke:def mark vase)
         %handle-http-request
       =^  cards  state
         %-  handle-http-request:do
         !<([=eyre-id =inbound-request:eyre] vase)
       [cards this]
     ::
-      ::TODO  actions
-      ::  - change root secret
-      ::  - change ship secret
-      ::  - set file name
+        %serval-action
+      ?>  (team:title [our src]:bowl)
+      =/  =action  !<(action vase)
+      :-  ~
+      ?-  -.action
+        %base-secret  ~&  [dap.bowl 'expiring all announce urls!']
+                      this(base-secret new.action)
+        %ship-secret  ~&  [dap.bowl 'expiring announce url!' ship.action]
+                      this(ship-secret (~(put by ship-secret) +.action))
+        %filename     =-  this(files (~(put by files) file-id.action -))
+                      =-  -(name `name.action)
+                      (~(gut by files) file-id.action *file)
+      ==
     ==
   ::
   ++  on-watch
@@ -323,6 +338,7 @@
   %+  scag  32  ::TODO  do we care about announce url length?
   %-  en-base58:mimes:html
   %+  shas  ship
+  ::TODO  should we always include the base secret?
   (~(gut by ship-secret) ship base-secret)
 ::
 ++  handle-http-request

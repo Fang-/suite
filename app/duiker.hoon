@@ -64,6 +64,7 @@
       [%clear ~]
     ::
       [%submit =magnet:torn name=@t desc=@t tags=(set tag)]
+      [%delete id=selector ~]
       [%rename id=selector name=@t]
       [%describe id=selector desc=@t]
       [%retag id=selector tags=(set tag)]
@@ -217,6 +218,7 @@
   ::
     %+  qfix  mic
     ;~  pose
+      ;~((glue ace) (perk %delete ~) ;~(plug select (easy ~)))
       ;~((glue ace) (perk %rename ~) select qut:ab)
       ;~((glue ace) (perk %describe ~) select qut:ab)
       ;~((glue ace) (perk %retag ~) select parse-tags)
@@ -346,7 +348,7 @@
       ==
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
-        ?(%rename %describe %retag)
+        ?(%delete %rename %describe %retag)
       =/  =file-id
         ?-  -.id.command
           %list  (snag num.id.command items.navstate)
@@ -359,6 +361,8 @@
           ==
         [[(out (failure:msg:render "not your file!"))]~ state]
       =.  files
+        ?:  ?=(%delete -.command)
+          (~(del by files) file-id)
         %+  ~(put by files)  file-id
         ?-  -.command
           %rename    u.fil(name `name.command)
@@ -369,6 +373,8 @@
       :_  ?.  ?=(%rename -.command)  ~
           [(set-filename:serval file-id name.command)]~
       %-  out  ::TODO  rename +display
+      ?:  ?=(%delete -.command)
+        (success:msg:render "\"{(trip (need name.u.fil))}\" was deleted")
       %+  change:msg:render
         ?-  -.command
           %rename    "renamed"
@@ -409,7 +415,7 @@
       %-  file-details:render
       (snag num.command items.navstate)
     ::
-        ?(%submit %rename %describe %retag)
+        ?(%submit %delete %rename %describe %retag)
       ~  ::NOTE  rendered in +undertake...
     ==
   --
@@ -520,8 +526,10 @@
         :~('        if name is the empty string, or not supplied at all, the')
         :~('        display name from the magnet link is used. if it has none,')
         :~('        providing a name manually is mandatory.')
+        :~(';delete 0')
+        :~('        delete the 0th file in the list')
         :~(';rename 0 \'new name\'')
-        :~('        rename the 0th file in the list')
+        :~('        rename the 0th file')
         :~(';describe 0 \'some description\'')
         :~('        change the description of the 0th file')
         :~(';retag 0 some, example:tags')
@@ -534,9 +542,12 @@
     ++  not-found
       |=  =selector
       ?-  -.selector
-        %list  (failure "file was deleted")
+        %list  deleted
         %hash  (failure "no such file {((x-co:co 40) fid.selector)}")
       ==
+    ::
+    ++  deleted
+      (failure "file was deleted")
     ::
     ++  change
       |=  [wut=tape old=tape new=tape]
@@ -555,6 +566,7 @@
   ++  file-details
     |=  =file-id
     ^-  shoe-effect:shoe
+    ?.  (~(has by files) file-id)  deleted:msg
     =+  (~(got by files) file-id)
     =*  magnet  -<
     :+  %sole  %mor
@@ -609,6 +621,8 @@
           (swag [(mul page.query 10) 10] items)
         |=  i=file-id
         ^-  (list dime)
+        ?.  (~(has by files) i)
+          ~[t+'(deleted file)' t+~ t+~ t+~ t+~]
         =+  (~(got by files) i)
         :~  t+(need name)
             p+from

@@ -102,22 +102,10 @@
   ++  on-save   !>(state)
   ++  on-load
     |=  =vase
-    |^  ^-  (quip card _this)
-        =/  loaded  !<(state-0 vase)
-        ~&  [dap.bowl %load %dumb-upgrade]
-        ::NOTE  we forgot to include the leading %0 when storing state-0...
-        [~ this(state (state-0-to-1 loaded))]
-    ::
-    +$  state-0
-      $:  db=[files=(map file-id finf) *]
-          ui=(map ship navstate)
-      ==
-    ::
-    ++  state-0-to-1
-      |=  state-0
-      ^-  state-1
-      [%1 files.db ui]
-    --
+    ^-  (quip card _this)
+    =/  loaded  !<(state-1 vase)
+    ~&  [dap.bowl %load %1]
+    [~ this(state loaded)]
   ::
   ++  on-poke
     |=  [=mark =vase]

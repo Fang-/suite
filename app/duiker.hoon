@@ -13,8 +13,7 @@
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
 ::
-:: /+  serval  ::TODO
-/+  torn, *pal,
+/+  serval, torn, *pal,
     shoe, default-agent, verb, dbug
 ::
 |%
@@ -387,14 +386,7 @@
   |=  =ship
   %^  cat  3
     base-url
-  %-  spat
-  .^  path
-    %gx
-    (scot %p our.bowl)
-    %serval
-    (scot %da now.bowl)
-    /announce/(scot %p ship)/path
-  ==
+  (spat (announce-path:serval ship))
 ::  +prep-magnet: add ourselves to the magnet's tracker list
 ::
 ++  prep-magnet
@@ -645,9 +637,9 @@
         =+  (~(got by files.db) i)
         :~  t+(need name)
             p+from
-            ud+(scry @ud %gx %serval /file/(scot %ux i)/seeders/atom)
-            ud+(scry @ud %gx %serval /file/(scot %ux i)/leechers/atom)
-            ud+(scry @ud %gx %serval /file/(scot %ux i)/completed/atom)
+            ud+(seeder-count:serval i)
+            ud+(leecher-count:serval i)
+            ud+(completed-count:serval i)
     ==  ==
   ::
   ++  tag
@@ -671,16 +663,5 @@
       [%sole txt+"imagine a magnet link here"]~
     ==
   --
-::
-::TODO  /lib/scry ?
-::
-++  scry
-  |*  [=mold care=term app=term =path]
-  .^(mold care (scot %p our.bowl) app (scot %da now.bowl) path)
-::
-::TODO  stdlib?
-::
-++  lead  |*(h=* |*(* [+>+< +<]))                          ::  put head
-++  late  |*(t=* |*(* [+< +>+<]))                          ::  put tail
 ::
 --

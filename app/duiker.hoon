@@ -17,27 +17,15 @@
     shoe, default-agent, verb, dbug
 ::
 |%
-+$  versioned-state
-  $%  [%0 state-0]
-  ==
-::
-+$  state-0
-  $:  db=[=files =index]
++$  state-1
+  $:  %1
+      files=(map file-id finf)
       ui=(map ship navstate)  ::TODO  per sole-id instead?
   ==
 ::
 +$  info-hash  info-hash:torn
 +$  file-id    file-id:torn
-+$  files      (map file-id finf)
 +$  tag        path  ::NOTE  /music/dance -> music:dance
-::
-::
-++  whem  ((ordered-map @da file-id) lte)
-+$  index
-  $:  when=(tree [key=@da val=file-id])
-      whom=(jug ship file-id)  ::TODO  unused?
-      tags=(jug tag file-id)   ::TODO  unused?
-  ==
 ::
 +$  finf
   $:  magnet:torn
@@ -96,7 +84,7 @@
 +$  card  card:agent:shoe
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %+  verb  |
@@ -113,10 +101,23 @@
   ++  on-init   [~ this]
   ++  on-save   !>(state)
   ++  on-load
-    |=  old=vase
-    ^-  (quip card _this)
-    ~&  [dap.bowl %load]
-    [~ this(state !<(state-0 old))]
+    |=  =vase
+    |^  ^-  (quip card _this)
+        =/  loaded  !<(state-0 vase)
+        ~&  [dap.bowl %load %dumb-upgrade]
+        ::NOTE  we forgot to include the leading %0 when storing state-0...
+        [~ this(state (state-0-to-1 loaded))]
+    ::
+    +$  state-0
+      $:  db=[files=(map file-id finf) *]
+          ui=(map ship navstate)
+      ==
+    ::
+    ++  state-0-to-1
+      |=  state-0
+      ^-  state-1
+      [%1 files.db ui]
+    --
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -167,8 +168,8 @@
   ::
   ++  on-submit
     |=  [=magnet:torn name=@t desc=@t tags=(set tag)]
-    ^+  db
-    %+  ~(put fin db)
+    ^+  files
+    %+  ~(put by files)
       (truncate-info-hash:torn info-hash.magnet)
     :_  [src.bowl now.bowl tags desc]
     %_  magnet
@@ -184,7 +185,7 @@
   --
 ::
 ++  default-navstate
-  [*query ~(tap in ~(key by files.db))]
+  [*query ~(tap in ~(key by files))]
 ::
 ++  build-parser
   |=  sole-id=@ta
@@ -300,7 +301,7 @@
       ^-  (list file-id)
       =-  (turn - head)
       =-  (sort - |=([a=[* finf] b=[* finf]] (gth when.a when.b)))
-      %+  skim  ~(tap by files.db)
+      %+  skim  ~(tap by files)
       |=  [* finf]
       ^-  ?
       ?&  ?|  =('' what)
@@ -326,7 +327,7 @@
       =/  =file-id
         (truncate-info-hash:torn info-hash.magnet)
       =/  ninja=@p
-        ?~  fil=(~(get by files.db) file-id)
+        ?~  fil=(~(get by files) file-id)
           src.bowl
         from.u.fil
       ?.  =(src.bowl ninja)
@@ -335,8 +336,8 @@
         "this file was already submitted by {(scow %p ninja)}"
       =?  name.magnet.command  !=('' name)
         `name
-      =.  db
-        %+  ~(put fin db)  file-id
+      =.  files
+        %+  ~(put by files)  file-id
         :_  [src.bowl now.bowl tags desc]
         =-  magnet.command(trackers -)
         ::  remove local/personalized tracker urls
@@ -363,7 +364,7 @@
       |=  =selector
       ^-  (unit finf)
       =;  fid=file-id
-        (~(get by files.db) fid)
+        (~(get by files) fid)
       ?-  -.selector
         %list  (snag num.selector items.navstate)
         %hash  fid.selector
@@ -401,68 +402,6 @@
   |=  [=magnet:torn =ship]
   ^+  magnet
   magnet(trackers [(tracker-url ship) trackers.magnet])
-::  +fin: file-index engine
-::
-++  fin
-  |_  [=files =index]
-  ::  +del: delete a file at file-id
-  ::
-  ++  del
-    |=  i=file-id
-    ^+  [files index]
-    :-  (~(del by files) i)
-    %_  index
-      when  +:(del:whem when.index when:(~(gut by files) i *finf))
-      whom  (~(run by whom.index) |*(s=(set) (~(del in s) i)))
-      tags  (~(run by tags.index) |*(s=(set) (~(del in s) i)))
-    ==
-  ::  +put: add a file
-  ::
-  ++  put
-    |=  [i=file-id f=finf]
-    ^+  [files index]
-    :-  (~(put by files) i f)
-    %_  index
-      when  (put:whem when.index when.f i)
-      whom  (~(put ju whom.index) from.f i)
-      tags  (~(gas ju tags.index) (turn ~(tap in tags.f) (late i)))
-    ==
-  ::  tig: add a tag to a file at file-id
-  ::
-  ++  tig
-    |=  [i=file-id t=tag]
-    ^+  [files index]
-    :-  %+  ~(jab by files)  i
-        |=  f=finf
-        =-  f(tags -)
-        :: ?@  t
-          (~(put in tags.f) t)
-        :: (~(uni in tags.f) t)
-    =-  index(tags -)
-    :: ?@  t
-      (~(put ju tags.index) t i)
-    :: %+  roll  ~(tap by tags.index)
-    :: |=  [t=tag =_tags.index]
-    :: (~(put in tags) t)
-  ::  +tug: remove a tag from a file at file-id
-  ::
-  ++  tug
-    |=  [i=file-id t=tag]
-    ^+  [files index]
-    :-  %+  ~(jab by files)  i
-        |=  f=finf
-        =-  f(tags -)
-        :: ?@  t
-          (~(put in tags.f) t)
-        :: (~(dif in tags.f) t)
-    =-  index(tags -)
-    :: ?@  t
-      (~(del ju tags.index) t i)
-    :: %+  roll  ~(tap by tags.index)
-    :: |=  [t=tag =_tags.index]
-    :: (~(del in tags) t)
-  --
-::
 ::  +render: rendering engine
 ::
 ++  render
@@ -588,7 +527,7 @@
   ++  file-details
     |=  =file-id
     ^-  shoe-effect:shoe
-    =+  (~(got by files.db) file-id)
+    =+  (~(got by files) file-id)
     =*  magnet  -<
     :+  %sole  %mor
     =-  (turn - (lead %klr))
@@ -642,7 +581,7 @@
           (swag [(mul page.query 10) 10] items)
         |=  i=file-id
         ^-  (list dime)
-        =+  (~(got by files.db) i)
+        =+  (~(got by files) i)
         :~  t+(need name)
             p+from
             ud+(seeder-count:serval i)

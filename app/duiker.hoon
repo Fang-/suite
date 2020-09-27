@@ -214,6 +214,7 @@
   ::
     %+  stag  %submit
     %:  pfox
+      ::TODO  enforce name is provided: either in magnet, or in command
       ;~(pfix lus parse-magnet:torn)
       ace
       ['' '' ~]
@@ -260,7 +261,8 @@
       =.   navstate   (navigate navstate)
       =^  caz  state  (undertake navstate)
       :_  state(ui (~(put by ui) src.bowl navstate))
-      (turn (weld caz (render-result navstate)) out)
+      %+  weld  caz
+      (turn (render-result navstate) out)
   ::
   ++  out
     |=  fec=shoe-effect:shoe
@@ -317,8 +319,7 @@
   ::
   ++  undertake
     |=  =navstate
-    ^-  (quip shoe-effect:shoe _state)
-    |^
+    |^  ^-  (quip card _state)
     ?+  -.command  [~ state]
         %submit
       =,  command
@@ -329,7 +330,7 @@
           src.bowl
         from.u.fil
       ?.  =(src.bowl ninja)
-        =-  [[-]~ state]
+        =-  [[(out -)]~ state]
         %-  failure:msg:render
         "this file was already submitted by {(scow %p ninja)}"
       =?  name.magnet.command  !=('' name)
@@ -345,12 +346,17 @@
         %+  skip  trackers.magnet
         |=(t=@t =(base-url (end 3 bum t)))
       :_  state
-      [(success:msg:render "file \"{(trip (need name.magnet))}\" added")]~
+      :~  (set-filename:serval file-id (need name.magnet.command))
+        ::
+          %-  out
+          %-  success:msg:render
+          "file \"{(trip (need name.magnet))}\" added"
+      ==
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
-      %rename    [[(failure:msg:render "unimplemented")]~ state]
-      %describe  [[(failure:msg:render "unimplemented")]~ state]
-      %retag     [[(failure:msg:render "unimplemented")]~ state]
+      %rename    [[(out (failure:msg:render "unimplemented"))]~ state]
+      %describe  [[(out (failure:msg:render "unimplemented"))]~ state]
+      %retag     [[(out (failure:msg:render "unimplemented"))]~ state]
     ==
     ::
     ++  get-file

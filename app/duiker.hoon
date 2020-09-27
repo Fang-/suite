@@ -215,9 +215,12 @@
       ==
     ==
   ::
-    (stag %rename ;~((glue ace) select qut:ab))
-    (stag %describe ;~((glue ace) select qut:ab))
-    (stag %retag ;~((glue ace) select parse-tags))
+    %+  qfix  mic
+    ;~  pose
+      ;~((glue ace) (perk %rename ~) select qut:ab)
+      ;~((glue ace) (perk %describe ~) select qut:ab)
+      ;~((glue ace) (perk %retag ~) select parse-tags)
+    ==
   ==
 ::
 ::TODO  alternatively: [separator=rule rules=(list rule) defaults=(list)]
@@ -343,9 +346,41 @@
       ==
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
-      %rename    [[(out (failure:msg:render "unimplemented"))]~ state]
-      %describe  [[(out (failure:msg:render "unimplemented"))]~ state]
-      %retag     [[(out (failure:msg:render "unimplemented"))]~ state]
+        ?(%rename %describe %retag)
+      =/  =file-id
+        ?-  -.id.command
+          %list  (snag num.id.command items.navstate)
+          %hash  fid.id.command
+        ==
+      ?~  fil=(~(get by files) file-id)
+        [[(out (not-found:msg:render id.command))]~ state]
+      ?.  ?|  (team:title from.u.fil src.bowl)
+              (team:title [our src]:bowl)
+          ==
+        [[(out (failure:msg:render "not your file!"))]~ state]
+      =.  files
+        %+  ~(put by files)  file-id
+        ?-  -.command
+          %rename    u.fil(name `name.command)
+          %describe  u.fil(desc desc.command)
+          %retag     u.fil(tags tags.command)
+        ==
+      :_  state
+      :_  ?.  ?=(%rename -.command)  ~
+          [(set-filename:serval file-id name.command)]~
+      %-  out  ::TODO  rename +display
+      %+  change:msg:render
+        ?-  -.command
+          %rename    "renamed"
+          %describe  "redescribed"
+          %retag     "retagged"
+        ==
+      =,  u.fil
+      ?-  -.command
+        %rename    [(trip (need name)) (trip name.command)]
+        %describe  [(scag 25 (trip desc)) (scag 25 (trip desc.command))]
+        %retag     [(tags:render tags) (tags:render tags.command)]
+      ==
     ==
     ::
     ++  get-file
@@ -485,7 +520,12 @@
         :~('        if name is the empty string, or not supplied at all, the')
         :~('        display name from the magnet link is used. if it has none,')
         :~('        providing a name manually is mandatory.')
-        :~('editing and deletion are coming soon!')
+        :~(';rename 0 \'new name\'')
+        :~('        rename the 0th file in the list')
+        :~(';describe 0 \'some description\'')
+        :~('        change the description of the 0th file')
+        :~(';retag 0 some, example:tags')
+        :~('        change the tags on the 0th file')
         ~
     ==
   ::
@@ -495,7 +535,7 @@
       |=  =selector
       ?-  -.selector
         %list  (failure "file was deleted")
-        %hash  (failure "no such file {((x-co:co 0) fid.selector)}")
+        %hash  (failure "no such file {((x-co:co 40) fid.selector)}")
       ==
     ::
     ++  change
@@ -522,11 +562,11 @@
     ^-  (list styx)
     :~  ~
         :~([`%un ~ ~]^[(need name)]~)
-        :*('tags: ' (join ', ' (turn ~(tap in tags) tag:render)))
         :~  'submitted by '  (scot %p from)
             ' on '  (scot %da (sub now.bowl (mod now.bowl ~d1)))
         ==
-        :~(desc)
+        :*('tags: ' ?~(tags ['(untagged)']~ (tags:render tags)))
+        :~(?:(=('' desc) '(no description provided)' desc))
         ~
         :~((render-magnet:torn (prep-magnet magnet src.bowl)))
         ~
@@ -581,6 +621,10 @@
     |=  =^tag
     ^-  @t
     (roll (join ':' (flop tag)) (cury cat 3))
+  ::
+  ++  tags
+    |=  tags=(set ^tag)
+    (join ', ' (turn ~(tap in tags) tag:render))
   ::
   ++  command-result
     |=  [=command =navstate]

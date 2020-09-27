@@ -73,4 +73,8 @@
 ++  may                                                 ::  rule or constant
   |*  [=rule else=*]
   ;~(pose rule (easy else))
+::
+++  qfix                                                ::  singular prefix
+  |*  [p=rule r=rule]
+  ;~(pfix p r)
 --

@@ -256,9 +256,9 @@
       =^  caz  state  (undertake navstate)
       :_  state(ui (~(put by ui) src.bowl navstate))
       %+  weld  caz
-      (turn (render-result navstate) out)
+      (turn (render-result navstate) display)
   ::
-  ++  out
+  ++  display
     |=  fec=shoe-effect:shoe
     ^-  card
     [%shoe ~[sole-id] fec]
@@ -324,7 +324,7 @@
           src.bowl
         from.u.fil
       ?.  =(src.bowl ninja)
-        =-  [[(out -)]~ state]
+        =-  [[(display -)]~ state]
         %-  failure:msg:render
         "this file was already submitted by {(scow %p ninja)}"
       =?  name.magnet.command  !=('' name)
@@ -342,7 +342,7 @@
       :_  state
       :~  (set-filename:serval file-id (need name.magnet.command))
         ::
-          %-  out
+          %-  display
           %-  success:msg:render
           "file \"{(trip (need name.magnet))}\" added"
       ==
@@ -355,11 +355,11 @@
           %hash  fid.id.command
         ==
       ?~  fil=(~(get by files) file-id)
-        [[(out (not-found:msg:render id.command))]~ state]
+        [[(display (not-found:msg:render id.command))]~ state]
       ?.  ?|  (team:title from.u.fil src.bowl)
               (team:title [our src]:bowl)
           ==
-        [[(out (failure:msg:render "not your file!"))]~ state]
+        [[(display (failure:msg:render "not your file!"))]~ state]
       =.  files
         ?:  ?=(%delete -.command)
           (~(del by files) file-id)
@@ -372,7 +372,7 @@
       :_  state
       :_  ?.  ?=(%rename -.command)  ~
           [(set-filename:serval file-id name.command)]~
-      %-  out  ::TODO  rename +display
+      %-  display
       ?:  ?=(%delete -.command)
         (success:msg:render "\"{(trip (need name.u.fil))}\" was deleted")
       %+  change:msg:render

@@ -206,7 +206,7 @@
     ==
   ;~  pose
     (stag %search ;~(pfix fas ;~(pfix (opt ace) (cook crip (star next)))))
-    (stag %narrow ;~(pfix col (most col parse-tag-term)))
+    (stag %narrow ;~(pfix col (more col parse-tag-term)))
     (stag %author ;~(pfix sig (punt fed:ag)))
   ::
     %+  stag  %submit

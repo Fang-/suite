@@ -500,7 +500,7 @@
             ' tracker url:'
         ==
         :~((cat 3 '   ' (tracker-url src.bowl)))
-        :~('3) start seeding the newly created torrent.')
+        :~('3) start seeding the newly created torrent')
         :~('3) copy the magnet link of the torrent')
         :~('   (usually, right-click -> copy magnet, or similar)')
         :~('4) in duiker, type ;add, then paste the magnet link')

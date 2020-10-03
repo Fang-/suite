@@ -9,7 +9,6 @@
 ::    for simplicity's sake, duiker only supports files in the form of magnet
 ::    links. this may change in the future, but seems sufficient for now.
 ::
-::TODO  poke serval with known file names
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
 ::
@@ -459,11 +458,9 @@
             ', a torrent tracker that associates traffic with urbit identities.'
         ==
         :~  'the magnet links shown are unique to you! '
-            'for best results, do not share them with others.'
-        ==
-        :~  [~ `%r ~]^"this is a beta!"
-            ' files and statistics may disappear. do not start dumping'
-            ' your archives just yet.'
+            'for best results, '
+            [~ `%r ~]^"do not share them with others"
+            '.'
         ==
         :~  'for detailed help, '
             [`%un ~ ~]^"press ?"
@@ -478,15 +475,10 @@
     ^-  (list styx)
     :~  ~
         :~(' ' [`%un ~ ~]^"duiker:")
-        :~('the magnet uri sharing terminal.')
+        :~('the magnet link sharing terminal.')
         :~('a ~paldev initiative. developed, with love, by ~palfun-foslup.')
         :~('part of the arvo enhancement suite:')
         :~('https://github.com/fang-/suite')
-        ~
-        :~(' ' [`%un ~ ~]^"about tags:")
-        :~  'tags might be nested. a file tagged with music:jazz is considered '
-            'to be tagged with both music and music:jazz.'
-        ==
         ~
         :~(' ' [`%un ~ ~]^"about magnet links and trackers:")
         :~  'duiker supports file sharing exclusively through magnet links. '
@@ -496,6 +488,11 @@
             'identities.'
         ==
         ~
+        :~(' ' [`%un ~ ~]^"about tags:")
+        :~  'tags might be nested. a file tagged as music:jazz is considered '
+            'to be tagged with both music and music:jazz.'
+        ==
+        ~
         :~(' ' [`%un ~ ~]^"generating magnet links for submission:")
         :~('1) start the torrent creation process in your torrent client')
         :~  '2) for the tracker, input your '
@@ -503,11 +500,12 @@
             ' tracker url:'
         ==
         :~((cat 3 '   ' (tracker-url src.bowl)))
-        :~('3) copy the magnet link of the newly created torrent')
+        :~('3) start seeding the newly created torrent.')
+        :~('3) copy the magnet link of the torrent')
         :~('   (usually, right-click -> copy magnet, or similar)')
-        :~('4) in duiker, type +, then paste the magnet link')
+        :~('4) in duiker, type ;add, then paste the magnet link')
         :~  '5) optionally specify a custom \'name\' '
-            '\'description\' some,tags:cool'
+            '\'description\' some, tags:etc'
         ==
         :~('6) hit return')
         ~
@@ -534,11 +532,11 @@
         :~(';add magnet:?xt=... \'name\' \'description\' tag:example, etc:etc')
         :~('        submit a file by typing ;add and pasting its magnet link.')
         :~('        name, description, and tags are all optional.')
-        :~('        if name is the empty string, or not supplied at all, the')
-        :~('        display name from the magnet link is used. if it has none,')
-        :~('        providing a name manually is mandatory.')
+        :~('        if no name is supplied, the display name from the magnet')
+        :~('        link is used. if it has none, providing a name manually')
+        :~('        becomes mandatory.')
         :~(';delete 0')
-        :~('        delete the 0th file in the list')
+        :~('        delete the 0th file in the 0-9 numbered list')
         :~(';rename 0 \'new name\'')
         :~('        rename the 0th file')
         :~(';describe 0 \'some description\'')
@@ -584,7 +582,7 @@
     =-  (turn - (lead %klr))
     ^-  (list styx)
     :~  ~
-        :~([`%un ~ ~]^[(need name)]~)
+        :~([`%un ~ ~]^[(fall name '(unnamed file)')]~)  ::TODO  need
         :~  'submitted by '  (scot %p from)
             ' on '  (scot %da (sub now.bowl (mod now.bowl ~d1)))
         ==
@@ -635,7 +633,7 @@
         ?.  (~(has by files) i)
           ~[t+'(deleted file)' t+~ t+~ t+~ t+~]
         =+  (~(got by files) i)
-        :~  t+(need name)
+        :~  t+(fall name 'unnamed')  ::TODO  need
             p+from
             ud+(seeder-count:serval i)
             ud+(leecher-count:serval i)
@@ -673,22 +671,6 @@
     %_  unpack-tag
       tagset  (~(put in tagset) i.tags)
       i.tags  (scag (dec (lent i.tags)) i.tags)
-    ==
-  ::
-  ++  command-result
-    |=  [=command =navstate]
-    ^-  (list shoe-effect:shoe)
-    ?+  -.command
-      (filelist:render navstate)
-    ::
-        %help
-      [%sole txt+"git gud"]~
-    ::
-        %select
-      ::TODO  print selected item
-      ~|  [%selected-outside-list -.navstate]
-      =+  (snag num.command items.navstate)
-      [%sole txt+"imagine a magnet link here"]~
     ==
   --
 ::

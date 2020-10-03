@@ -1,21 +1,21 @@
 ::  serval: simple http/s bittorrent tracker for urbit
 ::
-::    serval is a torrent tracker, n the sense of implementing the bittorrent
+::    serval is a torrent tracker, in the sense of implementing the bittorrent
 ::    tracker protocol.
 ::
 ::    serval expects requests to come in on announce urls that contain a unique
 ::    secret, allowing it to identify the connecting client as belonging to a
 ::    specific @p. it uses this to track up/download stats for @ps.
 ::
-::    q: "bittorrent client when?"
+::    q: "urbit bittorrent client when?"
 ::    a: after these happen:
-::       - there is an on-urbit torrent *file* sharing mechanism
+::       - there is an on-urbit bittorrent *file* sharing mechanism
 ::       - clay supports tombstoning
 ::       - urbit can store more than 2gb of state
 ::       - event logs can be truncated
-::       - there is a raw tcp (or udp, or utp?) vane
+::       - there is a raw tcp (or utp?) vane
 ::       - we can do event (de)prioritization
-::       - i get around to actually doing it
+::       - someone gets around to actually doing it
 ::
 ::TODO  move some data structures/functions into /lib/torn?
 ::
@@ -50,7 +50,7 @@
   $:  peers=(map peer-id peer)
       keys=(map @ peer-id)
       completed=(set ship)  ::NOTE  we could do peer-id, but "less real"
-      name=(unit @t)  ::NOTE  for scrape response ::TODO  make duiker send poke
+      name=(unit @t)  ::NOTE  for scrape response
   ==
 ::
 +$  peer
@@ -338,7 +338,7 @@
   %+  scag  32  ::TODO  do we care about announce url length?
   %-  en-base58:mimes:html
   %+  shas  ship
-  ::TODO  should we always include the base secret?
+  ::TODO  should we always include the base secret in derivation?
   (~(gut by ship-secret) ship base-secret)
 ::
 ++  handle-http-request

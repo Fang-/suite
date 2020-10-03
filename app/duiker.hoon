@@ -212,7 +212,7 @@
     %+  stag  %submit
     %:  pfox
       ::TODO  enforce name is provided: either in magnet, or in command
-      ;~(pfix lus parse-magnet:torn)
+      ;~(pfix (jest ';add ') parse-magnet:torn)
       ace
       ['' '' ~]
       %:  pfox
@@ -531,8 +531,8 @@
         :~('t       view the list of used tags')
         ~
         :~(' ' [`%un ~ ~]^"file management:")
-        :~('+magnet:?xt=... \'name\' \'description\' example:tag,more')
-        :~('        submit a file by typing + and pasting its magnet link.')
+        :~(';add magnet:?xt=... \'name\' \'description\' tag:example, etc:etc')
+        :~('        submit a file by typing ;add and pasting its magnet link.')
         :~('        name, description, and tags are all optional.')
         :~('        if name is the empty string, or not supplied at all, the')
         :~('        display name from the magnet link is used. if it has none,')

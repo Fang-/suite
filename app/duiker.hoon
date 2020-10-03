@@ -63,6 +63,10 @@
       [%author who=(unit ship)]
       [%clear ~]
     ::
+      [%tags ~]
+      ::TODO
+      ::  %stats print stats for ship
+    ::
       [%submit =magnet:torn name=@t desc=@t tags=(set tag)]
       [%delete id=selector ~]
       [%rename id=selector name=@t]
@@ -77,6 +81,8 @@
 ::
 +$  query
   $:  page=@ud  ::NOTE  only for navigation, items always all  TODO move out?
+      ::TODO  support things like "files i downloaded", "files i'm seeding",
+      ::      tag browser maybe
       what=@t
       =tag
       who=(unit ship)
@@ -190,6 +196,7 @@
       (cold [%nav %last] gar)
       (cold [%clear ~] zap)
       (cold [%help ~] wut)
+      (cold [%tags ~] (just 't'))
     ::
       %+  sear
         |=  n=@ud
@@ -410,6 +417,9 @@
         %help
       [help:render]~
     ::
+        %tags
+      [tag-list:render]~
+    ::
         %select
       :_  ~
       %-  file-details:render
@@ -518,6 +528,7 @@
         :~('~ship   search for files submitted by ~ship')
         :~('~       clear ship search')
         :~('!       clear all search parameters')
+        :~('t       view the list of used tags')
         ~
         :~(' ' [`%un ~ ~]^"file management:")
         :~('+magnet:?xt=... \'name\' \'description\' example:tag,more')
@@ -639,6 +650,30 @@
   ++  tags
     |=  tags=(set ^tag)
     (join ', ' (turn ~(tap in tags) tag:render))
+  ::
+  ++  tag-list
+    ^-  shoe-effect:shoe
+    :+  %sole  %mor
+    =;  tagset=(set ^tag)
+      ?:  =(~ tagset)
+        [%txt "no tags"]~
+      %+  turn
+        (sort ~(tap in tagset) aor)
+      |=(t=^tag txt+(trip (tag t)))
+    %+  roll  ~(val by files)
+    |=  [finf tagset=(set ^tag)]
+    =+  tags=~(tap in tags)
+    |-  =*  next-tag  $
+    ?~  tags  tagset
+    |-  =*  unpack-tag  $
+    ?:  ?|  =(~ i.tags)
+            (~(has in tagset) i.tags)
+        ==
+      next-tag(tags t.tags)
+    %_  unpack-tag
+      tagset  (~(put in tagset) i.tags)
+      i.tags  (scag (dec (lent i.tags)) i.tags)
+    ==
   ::
   ++  command-result
     |=  [=command =navstate]

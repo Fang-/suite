@@ -141,9 +141,13 @@
   ::
   ++  on-init
     ^-  (quip card _this)
+    ::  generate root secret for announce urls
+    ::
     =/  sek=@ux  (shas dap.bowl eny.bowl)
     ~&  [dap.bowl %please-backup-base-secret sek]
     :_  this(base-secret sek)
+    ::  set up eyre route and kick peer timeout timer
+    ::
     :~  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
         kick-peer-timer:do
     ==
@@ -344,22 +348,33 @@
 ++  handle-http-request
   |=  [=eyre-id =inbound-request:eyre]
   ^-  (quip card _state)
+  ::  parse request url into path and query args
+  ::
   =/  ,request-line:server
     (parse-request-line:server url.request.inbound-request)
+  ::
   =;  [[status=@ud res=value:benc] =_state]
     :_  state
     %-  give-bencoded-response
     [status eyre-id res]
+  ::  405 to all unexpected requests
+  ::
   ?.  ?&  ?=(%'GET' method.request.inbound-request)
           ?=(^ site)
           =(dap.bowl i.site)
       ==
     [[405 (bencode-response 'invalid request')] state]
+  ::  handle announce and scrape requests on /serval/[ship]/[key]/...
+  ::
   ?+  t.site  [[400 (bencode-response 'unsupported endpoint')] state]
       [@ @ %announce *]
+    ::  get the ship from the announce url path
+    ::
     =/  who=(unit ship)
       (validate-announce-path t.site)
     ?~  who  [[400 (bencode-response 'invalid announce key')] state]
+    ::  parse the announce from the url query args
+    ::
     =/  announce=(unit announce)
       %-  announce-from-args
       [args address.inbound-request]
@@ -377,6 +392,7 @@
       (validate-announce-path t.site)
     ?~  who  [400 (bencode-response 'invalid announce key')]
     :-  200
+    ::TODO  this prevents us from refactoring the bencode call into the =;
     %-  bencode-scrape-response
     %-  process-scrape
     %+  murn  args
@@ -504,13 +520,15 @@
   ::
   =?  peers.file  !?=(%stopped event)
     (~(put by peers.file) peer-id peer)
+  ::  write the changes back into state
   ::
   =.  files
     (~(put by files) file-id file)
   =.  stats
     (~(put bi stats) ship file-id stat)
-  ::
   :_  state
+  ::  give a normal announce response
+  ::
   :-  200
   ^-  response
   =+  (count-in-complete peers.file)

@@ -123,7 +123,7 @@
     [cards this]
   ::
   ++  command-parser  build-parser:do
-  ++  tab-list        tab-list:des  ::NOTE  discoverability covered by help text
+  ++  tab-list        tab-list:des
   ++  on-command
     |=  [sole-id=@ta =command]
     ^-  (quip card _this)
@@ -257,8 +257,8 @@
 ++  command-loop
   |=  [sole-id=@ta =command]
   ^-  (quip card _state)
-  |^  =/  =navstate   (~(gut by ui) src.bowl default-navstate)
-      =.   navstate   (navigate navstate)
+  |^  =/   =navstate  (~(gut by ui) src.bowl default-navstate)
+      =.    navstate  (navigate navstate)
       =^  caz  state  (undertake navstate)
       :_  state(ui (~(put by ui) src.bowl navstate))
       %+  weld  caz
@@ -325,6 +325,8 @@
       =,  command
       =/  =file-id
         (truncate-info-hash:torn info-hash.magnet)
+      ::  if someone else already submitted it, don't overwrite
+      ::
       =/  ninja=@p
         ?~  fil=(~(get by files) file-id)
           src.bowl
@@ -333,6 +335,8 @@
         =-  [[(display -)]~ state]
         %-  failure:msg:render
         "this file was already submitted by {(scow %p ninja)}"
+      ::  add the file to state
+      ::
       =?  name.magnet.command  !=('' name)
         `name
       =.  files
@@ -670,7 +674,7 @@
       next-tag(tags t.tags)
     %_  unpack-tag
       tagset  (~(put in tagset) i.tags)
-      i.tags  (scag (dec (lent i.tags)) i.tags)
+      i.tags  (snip i.tags)
     ==
   --
 ::

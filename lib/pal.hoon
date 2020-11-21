@@ -12,6 +12,20 @@
   :-  [i.a i.b]
   $(a t.a, b t.b)
 ::
+++  snip                                                ::  drop tail off list
+  |*  a=(list)
+  ^+  a
+  ?~  a  ~
+  ?:  =(~ t.a)  ~  ::NOTE  avoiding tmi
+  [i.a $(a t.a)]
+::
+++  rear                                                ::  last item of list
+  |*  a=(list)
+  ^-  _?>(?=(^ a) i.a)
+  ?~  a  !!
+  ?:  =(~ t.a)  i.a  ::NOTE  avoiding tmi
+  $(a t.a)
+::
 ::  functional toys
 ::
 ::TODO  from stdlib

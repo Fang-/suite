@@ -16,7 +16,7 @@
 ::
 /+  chat-store,
     default-agent, verb, dbug,
-    fid=fakeid, corsac, *server
+    fid=fakeid, *server
 ::
 |%
 +$  state-0
@@ -54,7 +54,6 @@
 %-  agent:dbug
 %+  verb  |
 ::
-%-  agent:corsac
 ^-  agent:gall
 =<
   |_  =bowl:gall

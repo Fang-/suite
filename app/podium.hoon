@@ -12,7 +12,7 @@
 ::    whenever the application sends a subscription update, expected to be
 ::    of the %json mark, that is sent to the subscribers as-is.
 ::
-/+  *server, corsac, default-agent, verb, dbug
+/+  *server, default-agent, verb, dbug
 ::
 |%
 +$  state-0
@@ -37,7 +37,6 @@
 %-  agent:dbug
 %+  verb  |
 ::
-%-  agent:corsac
 ^-  agent:gall
 =<
   |_  =bowl:gall

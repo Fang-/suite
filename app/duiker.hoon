@@ -286,7 +286,7 @@
                   ?-  +.command
                     %first  0
                     %left   (dec (max 1 page.query))
-                    %right  (min +(page.query) (lent items))
+                    %right  (min +(page.query) (div (lent items) 10))
                     %last   (div (lent items) 10)
                   ==  ==
         %search   query.navstate(page 0, what what.command)
@@ -359,12 +359,7 @@
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
         ?(%delete %rename %describe %retag)
-      =/  =file-id
-        ?-  -.id.command
-          %list  (snag num.id.command items.navstate)
-          %hash  fid.id.command
-        ==
-      ?~  fil=(~(get by files) file-id)
+      ?~  fil=(get-file id.command)
         [[(display (not-found:msg:render id.command))]~ state]
       ?.  ?|  (team:title from.u.fil src.bowl)
               (team:title [our src]:bowl)
@@ -372,16 +367,16 @@
         [[(display (failure:msg:render "not your file!"))]~ state]
       =.  files
         ?:  ?=(%delete -.command)
-          (~(del by files) file-id)
-        %+  ~(put by files)  file-id
+          (~(del by files) file-id.u.fil)
+        %+  ~(put by files)  file-id.u.fil
         ?-  -.command
-          %rename    u.fil(name `name.command)
-          %describe  u.fil(desc desc.command)
-          %retag     u.fil(tags tags.command)
+          %rename    +.u.fil(name `name.command)
+          %describe  +.u.fil(desc desc.command)
+          %retag     +.u.fil(tags tags.command)
         ==
       :_  state
       :_  ?.  ?=(%rename -.command)  ~
-          [(set-filename:serval file-id name.command)]~
+          [(set-filename:serval file-id.u.fil name.command)]~
       %-  display
       ?:  ?=(%delete -.command)
         (success:msg:render "\"{(trip (need name.u.fil))}\" was deleted")
@@ -401,13 +396,10 @@
     ::
     ++  get-file
       |=  =selector
-      ^-  (unit finf)
-      =;  fid=file-id
-        (~(get by files) fid)
-      ?-  -.selector
-        %list  (snag num.selector items.navstate)
-        %hash  fid.selector
-      ==
+      ^-  (unit [=file-id finf])
+      ?~  fid=(get-file-id navstate selector)   ~
+      ?~  fil=(~(get by files) u.fid)           ~
+      `[u.fid u.fil]
     --
   ::
   ++  render-result
@@ -425,12 +417,24 @@
     ::
         %select
       :_  ~
-      %-  file-details:render
-      (snag num.command items.navstate)
+      ?~  fid=(get-file-id navstate %list num.command)
+        (not-found:msg:render %list num.command)
+      (file-details:render u.fid)
     ::
         ?(%submit %delete %rename %describe %retag)
       ~  ::NOTE  rendered in +undertake...
     ==
+  ::
+  ++  get-file-id
+    |=  [=navstate =selector]
+    ^-  (unit file-id)
+    ?:  ?=(%hash -.selector)  `fid.selector
+    =/  num=@ud
+      %+  add  num.selector
+      (mul page.query.navstate 10)
+    ?:  (gte num (lent items.navstate))
+      ~
+    `(snag num items.navstate)
   --
 ::
 ++  tracker-url
@@ -555,7 +559,7 @@
     ++  not-found
       |=  =selector
       ?-  -.selector
-        %list  deleted
+        %list  (failure "no such file #{(scow %ud num.selector)}")
         %hash  (failure "no such file {((x-co:co 40) fid.selector)}")
       ==
     ::

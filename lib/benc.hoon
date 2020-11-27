@@ -173,13 +173,13 @@
   ::NOTE  cargo-culted from dejs-soft
   ::
   ++  za                                              ::  full unit pole
-    |*  pod/(pole (unit))
+    |*  pod=(pole (unit))
     ?~  pod  &
     ?~  -.pod  |
     (za +.pod)
   ::
   ++  zl                                              ::  collapse unit list
-    |*  lut/(list (unit))
+    |*  lut=(list (unit))
     ?.  |-  ^-  ?
         ?~(lut & ?~(i.lut | $(lut t.lut)))
       ~
@@ -189,15 +189,15 @@
     [i=u:+.i.lut t=$(lut t.lut)]
   ::
   ++  zp                                              ::  unit tuple
-    |*  but/(pole (unit))
+    |*  but=(pole (unit))
     ?~  but  !!
     ?~  +.but
       u:->.but
     [u:->.but (zp +.but)]
   :: ::
   :: ++  zm                                              ::  collapse unit map
-  ::   |*  lum/(map term (unit))
-  ::   ?:  (~(rep by lum) |=({{@ a/(unit)} b/_|} |(b ?=(~ a))))
+  ::   |*  lum=(map term (unit))
+  ::   ?:  (~(rep by lum) |=([[@ a=(unit)] b=_|] |(b ?=(~ a))))
   ::     ~
   ::   (some (~(run by lum) need))
   --

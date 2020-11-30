@@ -22,24 +22,36 @@
 ::
 ::TODO  maybe +$ finf [file info]
 ::
-::TODO  torrent file details. currently unused, so commented out
-:: +$  info
-::   $:  piece-length=@ud
-::       pieces=@t
-::       private=?
-::       =mode
-::   ==
-:: ::
-:: +$  mode
-::   $%  [%single name=@t length=@ud md5sum=(unit @ux)]
-::       [%multi name=@t files=(list file)]
-::   ==
-:: ::
-:: +$  file
-::   $:  length=@ud
-::       md5sum=(unit @ux)
-::       =path
-::   ==
++$  metainfo
+  $:  info
+      =announces
+      creation-date=(unit @da)
+      comment=(unit @t)
+      created-by=(unit @t)
+      encoding=(unit @t)
+  ==
+::
++$  info
+  $:  piece-length=@ud
+      pieces=@
+      private=?
+      =mode
+  ==
+::
++$  announces
+  $@  @t
+  (list (list @t))
+::
++$  mode
+  $%  [%single name=@t length=@ud md5sum=(unit @ux)]
+      [%multi name=@t files=(list file)]
+  ==
+::
++$  file
+  $:  length=@ud
+      md5sum=(unit @ux)
+      =path
+  ==
 ::
 ::TODO  one day, this could be transformed into a general-purpose magnet parser
 ::NOTE  x.pe is technically part of the spec but we choose to ignore it..
@@ -125,41 +137,133 @@
     (rsh 3 (sub m 22) (end 3 (sub m 2) ih.info-hash))
   ==
 ::
-++  reap-info
+++  reap-metainfo
   =,  reparse:benc
   |=  =value:benc
-  :: ^-  (unit info)
-  ~
-  ::TODO  this is shitty. write more reparsers?
-  :: ?.  ?=(%map -.value)  ~
-  :: ?~  piece-length=(bind (~(get by +.value) "piece length") ud)
-  ::   ~
-  :: ?~  pieces=(bind (~(get by +.value) "pieces") so)
-  ::   ~
-  :: ?~  name=(bind (~(get by +.value) "name") so)
-  ::   ~
-  :: =;  mode=(unit mode)
-  ::   ?~  mode  ~
-  ::   %-  some
-  ::   :*  u.piece-length
-  ::       u.pieces
-  ::       (fall (bind (~(get by +.value) "private")) |)
-  ::       u.mode
-  ::   ==
-  :: ?~  files=(~(get by +.value) "files")
-  ::   =/  deet=(unit)
-  ::     %.  value
-  ::     (ot (ly ~['length'^ud 'md5sum'^(mu (cu sa (curr rust hex)))]))
-  ::   ?~  deet  ~
-  ::   ;;  (unit mode)  ::TODO  just want better typechecks ):
-  ::   `[%single u.name u.deet]
-  :: =-  ~!  *mode  ~!  -  -
-  :: %.  u.files
-  :: %-  ar
-  :: %-  ot
-  :: %-  ly
-  :: :~  'length'^ud
-  ::     'md5sum'^(mu (cu sa (curr rust hex)))
-  ::     'path'^(ar so)
-  :: ==
+  ^-  (unit metainfo)
+  ?.  ?=(%map -.value)  ~
+  |^  ?~  info=(nab "info" reap-info)  ~
+      =/  announces=(unit announces)
+        %^  clap
+            (nab "announce" so)
+          (nab "announce-list" (ar (ar so)))
+        |=  [main=@t rest=(list (list @t))]
+        [[main]~ rest]
+      ?~  announces  ~
+      %-  some
+      :*  u.info
+          u.announces
+          (nab "creation date" (cu ud from-unix:chrono:userlib))
+          (nab "comment" so)
+          (nab "created by" so)
+          (nab "encoding" so)
+      ==
+  ::
+  ++  nab
+    |*  [key=tape =fist]
+    (biff (~(get by +.value) key) fist)
+  ::
+  ++  reap-info
+    |=  =value:benc
+    ^-  (unit info)
+    ?.  ?=(%map -.value)  ~
+    =.  ^value  value
+    ?~  piece-length=(nab "piece length" ud)  ~
+    ?~  pieces=(nab "pieces" so)              ~
+    ?~  name=(nab "name" so)                  ~
+    =;  mode=(unit mode)
+      ?~  mode  ~
+      %-  some
+      :*  u.piece-length
+          u.pieces
+          (fall (nab "private" bi) |)
+          u.mode
+      ==
+    ?~  files=(~(get by +.value) "files")
+      ?~  len=(nab "length" ud)  ~
+      =+  md5=(nab "md5sum" (ci sa (curr rust hex)))
+      `[%single u.name u.len md5]
+      :: =/  deet=(unit [@ud @ux])
+      ::   %.  value
+      ::   (ot (ly ~['length'^ud 'md5sum'^(mu (ci sa (curr rust hex)))]))
+      :: ?~  deet  ~
+      :: `[%single u.name u.deet]
+    =-  (bind - (corl (lead %multi) (lead u.name)))
+    ^-  (unit (list file))
+    %.  u.files
+    %-  ar
+    |=  v=value:benc
+    ^-  (unit file)
+    ?.  ?=(%map -.v)              ~
+    =.  ^value  v
+    ?~  len=(nab "length" ud)     ~
+    ?~  pax=(nab "path" (ar so))  ~
+    %-  some
+    :+  u.len
+      (nab "md5sum" (ci sa (curr rust hex)))
+    u.pax
+    :: %-  ot
+    :: %-  ly
+    :: :~  'length'^ud
+    ::     'md5sum'^(mu (ci sa (curr rust hex)))
+    ::     'path'^(ar so)
+    :: ==
+  --
+::
+++  render-metainfo
+  =,  build:benc
+  |=  metainfo
+  %-  render:benc
+  :-  %map
+  %-  ~(gas by *(map tape value:benc))
+  ::TODO  $?(~ pair) instead?
+  =;  (list (unit [tape value:benc]))
+    =-  ~!  -  -
+    (murn - same)
+  :~  ?~  comment     ~  :+  ~  "comment"     (so u.comment)
+      ?~  created-by  ~  :+  ~  "created by"  (so u.created-by)
+      ?~  encoding    ~  :+  ~  "encoding"    (so u.encoding)
+    ::
+      ?@  announces
+        `"announce"^(so `@t`announces)
+      `"announce-list"^((ar (ar so)) announces)
+    ::
+      ?~  creation-date  ~
+      :+  ~  "creation date"
+      (ud (div (sub u.creation-date ~1970.1.1) ~s1))
+    ::
+      :+  ~  "info"
+      :-  %map
+      %-  ~(gas by *(map tape value:benc))
+      ^-  (list [tape value:benc])
+      :*  :-  "name"          (so name.mode)
+          :-  "piece length"  (ud piece-length)
+          :-  "pieces"        (so pieces)
+          :-  "private"       (bi private)
+        ::
+          ^-  (list [tape value:benc])
+          ?-  -.mode
+              %single
+            :*  "length"^(ud length.mode)
+              ::
+                ?~  md5sum.mode  ~
+                ["md5sum"^byt+((x-co:co 32) u.md5sum.mode)]~
+            ==
+          ::
+              %multi
+            :_  ~
+            :-  "files"
+            :-  %mor
+            %+  turn  files.mode
+            |=  file
+            ^-  value:benc
+            :-  %map
+            %-  ~(gas by *(map tape value:benc))
+            :*  "length"^(ud length)
+                "path"^((ar so) path)
+              ::
+                ?~  md5sum  ~
+                ["md5sum"^byt+((x-co:co 32) u.md5sum)]~
+            ==
+  ==  ==  ==
 --

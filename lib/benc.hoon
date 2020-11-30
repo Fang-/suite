@@ -110,7 +110,12 @@
     ?:  =(--1 +.value)  (some &)
     ~
   ::
-  ++  cu                                                ::  transform
+  ++  ci                                                ::  unit transform
+    |*  [=fist =gate]
+    |=  =value
+    (biff (fist value) gate)
+  ::
+  ++  cu                                                ::  value transform
     |*  [=fist =gate]
     |=  =value
     (bind (fist value) gate)
@@ -165,7 +170,7 @@
   ::
   ++  ud                                                ::  positive integer
     |=  =value
-    ^-  (unit @ud)
+    ^-  (unit @)
     ?.  ?=(%int -.value)  ~
     ?.  (syn:si +.value)  ~
     (some (abs:si +.value))

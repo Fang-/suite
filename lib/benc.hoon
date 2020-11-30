@@ -10,6 +10,26 @@
       [%map (map tape value)]
   ==
 ::
+++  build
+  |%
+  ++  ar
+    |*  b=$-(* value)
+    |*  l=(list)
+    [%mor (turn l b)]
+  ::
+  ++  bi
+    |=  f=?
+    [%int ?:(f --1 --0)]
+  ::
+  ++  ud
+    |=  a=@ud
+    [%int (new:si & a)]
+  ::
+  ++  so
+    |=  t=@t
+    [%byt (trip t)]
+  --
+::
 ++  render
   |=  =value
   ^-  tape

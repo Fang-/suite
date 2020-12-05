@@ -32,7 +32,7 @@
 +$  info
   $:  piece-length=@ud
       pieces=@
-      private=?
+      private=(unit ?)
       =mode
   ==
 ::
@@ -174,7 +174,7 @@
       %-  some
       :*  u.piece-length
           u.pieces
-          (fall (nab "private" bi) |)
+          (nab "private" bi)
           u.mode
       ==
     ?~  files=(~(get by +.value) "files")
@@ -226,8 +226,11 @@
       :*  :-  "name"          (so name.mode)
           :-  "piece length"  (ud piece-length)
           :-  "pieces"        (so pieces)
-          :-  "private"       (bi private)
         ::
+          %+  weld
+            ^-  (list [tape value:benc])
+            ?~  private  ~
+            ["private" (bi u.private)]~
           ^-  (list [tape value:benc])
           ?-  -.mode
               %single

@@ -26,12 +26,6 @@
   ?:  =(~ t.a)  i.a  ::NOTE  avoiding tmi
   $(a t.a)
 ::
-::  functional toys
-::
-::TODO  from stdlib
-++  lead  |*(* |*(* [+>+< +<]))                         ::  put head
-++  late  |*(* |*(* [+< +>+<]))                         ::  put tail
-::
 ::  data structures
 ::
 ++  mip                                                 ::  map of maps

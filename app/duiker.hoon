@@ -174,7 +174,7 @@
       ::
       =+  bum=(met 3 base-url)
       %+  skip  trackers.magnet
-      |=(t=@t =(base-url (end 3 bum t)))
+      |=(t=@t =(base-url (end [3 bum] t)))
     ==
   --
 ::
@@ -189,8 +189,8 @@
     ;~  pose
       (cold [%reprint ~] dot)
       (cold [%refresh ~] (just 'r'))
-      (cold [%nav %left] lac)
-      (cold [%nav %right] rac)
+      (cold [%nav %left] sel)
+      (cold [%nav %right] ser)
       (cold [%nav %first] gal)
       (cold [%nav %last] gar)
       (cold [%clear ~] zap)
@@ -348,7 +348,7 @@
         ::
         =+  bum=(met 3 base-url)
         %+  skip  trackers.magnet
-        |=(t=@t =(base-url (end 3 bum t)))
+        |=(t=@t =(base-url (end [3 bum] t)))
       :_  state
       :~  (set-filename:serval file-id (need name.magnet.command))
         ::

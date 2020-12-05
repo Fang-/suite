@@ -134,7 +134,7 @@
     ::NOTE  skip past first two bytes, those are part of multi-hash format.
     ::
     =+  m=(met 3 ih.info-hash)
-    (rsh 3 (sub m 22) (end 3 (sub m 2) ih.info-hash))
+    (rsh [3 (sub m 22)] (end [3 (sub m 2)] ih.info-hash))
   ==
 ::
 ++  reap-metainfo

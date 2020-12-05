@@ -31,8 +31,8 @@
     server, default-agent, verb, dbug
 ::
 |%
-+$  state-1
-  $:  %1
++$  state-0
+  $:  %0
       files=(map file-id file)
       stats=(mip ship file-id stat)
       ::  secrets for generating unique announce urls
@@ -127,7 +127,7 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-1
+=|  state-0
 =*  state  -
 ::
 %-  agent:dbug
@@ -154,43 +154,10 @@
   ++  on-save  !>(state)
   ++  on-load
     |=  =vase
-    |^  ^-  (quip card _this)
-        =/  loaded  !<(state-v vase)
-        ~&  [dap.bowl %load -.loaded -.state]
-        =?  loaded  ?=(%0 -.loaded)
-          (state-0-to-1 loaded)
-        ?>  ?=(%1 -.loaded)
-        [~ this(state loaded)]
-    ::
-    +$  state-v
-      $%  state-0
-          state-1
-      ==
-    ::
-    +$  state-0
-      $:  %0
-          files=(map file-id file)
-          stats=(mip ship file-id stat-0)
-          base-secret=@
-          ship-secret=(map ship @)
-      ==
-    ::
-    +$  stat-0
-      $:  uploaded=@ud
-          downloaded=@ud
-          completed=_|
-      ==
-    ::
-    ++  state-0-to-1
-      |=  state-0
-      ^-  state-1
-      =-  [%1 files - base-secret ship-secret]
-      %-  ~(run by stats)
-      |=  f=(map file-id stat-0)
-      %-  ~(run by f)
-      |=  stat-0
-      [uploaded downloaded completed ~s0]
-    --
+    ^-  (quip card _this)
+    =/  loaded  !<(state-0 vase)
+    ~&  [dap.bowl %load -.loaded -.state]
+    [~ this(state loaded)]
   ::
   ++  on-poke
     |=  [=mark =vase]

@@ -20,8 +20,6 @@
       trackers=(list @t)
   ==
 ::
-::TODO  maybe +$ finf [file info]
-::
 +$  metainfo
   $:  info
       =announces
@@ -183,11 +181,6 @@
       ?~  len=(nab "length" ud)  ~
       =+  md5=(nab "md5sum" (ci sa (curr rust hex)))
       `[%single u.name u.len md5]
-      :: =/  deet=(unit [@ud @ux])
-      ::   %.  value
-      ::   (ot (ly ~['length'^ud 'md5sum'^(mu (ci sa (curr rust hex)))]))
-      :: ?~  deet  ~
-      :: `[%single u.name u.deet]
     =-  (bind - (corl (lead %multi) (lead u.name)))
     ^-  (unit (list file))
     %.  u.files
@@ -202,12 +195,6 @@
     :+  u.len
       (nab "md5sum" (ci sa (curr rust hex)))
     u.pax
-    :: %-  ot
-    :: %-  ly
-    :: :~  'length'^ud
-    ::     'md5sum'^(mu (ci sa (curr rust hex)))
-    ::     'path'^(ar so)
-    :: ==
   --
 ::
 ++  render-metainfo

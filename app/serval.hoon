@@ -194,12 +194,12 @@
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
     ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-        [%e %bound *]
+        [%eyre %bound *]
       ~?  !accepted.sign-arvo
         [dap.bowl 'bind rejected!' binding.sign-arvo]
       [~ this]
     ::
-        [%b %wake *]
+        [%behn %wake *]
       ?>  ?=([%stale-peers ~] wire)
       =.  state  clear-stale-peers:do
       [[kick-peer-timer:do]~ this]

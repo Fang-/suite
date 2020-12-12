@@ -126,12 +126,12 @@
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
     ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-        [%e %bound *]
+        [%eyre %bound *]
       ~?  !accepted.sign-arvo
         [dap.bowl 'bind rejected!' binding.sign-arvo]
       [~ this]
     ::
-        [%b %wake *]
+        [%behn %wake *]
       ?.  ?=([%heartbeat ~] wire)  (on-arvo:def wire sign-arvo)
       [send-heartbeat:do this]
     ==

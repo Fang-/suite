@@ -197,16 +197,57 @@
     u.pax
   --
 ::
-++  render-metainfo
+++  hash-info
+  |=  =info
+  ^-  file-id
+  =+  (render:benc (benc-info info))
+  (sha-1:sha (swp 3 (crip -)))
+::
+++  benc-info
+  |=  info
+  ^-  value:benc
   =,  build:benc
+  %-  os
+  ^-  (list [tape value:benc])
+  :*  :-  "name"          (so name.mode)
+      :-  "piece length"  (ud piece-length)
+      :-  "pieces"        (so pieces)
+    ::
+      %+  weld
+        ^-  (list [tape value:benc])
+        ?~  private  ~
+        ["private" (bi u.private)]~
+      ^-  (list [tape value:benc])
+      ?-  -.mode
+          %single
+        :*  "length"^(ud length.mode)
+          ::
+            ?~  md5sum.mode  ~
+            ["md5sum"^byt+((x-co:co 32) u.md5sum.mode)]~
+        ==
+      ::
+          %multi
+        :_  ~
+        :-  "files"
+        :-  %mor
+        %+  turn  files.mode
+        |=  file
+        %-  os
+        :*  "length"^(ud length)
+            "path"^((ar so) path)
+          ::
+            ?~  md5sum  ~
+            ["md5sum"^byt+((x-co:co 32) u.md5sum)]~
+        ==
+  ==  ==
+::
+++  benc-metainfo
   |=  metainfo
-  %-  render:benc
-  :-  %map
-  %-  ~(gas by *(map tape value:benc))
-  ::TODO  $?(~ pair) instead?
+  ^-  value:benc
+  =*  info  +<-
+  =,  build:benc
   =;  (list (unit [tape value:benc]))
-    =-  ~!  -  -
-    (murn - same)
+    (os (murn - same))
   :~  ?~  comment     ~  :+  ~  "comment"     (so u.comment)
       ?~  created-by  ~  :+  ~  "created by"  (so u.created-by)
       ?~  encoding    ~  :+  ~  "encoding"    (so u.encoding)
@@ -220,40 +261,6 @@
       (ud (div (sub u.creation-date ~1970.1.1) ~s1))
     ::
       :+  ~  "info"
-      :-  %map
-      %-  ~(gas by *(map tape value:benc))
-      ^-  (list [tape value:benc])
-      :*  :-  "name"          (so name.mode)
-          :-  "piece length"  (ud piece-length)
-          :-  "pieces"        (so pieces)
-        ::
-          %+  weld
-            ^-  (list [tape value:benc])
-            ?~  private  ~
-            ["private" (bi u.private)]~
-          ^-  (list [tape value:benc])
-          ?-  -.mode
-              %single
-            :*  "length"^(ud length.mode)
-              ::
-                ?~  md5sum.mode  ~
-                ["md5sum"^byt+((x-co:co 32) u.md5sum.mode)]~
-            ==
-          ::
-              %multi
-            :_  ~
-            :-  "files"
-            :-  %mor
-            %+  turn  files.mode
-            |=  file
-            ^-  value:benc
-            :-  %map
-            %-  ~(gas by *(map tape value:benc))
-            :*  "length"^(ud length)
-                "path"^((ar so) path)
-              ::
-                ?~  md5sum  ~
-                ["md5sum"^byt+((x-co:co 32) u.md5sum)]~
-            ==
-  ==  ==  ==
+      (benc-info info)
+  ==
 --

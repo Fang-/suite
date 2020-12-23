@@ -585,8 +585,7 @@
 ++  bencode-response
   |=  =response
   ^-  value:benc
-  :-  %map
-  %-  ~(gas by *(map tape value:benc))
+  %-  os:build:benc
   ?@  response
     ~&  [%bencoding-failure response]
     ^-  (list (pair tape value:benc))
@@ -621,8 +620,7 @@
   :-  %mor
   %+  turn  peers
   |=  [=peer-id ip=address:eyre port=@ud]
-  :-  %map
-  %-  ~(gas by *(map tape value:benc))
+  %-  os:build:benc
   :*  "ip"^[%byt (render-ip ip)]
       "port"^[%int (new:si & port)]
     ::
@@ -655,13 +653,11 @@
   ~&  [%bencoding-scrape res]
   =;  files=value:benc
     [%map ["files"^files ~ ~]]
-  :-  %map
-  %-  ~(gas by *(map tape value:benc))
+  %-  os:build:benc
   %+  turn  ~(tap by res)
   |=  [hash=file-id scrape-stat]
   :-  (flop (rip 3 hash)) :: (trip hash)  ::NOTE  care, maybe ordering...
-  :-  %map
-  %-  ~(gas by *(map tape value:benc))
+  %-  os:build:benc
   :*  "complete"^[%int (new:si & complete)]
       "incomplete"^[%int (new:si & incomplete)]
       "downloaded"^[%int (new:si & downloaded)]

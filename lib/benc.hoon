@@ -21,6 +21,10 @@
     |=  f=?
     [%int ?:(f --1 --0)]
   ::
+  ++  os
+    |=  o=(list [tape value])
+    [%map (~(gas by *(map tape value)) o)]
+  ::
   ++  ud
     |=  a=@ud
     [%int (new:si & a)]
@@ -69,9 +73,8 @@
     %+  ifix  [l e]
     (star parse)
   ::
-    %+  stag  %map
     %+  ifix  [d e]
-    %+  cook  ~(gas by *(map tape value))
+    %+  cook  os:build
     (star ;~(plug bytz parse))
   ==
   ::

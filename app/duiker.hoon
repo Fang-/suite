@@ -11,14 +11,15 @@
 ::
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
-::
-/+  srvl=serval, torn, *pal,
-    shoe, default-agent, verb, dbug
+::TODO  download torrent files using %sav !!!
+::.
+/+  srvl=serval, torn, benc, multipart, *pal,
+    shoe, server, default-agent, verb, dbug
 ::
 |%
-+$  state-1
-  $:  %1
-      files=(map file-id finf)
++$  state-0
+  $:  %0
+      files=(map file-id file)
       ui=(map ship navstate)  ::TODO  per sole-id instead?
   ==
 ::
@@ -26,13 +27,19 @@
 +$  file-id    file-id:torn
 +$  tag        path  ::NOTE  /music/dance -> music:dance
 ::
-+$  finf
-  $:  magnet:torn
++$  file
+  $:  finf
       meta
   ==
 ::
++$  finf
+  $%  [%magnet =magnet:torn]
+      [%torrent =metainfo:torn]  ::TODO  faceless?
+  ==
+::
 +$  meta
-  $:  from=ship
+  $:  name=@t
+      from=ship
       when=@da
       tags=(set tag)
       desc=@t
@@ -46,9 +53,9 @@
   [=query items=(list file-id)]
 ::
 ::NOTE  regarding code flows, we have commands that:
-::  - render something
-::  - update navstate and render list
-::  - update state and render result
+::      - render something
+::      - update navstate and render list
+::      - update state and render result
 ::
 +$  command
   $%  [%reprint ~]
@@ -66,7 +73,7 @@
       ::TODO
       ::  %stats print stats for ship
     ::
-      [%submit =magnet:torn name=@t desc=@t tags=(set tag)]
+      [%submit =finf name=@t desc=@t tags=(set tag)]
       [%delete id=selector ~]
       [%rename id=selector name=@t]
       [%describe id=selector desc=@t]
@@ -87,10 +94,11 @@
       who=(unit ship)
   ==
 ::
-+$  card  card:agent:shoe
++$  card     card:agent:shoe
++$  eyre-id  @ta
 --
 ::
-=|  state-1
+=|  state-0
 =*  state  -
 ::
 %+  verb  |
@@ -104,14 +112,24 @@
       des   ~(. (default:shoe this command) bowl)
       do    ~(. +> bowl)
   ::
-  ++  on-init   [~ this]
+  ++  on-init
+    ^-  (quip card _this)
+    :_  this
+    [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
+  ::
   ++  on-save   !>(state)
   ++  on-load
     |=  =vase
     ^-  (quip card _this)
-    =/  loaded  !<(state-1 vase)
-    ~&  [dap.bowl %load %1]
+    =/  loaded  !<(state-0 vase)
+    ~&  [dap.bowl %load -.loaded]
     [~ this(state loaded)]
+  ::
+  ++  on-watch
+    |=  =path
+    ?:  ?=([%http-response @ ~] path)
+      [~ this]
+    (on-watch:def path)
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -119,8 +137,24 @@
     =^  cards  state
       ?+  mark  ~&(state (on-poke:def mark vase))
         ?(%noun %duiker-action)  (on-action:do !<(action vase))
+      ::
+          %handle-http-request
+        =^  cards  state
+          %-  handle-http-request:do
+          !<([=eyre-id =inbound-request:eyre] vase)
+        [cards state]
       ==
     [cards this]
+  ::
+  ++  on-arvo
+    |=  [=wire =sign-arvo]
+    ^-  (quip card _this)
+    ?+  sign-arvo  (on-arvo:def wire sign-arvo)
+        [%eyre %bound *]
+      ~?  !accepted.sign-arvo
+        [dap.bowl 'bind rejected!' binding.sign-arvo]
+      [~ this]
+    ==
   ::
   ++  command-parser  build-parser:do
   ++  tab-list        tab-list:des
@@ -140,11 +174,9 @@
   ::
   ++  on-disconnect  on-disconnect:des
   ::
-  ++  on-watch  on-watch:def
   ++  on-leave  on-leave:def
   ++  on-peek   on-peek:def
   ++  on-agent  on-agent:def
-  ++  on-arvo   on-arvo:def
   ++  on-fail   on-fail:def
   --
 ::
@@ -153,29 +185,94 @@
 ::
 ++  base-url  'https://urb.pal.dev/serval'
 ::
-++  on-action
-  |=  =action
+++  handle-http-request
+  |=  [=eyre-id =inbound-request:eyre]
   ^-  (quip card _state)
-  |^  ?-  -.action
+  ::  parse request url into path and query args
+  ::
+  =/  ,request-line:server
+    (parse-request-line:server url.request.inbound-request)
+  ::
+  =;  [[status=@ud out=(unit @t)] =_state]
+    :_  state
+    %+  give-simple-payload:app:server
+      eyre-id
+    :-  [status ~]
+    ?~  out  ~
+    `[(met 3 u.out) u.out]
+  ::  405 to all unexpected requests
+  ::
+  ?.  &(?=(^ site) =(dap.bowl i.site))
+    [[500 `'unexpected route'] state]
+  ?~  who=(validate-secret-path:serval t.site)
+    [[404 ~] state]
+  =/  =path  (slag 3 `path`site)
+  ~&  [%hit path]
+  ::  handle announce and scrape requests on /serval/[ship]/[key]/...
+  ::
+  ?+  path  [[404 `'four oh four'] state]
+      [%upload ~]
+    ?+  method.request.inbound-request  [[405 ~] state]
+        %'GET'
+      :_  state
+      [200 `(crip (en-xml:html (upload-page u.who)))]
+    ::
+        %'POST'
+      ::  try to get metainfo from the request
+      ::
+      =,  multipart
+      =/  submitted=(unit (list [@t part]))
+        (de-request [header-list body]:request.inbound-request)
+      ?~  submitted
+        [[400 `'not multipart?'] state]
+      =/  args
+        (~(gas in *(map @t part)) u.submitted)
+      ?.  (~(has by args) 'file')
+        [[400 `'no file!'] state]
+      =/  body=@t
+        body:(~(got by args) 'file')
+      =/  info=(unit metainfo:torn)
+        %+  biff  (rush body parse:benc)
+        reap-metainfo:torn
+      ?~  info
+        [[400 `'file not metainfo'] state]
+      ?.  =(body (crip (render:benc (benc-metainfo:torn u.info))))
+        ~&  :+  dap.bowl  %lossy-conversion
+            [body=body copy=(render:benc (benc-metainfo:torn u.info))]
+        [[500 `'lossy'] state]
+      ::  get other arguments
+      ::
+      ::TODO
+      =|  name=@t
+      =|  desc=@t
+      =|  tags=(set tag)
+      ::  store file in state
+      ::
+      ::TODO  check if already exists?
+      =.  files
+        (on-submit:on-action [%torrent u.info] name desc tags)
+      [[200 `'i think we got it chief'] state]
+    ==
+  ==
+::
+++  on-action
+  |^  |=  =action
+      ^-  (quip card _state)
+      ?-  -.action
         %command  (command-loop +.action)
       ==
   ::
   ++  on-submit
-    |=  [=magnet:torn name=@t desc=@t tags=(set tag)]
-    ^+  files
+    |=  [=finf name=@t desc=@t tags=(set tag)]
+    ^+  files  ::TODO  also notify
+    ::TODO  check if already exists?
     %+  ~(put by files)
-      (truncate-info-hash:torn info-hash.magnet)
-    :_  [src.bowl now.bowl tags desc]
-    %_  magnet
-      name  `name
-    ::
-        trackers
-      ::  remove local/personalized tracker urls
-      ::
-      =+  bum=(met 3 base-url)
-      %+  skip  trackers.magnet
-      |=(t=@t =(base-url (end [3 bum] t)))
-    ==
+      (finf-id finf)
+    :_  [name src.bowl now.bowl tags desc]
+    %-  privatize-trackers
+    ?:  ?=(%torrent -.finf)  finf
+    ::  the name stored in magnets we can safely update
+    finf(name.magnet `name)
   --
 ::
 ++  default-navstate
@@ -211,7 +308,7 @@
     %+  stag  %submit
     %:  pfox
       ::TODO  enforce name is provided: either in magnet, or in command
-      ;~(pfix (jest ';add ') parse-magnet:torn)
+      ;~(pfix (jest ';add ') (stag %magnet parse-magnet:torn))
       ace
       ['' '' ~]
       %:  pfox
@@ -299,12 +396,12 @@
       =,  query.navstate
       ^-  (list file-id)
       =-  (turn - head)
-      =-  (sort - |=([a=[* finf] b=[* finf]] (gth when.a when.b)))
+      =-  (sort - |=([a=[* file] b=[* file]] (gth when.a when.b)))
       %+  skim  ~(tap by files)
-      |=  [* finf]
+      |=  [* file]
       ^-  ?
       ?&  ?|  =('' what)
-              ?=(^ (find (trip what) (trip (need name))))
+              ?=(^ (find (trip what) (trip name)))
           ==
           =(from (fall who from))
           ?|  =(~ tag)
@@ -324,7 +421,7 @@
         %submit
       =,  command
       =/  =file-id
-        (truncate-info-hash:torn info-hash.magnet)
+        (finf-id finf)
       ::  if someone else already submitted it, don't overwrite
       ::
       =/  ninja=@p
@@ -337,24 +434,19 @@
         "this file was already submitted by {(scow %p ninja)}"
       ::  add the file to state
       ::
-      =?  name.magnet.command  !=('' name)
-        `name
+      =.  finf.command
+        ?.  &(?=(%magnet -.finf.command) !=('' name))  finf.command
+          finf.command(name.magnet `name)
       =.  files
         %+  ~(put by files)  file-id
-        :_  [src.bowl now.bowl tags desc]
-        =-  magnet.command(trackers -)
-        ::  remove local/personalized tracker urls
-        ::TODO  dedupe with +on-action
-        ::
-        =+  bum=(met 3 base-url)
-        %+  skip  trackers.magnet
-        |=(t=@t =(base-url (end [3 bum] t)))
+        :_  [name.command src.bowl now.bowl tags desc]
+        (privatize-trackers finf)
       :_  state
-      :~  (set-filename:serval file-id (need name.magnet.command))
+      :~  (set-filename:serval file-id name)
         ::
           %-  display
           %-  success:msg:render
-          "file \"{(trip (need name.magnet))}\" added"
+          "file \"{(trip name)}\" added"
       ==
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
@@ -369,8 +461,10 @@
         ?:  ?=(%delete -.command)
           (~(del by files) file-id.u.fil)
         %+  ~(put by files)  file-id.u.fil
+        ^-  file
+        ?>  ?=(%magnet +<-.u.fil)  ::TODO
         ?-  -.command
-          %rename    +.u.fil(name `name.command)
+          %rename    +.u.fil(name name.command)
           %describe  +.u.fil(desc desc.command)
           %retag     +.u.fil(tags tags.command)
         ==
@@ -379,7 +473,7 @@
           [(set-filename:serval file-id.u.fil name.command)]~
       %-  display
       ?:  ?=(%delete -.command)
-        (success:msg:render "\"{(trip (need name.u.fil))}\" was deleted")
+        (success:msg:render "\"{(trip name.u.fil)}\" was deleted")
       %+  change:msg:render
         ?-  -.command
           %rename    "renamed"
@@ -388,7 +482,7 @@
         ==
       =,  u.fil
       ?-  -.command
-        %rename    [(trip (need name)) (trip name.command)]
+        %rename    [(trip name) (trip name.command)]
         %describe  [(scag 25 (trip desc)) (scag 25 (trip desc.command))]
         %retag     [(tags:render tags) (tags:render tags.command)]
       ==
@@ -396,7 +490,7 @@
     ::
     ++  get-file
       |=  =selector
-      ^-  (unit [=file-id finf])
+      ^-  (unit [=file-id file])
       ?~  fid=(get-file-id navstate selector)   ~
       ?~  fil=(~(get by files) u.fid)           ~
       `[u.fid u.fil]
@@ -448,6 +542,45 @@
   |=  [=magnet:torn =ship]
   ^+  magnet
   magnet(trackers [(tracker-url ship) trackers.magnet])
+::
+++  finf-id
+  |=  =finf
+  ?-  -.finf
+    %magnet   (truncate-info-hash:torn info-hash.magnet.finf)
+    %torrent  (hash-info:torn -.metainfo.finf)
+  ==
+::
+++  privatize-trackers
+  |=  =finf
+  ^+  finf
+  =>  |%
+      ++  is-secret
+        =+  bum=(met 3 base-url)
+        |=  t=@t
+        =(base-url (end [3 bum] t))
+      --
+  ?-  -.finf
+      %magnet
+    =-  finf(trackers.magnet -)
+    (skip trackers.magnet.finf is-secret)
+  ::
+      %torrent
+    =-  finf(announces.metainfo -)
+    =*  announces  announces.metainfo.finf
+    ?@             announces.metainfo.finf
+      ?:((is-secret `@`announces) '' announces)
+    %+  turn  announces
+    |=  l=(list @t)
+    (skip l is-secret)
+  ==
+::
+++  find-name
+  |=  =finf
+  ^-  (unit @t)
+  ?-  -.finf
+    %magnet   name.magnet.finf
+    %torrent  `name.mode.metainfo.finf
+  ==
 ::  +render: rendering engine
 ::
 ++  render
@@ -585,18 +718,19 @@
     ^-  shoe-effect:shoe
     ?.  (~(has by files) file-id)  deleted:msg
     =+  (~(got by files) file-id)
-    =*  magnet  -<
+    =*  file  -<
     :+  %sole  %mor
     =-  (turn - (lead %klr))
     ^-  (list styx)
     :~  ~
-        :~([`%un ~ ~]^[(fall name '(unnamed file)')]~)  ::TODO  need
+        :~([`%un ~ ~]^[name]~)
         :~  'submitted by '  (scot %p from)
             ' on '  (scot %da (sub now.bowl (mod now.bowl ~d1)))
         ==
         :*('tags: ' ?~(tags ['(untagged)']~ (tags:render tags)))
         :~(?:(=('' desc) '(no description provided)' desc))
         ~
+        ?>  ?=(%magnet -.file)  ::TODO
         :~((render-magnet:torn (prep-magnet magnet src.bowl)))
         ~
     ==
@@ -641,7 +775,7 @@
         ?.  (~(has by files) i)
           ~[t+'(deleted file)' t+~ t+~ t+~ t+~]
         =+  (~(got by files) i)
-        :~  t+(fall name 'unnamed')  ::TODO  need
+        :~  t+name
             p+from
             ud+(seeder-count:serval i)
             ud+(leecher-count:serval i)
@@ -667,7 +801,7 @@
         (sort ~(tap in tagset) aor)
       |=(t=^tag txt+(trip (tag t)))
     %+  roll  ~(val by files)
-    |=  [finf tagset=(set ^tag)]
+    |=  [file tagset=(set ^tag)]
     =+  tags=~(tap in tags)
     |-  =*  next-tag  $
     ?~  tags  tagset
@@ -682,4 +816,27 @@
     ==
   --
 ::
+++  upload-page
+  |=  who=ship
+  =/  style=@t
+    '''
+    * { margin: 1em; padding: 0.5em; }
+    input, textarea { width: 50%; }
+    '''
+  ;html
+    ;head
+      ;title:"~paldev/duiker - upload"
+      ;style:"{(trip style)}"
+    ==
+    ;body
+      ;h2:"duiker - uploading as {(scow %p who)}"
+      ;form(method "post", enctype "multipart/form-data")
+              ;input(type "text", name "title", placeholder "title");
+        ;br;  ;textarea(name "description", placeholder "description");
+        ;br;  ;input(type "text", name "tags", placeholder "tags");
+        ;br;  ;input(type "file", name "file"); ::, accept ".torrent");
+        ;br;  ;button(type "submit"):"Submit"
+      ==
+    ==
+  ==
 --

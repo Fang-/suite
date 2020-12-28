@@ -204,10 +204,13 @@
   ::
   ?.  &(?=(^ site) =(dap.bowl i.site))
     [[500 `'unexpected route'] state]
+  ::  set src.bowl through secret-path-based authentication
+  ::
   ?~  who=(validate-secret-path:serval t.site)
     [[404 ~] state]
+  =.  src.bowl  u.who
+  ::
   =/  =path  (slag 3 `path`site)
-  ~&  [%hit path]
   ::  handle announce and scrape requests on /serval/[ship]/[key]/...
   ::
   ?+  path  [[404 `'four oh four'] state]
@@ -240,6 +243,10 @@
         ~&  :+  dap.bowl  %lossy-conversion
             [body=body copy=(render:benc (benc-metainfo:torn u.info))]
         [[500 `'lossy'] state]
+      ::  make sure we can actually submit this
+      ::
+      ?^  why=(may-submit (finf-id %torrent u.info))
+        [[403 `(crip u.why)] state]
       ::  get other arguments
       ::
       =/  parg  (curr ~(gut by args) *part:multipart)
@@ -251,7 +258,6 @@
         (fall (rush body:(parg 'tags') parse-tags) ~)
       ::  store file in state
       ::
-      ::TODO  check if already exists?
       =.  files
         (on-submit:on-action [%torrent u.info] name desc tags)
       [[200 `'i think we got it chief'] state]
@@ -267,8 +273,7 @@
   ::
   ++  on-submit
     |=  [=finf name=@t desc=@t tags=(set tag)]
-    ^+  files  ::TODO  also notify
-    ::TODO  check if already exists?
+    ^+  files  ::TODO  also notify?
     %+  ~(put by files)
       (finf-id finf)
     :_  [name src.bowl now.bowl tags desc]
@@ -425,25 +430,15 @@
       =,  command
       =/  =file-id
         (finf-id finf)
-      ::  if someone else already submitted it, don't overwrite
+      ::  if we can't submit his, say why
       ::
-      =/  ninja=@p
-        ?~  fil=(~(get by files) file-id)
-          src.bowl
-        from.u.fil
-      ?.  =(src.bowl ninja)
+      ?^  why=(may-submit file-id)
         =-  [[(display -)]~ state]
-        %-  failure:msg:render
-        "this file was already submitted by {(scow %p ninja)}"
+        (failure:msg:render u.why)
       ::  add the file to state
       ::
-      =.  finf.command
-        ?.  &(?=(%magnet -.finf.command) !=('' name))  finf.command
-          finf.command(name.magnet `name)
       =.  files
-        %+  ~(put by files)  file-id
-        :_  [name.command src.bowl now.bowl tags desc]
-        (privatize-trackers finf)
+        (on-submit:on-action finf name.command desc tags)
       :_  state
       :~  (set-filename:serval file-id name)
         ::
@@ -584,6 +579,16 @@
     %magnet   name.magnet.finf
     %torrent  `name.mode.metainfo.finf
   ==
+::
+++  may-submit
+  |=  =file-id
+  ^-  (unit tape)
+  =/  ninja=@p
+    ?~  fil=(~(get by files) file-id)
+      src.bowl
+    from.u.fil
+  ?:  =(src.bowl ninja)  ~
+  `"this file was already submitted by {(scow %p ninja)}"
 ::  +render: rendering engine
 ::
 ++  render

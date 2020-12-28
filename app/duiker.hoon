@@ -242,10 +242,13 @@
         [[500 `'lossy'] state]
       ::  get other arguments
       ::
-      ::TODO
-      =|  name=@t
-      =|  desc=@t
-      =|  tags=(set tag)
+      =/  parg  (curr ~(gut by args) *part:multipart)
+      =/  name=@t
+        =/  nom=@t  body:(parg 'name')
+        ?:(=('' nom) name.mode.u.info nom)
+      =/  desc=@t   body:(parg 'desc')
+      =/  tags=(set tag)
+        (fall (rush body:(parg 'tags') parse-tags) ~)
       ::  store file in state
       ::
       ::TODO  check if already exists?
@@ -831,10 +834,10 @@
     ;body
       ;h2:"duiker - uploading as {(scow %p who)}"
       ;form(method "post", enctype "multipart/form-data")
-              ;input(type "text", name "title", placeholder "title");
-        ;br;  ;textarea(name "description", placeholder "description");
+              ;input(type "text", name "name", placeholder "name");
+        ;br;  ;textarea(name "desc", placeholder "description");
         ;br;  ;input(type "text", name "tags", placeholder "tags");
-        ;br;  ;input(type "file", name "file"); ::, accept ".torrent");
+        ;br;  ;input(type "file", name "file", accept ".torrent");
         ;br;  ;button(type "submit"):"Submit"
       ==
     ==

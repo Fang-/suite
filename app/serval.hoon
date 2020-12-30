@@ -223,6 +223,11 @@
         %completed  ~(wyt in completed)
       ==
     ::
+        [%secret @ ~]
+      ?.  =(src.bowl our.bowl)  ~
+      ?~  who=(slaw %p i.t.t.path)  [~ ~]
+      ``atom+!>((announce-secret:do u.who))
+    ::
         [%announce @ ~]
       ?.  =(src.bowl our.bowl)  ~
       ?~  who=(slaw %p i.t.t.path)  [~ ~]

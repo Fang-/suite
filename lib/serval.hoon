@@ -1,6 +1,6 @@
 ::  serval: interacting with the simple http/s bittorrent tracker
 ::
-/+  torn
+/+  torn, server
 ::
 |_  =bowl:gall
 ::  reads
@@ -8,6 +8,10 @@
 ++  scry
   |*  [=mold =path]
   .^(mold %gx (scot %p our.bowl) %serval (scot %da now.bowl) path)
+::
+++  secret
+  |=  =ship
+  (scry @t /secret/(scot %p ship)/atom)
 ::
 ++  announce-path
   |=  =ship
@@ -54,4 +58,14 @@
   |=  [=ship secret=@]
   %+  action  /secret/(scot %p ship)
   !>([%ship-secret ship secret])
+::
+::  helpers
+::
+++  validate-secret-path
+  |=  =path
+  ^-  (unit ship)
+  ?.  ?=([@ @ *] path)            ~
+  ?~  who=(slaw %p i.path)        ~
+  ?.  =(i.t.path (secret u.who))  ~
+  who
 --

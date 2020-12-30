@@ -34,7 +34,7 @@
 ::
 +$  finf
   $%  [%magnet =magnet:torn]
-      [%torrent =metainfo:torn]  ::TODO  faceless?
+      [%torrent =metainfo:torn]
   ==
 ::
 +$  meta
@@ -449,36 +449,40 @@
       ::TODO  also notify all connected clients? "~x submitted y"
     ::
         ?(%delete %rename %describe %retag)
-      ?~  fil=(get-file id.command)
-        [[(display (not-found:msg:render id.command))]~ state]
-      ?.  ?|  (team:title from.u.fil src.bowl)
+      =/  fil=(unit [=file-id =finf =meta])  (get-file id.command)
+      ?~  fil  [[(display (not-found:msg:render id.command))]~ state]
+      =+  u.fil  ::NOTE  we want to do typechecking later, =, would trip up
+      ?.  ?|  (team:title from.meta src.bowl)
               (team:title [our src]:bowl)
           ==
         [[(display (failure:msg:render "not your file!"))]~ state]
+      ::
       =.  files
         ?:  ?=(%delete -.command)
-          (~(del by files) file-id.u.fil)
-        %+  ~(put by files)  file-id.u.fil
+          (~(del by files) file-id)
+        %+  ~(put by files)  file-id
         ^-  file
-        ?>  ?=(%magnet +<-.u.fil)  ::TODO
+        :-  ?.  &(?=(%rename -.command) ?=(%magnet -.finf))  finf
+            finf(name.magnet `name.command)
         ?-  -.command
-          %rename    +.u.fil(name name.command)
-          %describe  +.u.fil(desc desc.command)
-          %retag     +.u.fil(tags tags.command)
+          %rename    meta(name name.command)
+          %describe  meta(desc desc.command)
+          %retag     meta(tags tags.command)
         ==
+      ::
       :_  state
       :_  ?.  ?=(%rename -.command)  ~
-          [(set-filename:serval file-id.u.fil name.command)]~
+          [(set-filename:serval file-id name.command)]~
       %-  display
       ?:  ?=(%delete -.command)
-        (success:msg:render "\"{(trip name.u.fil)}\" was deleted")
+        (success:msg:render "\"{(trip name.meta)}\" was deleted")
       %+  change:msg:render
         ?-  -.command
           %rename    "renamed"
           %describe  "redescribed"
           %retag     "retagged"
         ==
-      =,  u.fil
+      =,  meta
       ?-  -.command
         %rename    [(trip name) (trip name.command)]
         %describe  [(scag 25 (trip desc)) (scag 25 (trip desc.command))]
@@ -540,6 +544,16 @@
   |=  [=magnet:torn =ship]
   ^+  magnet
   magnet(trackers [(tracker-url ship) trackers.magnet])
+::
+++  prep-metainfo
+  |=  [=metainfo:torn =ship]
+  ^+  metainfo
+  =-  metainfo(announces -)
+  ^-  announces:torn
+  :-  [`@t`(tracker-url ship)]~
+  ?~  announces.metainfo  ~
+  ?^  announces.metainfo  announces.metainfo
+  [[announces.metainfo]~]~
 ::
 ++  finf-id
   |=  =finf
@@ -728,9 +742,11 @@
     =+  (~(got by files) file-id)
     =*  file  -<
     :+  %sole  %mor
-    =-  (turn - (lead %klr))
-    ^-  (list styx)
-    :~  ~
+    %+  weld
+      ^-  (list sole-effect:shoe)
+      =;  meta=(list styx)
+        (turn meta (lead %klr))
+      :~  ~
         :~([`%un ~ ~]^[name]~)
         :~  'submitted by '  (scot %p from)
             ' on '  (scot %da (sub now.bowl (mod now.bowl ~d1)))
@@ -738,9 +754,20 @@
         :*('tags: ' ?~(tags ['(untagged)']~ (tags:render tags)))
         :~(?:(=('' desc) '(no description provided)' desc))
         ~
-        ?>  ?=(%magnet -.file)  ::TODO
-        :~((render-magnet:torn (prep-magnet magnet src.bowl)))
-        ~
+      ==
+    ^-  (list sole-effect:shoe)
+    ?-  -.file
+        %magnet
+      [%url (render-magnet:torn (prep-magnet magnet src.bowl))]~
+    ::
+        %torrent
+      =.  metainfo  (prep-metainfo metainfo src.bowl)
+      =/  file=@t  (crip (render:benc (benc-metainfo:torn metainfo)))
+      =/  uniq=@t  (crip ((x-co:co 6) (end 5 file-id)))
+      =/  name=@t  :((cury cat 3) name '_' uniq)
+      :~  [%sav /[dap.bowl]/[name]/torrent file]
+          [%txt "downloaded to .urb/put/{(trip dap.bowl)}/"]
+      ==
     ==
   ::
   ++  filelist

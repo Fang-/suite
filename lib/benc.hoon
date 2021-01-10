@@ -183,7 +183,7 @@
   ++  so
     |=  =value
     ?.  ?=(%byt -.value)  ~
-    (some (crip +.value))
+    (some (rep 3 +.value))
   ::
   ++  sd                                                ::  signed integer
     |=  =value

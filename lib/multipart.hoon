@@ -48,6 +48,6 @@
   ++  sip   ;~(plug nip nip)
   ++  tip   ;~(plug dim hep hep nip)
   ::
-  ++  dine  |*(r=rule (cook crip (star r)))
+  ++  dine  |*(r=rule (cook (cury rep 3) (star r)))
   --
 --

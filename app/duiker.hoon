@@ -47,6 +47,7 @@
 ::
 +$  action
   $%  [%command sole-id=@ta cmd=command]
+      [%import jam=path]
   ==
 ::
 +$  navstate
@@ -280,6 +281,33 @@
       ^-  (quip card _state)
       ?-  -.action
         %command  (command-loop +.action)
+      ::
+          %import
+        |^
+        =/  dol=@  .^(@ %cx jam.action)
+        ~|  ((soft (map file-id finf-0)) (cue dol))
+        =/  old    ;;((map file-id finf-0) (cue dol))
+        =-  [~ state(files -)]
+        %-  ~(gas by files)
+        %+  turn  ~(tap by old)
+        |=  [i=file-id f=finf-0]
+        =;  tags=(set tag)
+          [i [%magnet -.f] (fall name.f '') from.f when.f tags desc.f]
+        %-  ~(gas in *(set tag))
+        ~(tap in ;;((tree path) tags.f))
+        ::
+        +$  finf-0
+          $:  magnet:torn
+              meta-0
+          ==
+        ::
+        +$  meta-0
+          $:  from=ship
+              when=@da
+              tags=*
+              desc=@t
+          ==
+        --
       ==
   ::
   ++  on-submit

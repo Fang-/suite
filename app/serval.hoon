@@ -163,6 +163,8 @@
     |=  [=mark =vase]
     ^-  (quip card _this)
     ?+  mark  (on-poke:def mark vase)
+      %noun  $(mark %serval-action)
+    ::
         %handle-http-request
       =^  cards  state
         %-  handle-http-request:do

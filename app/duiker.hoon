@@ -73,6 +73,7 @@
       ::TODO
       ::  %stats print stats for ship
     ::
+      [%upload ~]
       [%submit =finf name=@t desc=@t tags=(set tag)]
       [%delete id=selector ~]
       [%rename id=selector name=@t]
@@ -183,7 +184,8 @@
 |_  =bowl:gall
 +*  serval  ~(. srvl bowl)
 ::
-++  base-url  'https://urb.pal.dev/serval'
+++  duiker-url  'https://urb.pal.dev/duiker'
+++  serval-url  'https://urb.pal.dev/serval'
 ::
 ++  handle-http-request
   |=  [=eyre-id =inbound-request:eyre]
@@ -211,7 +213,7 @@
   =.  src.bowl  u.who
   ::
   =/  =path  (slag 3 `path`site)
-  ::  handle announce and scrape requests on /serval/[ship]/[key]/...
+  ::  serve duiker pages on /duiker/[ship]/[key]/...
   ::
   ?+  path  [[404 `'four oh four'] state]
       [%upload ~]
@@ -229,19 +231,26 @@
       ?~  submitted
         [[400 `'not multipart?'] state]
       =/  args
-        (~(gas in *(map @t part)) u.submitted)
+        (~(gas by *(map @t part)) u.submitted)
       ?.  (~(has by args) 'file')
         [[400 `'no file!'] state]
       =/  body=@t
         body:(~(got by args) 'file')
+      =/  enfo=(unit value:benc)
+        (rush body parse:benc)
       =/  info=(unit metainfo:torn)
-        %+  biff  (rush body parse:benc)
-        reap-metainfo:torn
+        (biff enfo reap-metainfo:torn)
       ?~  info
         [[400 `'file not metainfo'] state]
-      ?.  =(body (crip (render:benc (benc-metainfo:torn u.info))))
-        ~&  :+  dap.bowl  %lossy-conversion
-            [body=body copy=(render:benc (benc-metainfo:torn u.info))]
+      ::  other properties may get lost, but the info dict *must* be lossless
+      ::
+      ?>  ?=([~ %map *] enfo)
+      ?.  =((~(got by +.u.enfo) "info") (benc-info:torn -.u.info))
+        ~&  :*  dap.bowl  %lossy-conversion
+                from=src.bowl
+                orig=(brief:benc (~(got by +.u.enfo) "info"))
+                ours=(brief:benc (benc-info:torn -.u.info))
+            ==
         [[500 `'lossy'] state]
       ::  make sure we can actually submit this
       ::
@@ -260,7 +269,9 @@
       ::
       =.  files
         (on-submit:on-action [%torrent u.info] name desc tags)
-      [[200 `'i think we got it chief'] state]
+      =;  msg=tape
+        [[200 `(crip -)] state]
+      "file {((x-co:co 40) (finf-id %torrent u.info))} submitted. thank you!"
     ==
   ==
 ::
@@ -312,6 +323,8 @@
     (stag %search ;~(pfix fas ;~(pfix (opt ace) (cook crip (star next)))))
     (stag %narrow ;~(pfix col (more col parse-tag-term)))
     (stag %author ;~(pfix sig (punt fed:ag)))
+  ::
+    (cold [%upload ~] (jest ';upload'))
   ::
     %+  stag  %submit
     %:  pfox
@@ -505,11 +518,9 @@
         ?(%reprint %refresh %nav %search %narrow %author %clear)
       (filelist:render navstate)
     ::
-        %help
-      [help:render]~
-    ::
-        %tags
-      [tag-list:render]~
+        %upload  [upload:render]~
+        %help    [help:render]~
+        %tags    [tag-list:render]~
     ::
         %select
       :_  ~
@@ -533,10 +544,18 @@
     `(snag num items.navstate)
   --
 ::
+++  upload-url
+  |=  =ship
+  ^-  @t
+  %^  cat  3
+    duiker-url
+  (spat /(scot %p ship)/[(secret:serval ship)]/upload)
+::
 ++  tracker-url
   |=  =ship
+  ^-  @t
   %^  cat  3
-    base-url
+    serval-url
   (spat (announce-path:serval ship))
 ::  +prep-magnet: add ourselves to the magnet's tracker list
 ::
@@ -548,12 +567,12 @@
 ++  prep-metainfo
   |=  [=metainfo:torn =ship]
   ^+  metainfo
-  =-  metainfo(announces -)
-  ^-  announces:torn
-  :-  [`@t`(tracker-url ship)]~
-  ?~  announces.metainfo  ~
-  ?^  announces.metainfo  announces.metainfo
-  [[announces.metainfo]~]~
+  =+  aurl=(tracker-url ship)
+  =-  metainfo(announce aurl, announce-list -)
+  ^+  announce-list.metainfo
+  ?:  =(~ announce-list.metainfo)  ~
+  :-  [(tracker-url ship)]~
+  [[announce.metainfo]~ announce-list.metainfo]  ::TODO  sane?
 ::
 ++  finf-id
   |=  =finf
@@ -566,24 +585,25 @@
   |=  =finf
   ^+  finf
   =>  |%
-      ++  is-secret
-        =+  bum=(met 3 base-url)
+      ++  is-serval
+        =+  bum=(met 3 serval-url)
         |=  t=@t
-        =(base-url (end [3 bum] t))
+        =(serval-url (end [3 bum] t))
       --
   ?-  -.finf
       %magnet
     =-  finf(trackers.magnet -)
-    (skip trackers.magnet.finf is-secret)
+    (skip trackers.magnet.finf is-serval)
   ::
       %torrent
-    =-  finf(announces.metainfo -)
-    =*  announces  announces.metainfo.finf
-    ?@             announces.metainfo.finf
-      ?:((is-secret `@`announces) '' announces)
-    %+  turn  announces
+    =;  [nan=@t ans=(list (list @t))]
+      finf(announce.metainfo nan, announce-list.metainfo ans)
+    =,  metainfo.finf
+    :-  ?:((is-serval announce) '' announce)
+    ?~  announce-list.metainfo.finf  ~
+    %+  turn  announce-list
     |=  l=(list @t)
-    (skip l is-secret)
+    (skip l is-serval)
   ==
 ::
 ++  find-name
@@ -706,6 +726,20 @@
         :~('        change the description of the 0th file')
         :~(';retag 0 some, example:tags')
         :~('        change the tags on the 0th file')
+        ~
+    ==
+  ::
+  ++  upload
+    ^-  shoe-effect:shoe
+    :+  %sole  %mor
+    =-  (turn - (lead %klr))
+    ^-  (list styx)
+    :~  ~
+        :~  'your '
+            [`%br `%r ~]^"personal"
+            ' upload url:'
+        ==
+        :~((upload-url src.bowl))
         ~
     ==
   ::

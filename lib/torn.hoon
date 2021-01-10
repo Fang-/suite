@@ -35,6 +35,16 @@
       pieces=@
       private=(unit ?)
       =mode
+      ::  non-standard info map entries
+      ::
+      ::    we pay the complexity cost of tracking these, so that we may
+      ::    guarantee compatibility with the original .torrent file:
+      ::    different info dict would result in a different info-hash.
+      ::    whether this is worth it or not remains to be seen. not doing this
+      ::    would mean forcing people to re-retrieve their just-submitted file
+      ::    (with nstd entries) from apps using this library.
+      ::
+      nstd=(map tape value:benc)
   ==
 ::
 +$  mode
@@ -46,6 +56,7 @@
   $:  length=@ud
       md5sum=(unit @ux)
       =path
+      nstd=(map tape value:benc)
   ==
 ::
 ::TODO  one day, this could be transformed into a general-purpose magnet parser
@@ -178,6 +189,12 @@
           u.pieces
           (nab "private" bi)
           u.mode
+        ::
+          =/  std=(list tape)
+            ~["piece length" "pieces" "name" "files" "length" "md5sum"]
+          |-
+          ?~  std  +.value
+          $(+.value (~(del by +.value) i.std), std t.std)
       ==
     ?~  files=(~(get by +.value) "files")
       ?~  len=(nab "length" ud)  ~
@@ -194,9 +211,16 @@
     ?~  len=(nab "length" ud)     ~
     ?~  pax=(nab "path" (ar so))  ~
     %-  some
-    :+  u.len
-      (nab "md5sum" (ci sa (curr rust hex)))
-    u.pax
+    :*  u.len
+        (nab "md5sum" (ci sa (curr rust hex)))
+        u.pax
+      ::
+        =/  std=(list tape)
+          ~["length" "path" "md5sum"]
+        |-
+        ?~  std  +.v
+        $(+.v (~(del by +.v) i.std), std t.std)
+    ==
   --
 ::
 ++  hash-info
@@ -209,7 +233,8 @@
   |=  info
   ^-  value:benc
   =,  build:benc
-  %-  os
+  :-  %map
+  %-  ~(gas by nstd)
   ^-  (list [tape value:benc])
   :*  :-  "name"          (so name.mode)
       :-  "piece length"  (ud piece-length)
@@ -234,7 +259,8 @@
         :-  %mor
         %+  turn  files.mode
         |=  file
-        %-  os
+        :-  %map
+        %-  ~(gas by nstd)
         :*  "length"^(ud length)
             "path"^((ar so) path)
           ::

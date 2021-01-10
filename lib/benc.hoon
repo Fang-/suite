@@ -34,6 +34,18 @@
     [%byt (trip t)]
   --
 ::
+++  brief
+  |=  =value
+  ?-  -.value
+    %byt  [%byt (lent +.value) `@p`(mug +.value)]
+    %int  [%int +.value]
+    %mor  ?:  (gth (lent +.value) 10)  [%mor `(list @p)`(turn +.value mug)]
+          [%mor (turn +.value brief)]
+    %map  ?:  (gth ~(wyt by +.value) 10)
+            [%map `(map tape @p)`(~(run by +.value) mug)]
+          [%map `(map tape _$)`(~(run by +.value) brief)]
+  ==
+::
 ++  render
   |=  =value
   ^-  tape

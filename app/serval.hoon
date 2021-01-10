@@ -505,7 +505,10 @@
   ^-  response
   =+  (count-in-complete peers.file)
   :*  [compact no-peer-id]
-      ~  ::TODO  when do we want to warn? in weird stats case?
+    ::
+      ?^  name.file  ~
+      `'unknown file'
+    ::
       `our-tracker-id
       interval:config
       `min-interval:config

@@ -609,6 +609,13 @@
     %torrent  (hash-info:torn -.metainfo.finf)
   ==
 ::
+++  is-private
+  |=  =finf
+  ?-  -.finf
+    %magnet   |
+    %torrent  &(=(`& private) =('' announce) =(~ announce-list)):metainfo.finf
+  ==
+::
 ++  privatize-trackers
   |=  =finf
   ^+  finf
@@ -813,6 +820,13 @@
         :~  'submitted by '  (scot %p from)
             ' on '  (scot %da (sub now.bowl (mod now.bowl ~d1)))
         ==
+      ::
+        ?-  -<-
+          %magnet   ['magnet link']~
+          %torrent  :-  'torrent file'
+                    ?:((is-private file) [' (private)']~ ~)
+        ==
+      ::
         :*('tags: ' ?~(tags ['(untagged)']~ (tags:render tags)))
         :~(?:(=('' desc) '(no description provided)' desc))
         ~
@@ -862,17 +876,18 @@
       ::
         ^-  shoe-effect:shoe
         :^    %table
-            ~[t+'n' t+'name' t+'from' t+'s' t+'l' t+'c']
-          ~[1 59 14 2 2 2]
+            ~[t+'n' t+'name' t+'p' t+'from' t+'s' t+'l' t+'c']
+          ~[1 52 1 14 2 2 2]
         %+  fuse  (turn (gulf 0 9) (lead %ud))
         %+  turn
           (swag [(mul page.query 10) 10] items)
         |=  i=file-id
         ^-  (list dime)
         ?.  (~(has by files) i)
-          ~[t+'(deleted file)' t+~ t+~ t+~ t+~]
+          ~[t+'(deleted file)' t+~ t+~ t+~ t+~ t+~]
         =+  (~(got by files) i)
         :~  t+name
+            t+?:((is-private -<) 'y' '')
             p+from
             ud+(seeder-count:serval i)
             ud+(leecher-count:serval i)

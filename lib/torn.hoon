@@ -203,7 +203,7 @@
   |=  =info
   ^-  file-id
   =+  (render:benc (benc-info info))
-  (sha-1:sha (swp 3 (crip -)))
+  (sha-1:sha (swp 3 (rep 3 -)))
 ::
 ++  benc-info
   |=  info

@@ -287,7 +287,12 @@
         =/  dol=@  .^(@ %cx jam.action)
         ~|  ((soft (map file-id finf-0)) (cue dol))
         =/  old    ;;((map file-id finf-0) (cue dol))
-        =-  [~ state(files -)]
+        :-  %+  murn  ~(tap by old)
+            |=  [i=file-id finf-0]
+            ^-  (unit card)
+            ?~  name  ~
+            `(set-filename:serval i u.name)
+        =-  state(files -)
         %-  ~(gas by files)
         %+  turn  ~(tap by old)
         |=  [i=file-id f=finf-0]

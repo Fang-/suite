@@ -22,7 +22,8 @@
 ::
 +$  metainfo
   $:  info
-      =announces
+      announce=@t
+      announce-list=(list (list @t))
       creation-date=(unit @da)
       comment=(unit @t)
       created-by=(unit @t)
@@ -35,10 +36,6 @@
       private=(unit ?)
       =mode
   ==
-::
-+$  announces
-  $@  @t
-  (list (list @t))
 ::
 +$  mode
   $%  [%single name=@t length=@ud md5sum=(unit @ux)]
@@ -141,16 +138,21 @@
   ^-  (unit metainfo)
   ?.  ?=(%map -.value)  ~
   |^  ?~  info=(nab "info" reap-info)  ~
-      =/  announces=(unit announces)
-        %^  clap
-            (nab "announce" so)
-          (nab "announce-list" (ar (ar so)))
-        |=  [main=@t rest=(list (list @t))]
-        [[main]~ rest]
-      ?~  announces  ~
+      =/  announces=(unit (list (list @t)))
+        (nab "announce-list" (ar (ar so)))
+      =/  announce=(unit @t)
+        ?^  nan=(nab "announce" so)  nan
+        %+  biff  announces
+        |=  [ans=(list (list @t))]
+        ^-  (unit @t)
+        ?~  ans    ~
+        ?~  i.ans  ~
+        `i.i.ans
+      ?~  announce  ~
       %-  some
       :*  u.info
-          u.announces
+          u.announce
+          (fall announces ~)
           (nab "creation date" (cu ud from-unix:chrono:userlib))
           (nab "comment" so)
           (nab "created by" so)
@@ -252,9 +254,9 @@
       ?~  created-by  ~  :+  ~  "created by"  (so u.created-by)
       ?~  encoding    ~  :+  ~  "encoding"    (so u.encoding)
     ::
-      ?@  announces
-        `"announce"^(so `@t`announces)
-      `"announce-list"^((ar (ar so)) announces)
+      :+  ~  "announce"       (so `@t`announce)
+      ?~  announce-list  ~
+      :+  ~  "announce-list"  ((ar (ar so)) announce-list)
     ::
       ?~  creation-date  ~
       :+  ~  "creation date"

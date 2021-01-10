@@ -271,7 +271,7 @@
 ++  kick-peer-timer
   =+  (add ~m5 (sub now.bowl (mod now.bowl ~m5)))
   [%pass /stale-peers %arvo %b %wait -]
-::.
+::
 ++  clear-stale-peers
   ^+  state
   =-  state(files -)

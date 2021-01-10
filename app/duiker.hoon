@@ -12,7 +12,7 @@
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
 ::TODO  download torrent files using %sav !!!
-::.
+::
 /+  srvl=serval, torn, benc, multipart, *pal,
     shoe, server, default-agent, verb, dbug
 ::

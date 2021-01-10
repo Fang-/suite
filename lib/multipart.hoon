@@ -1,7 +1,6 @@
 ::  multipart: multipart/form-data request decoding
 ::
 ::NOTE  this parses really narrowly!
-::      it will probably drop null bytes in content.
 ::      it does not support multipart/mixed (aka multi-file upload).
 ::
 |%

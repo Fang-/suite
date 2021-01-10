@@ -680,8 +680,8 @@
             [`%br ~ ~]^"serval"
             ', a torrent tracker that associates traffic with urbit identities.'
         ==
-        :~  'the magnet links shown are unique to you! '
-            'for best results, '
+        :~  'the upload url, torrent files and magnet links shown are unique '
+            'to you! for best results, '
             [~ `%r ~]^"do not share them with others"
             '.'
         ==
@@ -698,13 +698,14 @@
     ^-  (list styx)
     :~  ~
         :~(' ' [`%un ~ ~]^"duiker:")
-        :~('the magnet link sharing terminal.')
+        :~('the bittorrent file-sharing terminal.')
         :~('a ~paldev initiative. developed, with love, by ~palfun-foslup.')
         :~('part of the arvo enhancement suite:')
         :~('https://github.com/fang-/suite')
         ~
-        :~(' ' [`%un ~ ~]^"about magnet links and trackers:")
-        :~  'duiker supports file sharing exclusively through magnet links. '
+        :~(' ' [`%un ~ ~]^"about trackers:")
+        :~  'duiker supports file sharing through both magnet links and '
+            '.torrent files. '
             'submitted magnet links may contain pre-configured tracker urls. '
             'duiker will automatically add a personalized tracker url to that '
             'list, letting serval associate up/download stats with urbit '
@@ -716,14 +717,25 @@
             'to be tagged with both music and music:jazz.'
         ==
         ~
-        :~(' ' [`%un ~ ~]^"generating magnet links for submission:")
+        :~(' ' [`%un ~ ~]^"submitting a torrent file:")
         :~('1) start the torrent creation process in your torrent client')
         :~  '2) for the tracker, input your '
             [`%br `%r ~]^"personal"
             ' tracker url:'
         ==
         :~((cat 3 '   ' (tracker-url src.bowl)))
-        :~('3) start seeding the newly created torrent')
+        :~  '3) if desired, make the torrent duiker-exclusive by setting '
+            'the "private" flag.'
+        ==
+        :~  '4) upload the generated .torrent file via your '
+            [`%br `%r ~]^"personal"
+            ' upload url:'
+        ==
+        :~((cat 3 '   ' (upload-url src.bowl)))
+        ~
+        :~(' ' [`%un ~ ~]^"submitting a magnet link:")
+        :~('1) follow steps 1-3 of the torrent process above.')
+        :~('2) start seeding the newly created torrent')
         :~('3) copy the magnet link of the torrent')
         :~('   (usually, right-click -> copy magnet, or similar)')
         :~('4) in duiker, type ;add, then paste the magnet link')
@@ -752,6 +764,8 @@
         :~('t       view the list of used tags')
         ~
         :~(' ' [`%un ~ ~]^"file management:")
+        :~(';upload')
+        :~('        display your personal upload url')
         :~(';add magnet:?xt=... \'name\' \'description\' tag:example, etc:etc')
         :~('        submit a file by typing ;add and pasting its magnet link.')
         :~('        name, description, and tags are all optional.')

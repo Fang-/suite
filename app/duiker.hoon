@@ -857,7 +857,7 @@
     ::
         %torrent
       =.  metainfo  (prep-metainfo metainfo src.bowl)
-      =/  file=@t  (crip (render:benc (benc-metainfo:torn metainfo)))
+      =/  file=@t  (rep 3 (render:benc (benc-metainfo:torn metainfo)))
       =/  uniq=@t  (crip ((x-co:co 6) (end 5 file-id)))
       =/  name=@t  :((cury cat 3) name '_' uniq)
       :~  [%sav /[dap.bowl]/[name]/torrent file]

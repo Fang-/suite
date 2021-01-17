@@ -61,7 +61,8 @@
 +$  command
   $%  [%reprint ~]
       [%help ~]
-      [%select num=@ud]
+      [%select id=selector]
+      [%get id=selector]
     ::
       [%refresh ~]
       [%nav ?(%first %left %right %last)]
@@ -333,7 +334,6 @@
 ++  build-parser
   |=  sole-id=@ta
   ^+  |~(nail *(like [? command]))
-  =/  =navstate  (~(gut by ui) src.bowl default-navstate)
   %+  pick
     ;~  pose
       (cold [%reprint ~] dot)
@@ -345,12 +345,7 @@
       (cold [%clear ~] zap)
       (cold [%help ~] wut)
       (cold [%tags ~] (just 't'))
-    ::
-      %+  sear
-        |=  n=@ud
-        ?:  (gte n (lent items.navstate))  ~
-        (some [%select n])
-      dit:ag
+      (stag %select select-list)
     ==
   ;~  pose
     (stag %search ;~(pfix fas ;~(pfix (opt ace) (cook crip (star next)))))
@@ -375,6 +370,8 @@
   ::
     %+  qfix  mic
     ;~  pose
+      (stag %select select-hash)
+      ;~((glue ace) (perk %get ~) select)
       ;~((glue ace) (perk %delete ~) ;~(plug select (easy ~)))
       ;~((glue ace) (perk %rename ~) select qut:ab)
       ;~((glue ace) (perk %describe ~) select qut:ab)
@@ -402,8 +399,9 @@
     |=(a=tape (rap 3 ^-((list @) a)))
   (plus ;~(pose nud low hep dot sig))
 ::
-++  select
-  ;~(pose (stag %list dit:ag) (stag %hash hex))
+++  select       ;~(pose select-list select-hash)
+++  select-list  (stag %list dit:ag)
+++  select-hash  (stag %hash hex)
 ::
 ++  command-loop
   |=  [sole-id=@ta =command]
@@ -539,8 +537,8 @@
     ++  get-file
       |=  =selector
       ^-  (unit [=file-id file])
-      ?~  fid=(get-file-id navstate selector)   ~
-      ?~  fil=(~(get by files) u.fid)           ~
+      ?~  fid=(select-file-id navstate selector)  ~
+      ?~  fil=(~(get by files) u.fid)             ~
       `[u.fid u.fil]
     --
   ::
@@ -555,27 +553,30 @@
         %help    [help:render]~
         %tags    [tag-list:render]~
     ::
-        %select
+        ?(%select %get)
       :_  ~
-      ?~  fid=(get-file-id navstate %list num.command)
-        (not-found:msg:render %list num.command)
-      (file-details:render u.fid)
+      ?~  fid=(select-file-id navstate id.command)
+        (not-found:msg:render id.command)
+      ?-  -.command
+        %select  (file-details:render u.fid id.command)
+        %get     (file-transfer:render u.fid)
+      ==
     ::
         ?(%submit %delete %rename %describe %retag)
       ~  ::NOTE  rendered in +undertake...
     ==
-  ::
-  ++  get-file-id
-    |=  [=navstate =selector]
-    ^-  (unit file-id)
-    ?:  ?=(%hash -.selector)  `fid.selector
-    =/  num=@ud
-      %+  add  num.selector
-      (mul page.query.navstate 10)
-    ?:  (gte num (lent items.navstate))
-      ~
-    `(snag num items.navstate)
   --
+::
+++  select-file-id
+  |=  [=navstate =selector]
+  ^-  (unit file-id)
+  ?:  ?=(%hash -.selector)  `fid.selector
+  =/  num=@ud
+    %+  add  num.selector
+    (mul page.query.navstate 10)
+  ?:  (gte num (lent items.navstate))
+    ~
+  `(snag num items.navstate)
 ::
 ++  upload-url
   |=  =ship
@@ -824,13 +825,13 @@
     --
   ::
   ++  file-details
-    |=  =file-id
+    |=  [=file-id id=selector]
     ^-  shoe-effect:shoe
-    ?.  (~(has by files) file-id)  deleted:msg
+    ?.  (~(has by files) file-id)  (not-found:msg id)
     =+  (~(got by files) file-id)
     =*  file  -<
     :+  %sole  %mor
-    %+  weld
+    %+  snoc
       ^-  (list sole-effect:shoe)
       =;  meta=(list styx)
         (turn meta (lead %klr))
@@ -850,18 +851,35 @@
         :~(?:(=('' desc) '(no description provided)' desc))
         ~
       ==
-    ^-  (list sole-effect:shoe)
+    ^-  sole-effect:shoe
+    :-  %txt
     ?-  -.file
-        %magnet
-      [%url (render-magnet:torn (prep-magnet magnet src.bowl))]~
+      %magnet   (trip (render-magnet:torn (prep-magnet magnet src.bowl)))
+      %torrent  %+  weld  "download: ;get "
+                ?-  -.id
+                  %list  ((d-co:co 1) num.id)
+                  %hash  (render-file-id:torn fid.id)
+                ==
+    ==
+  ::
+  ++  file-transfer
+    |=  =file-id
+    ^-  shoe-effect:shoe
+    ?.  (~(has by files) file-id)  [%sole %mor ~]
+    =+  (~(got by files) file-id)
+    =*  file   -<
+    :-  %sole
+    ?-  -.file
+      %magnet   [%url (render-magnet:torn (prep-magnet magnet src.bowl))]
     ::
         %torrent
       =.  metainfo  (prep-metainfo metainfo src.bowl)
       =/  file=@t  (rep 3 (render:benc (benc-metainfo:torn metainfo)))
       =/  uniq=@t  (crip ((x-co:co 6) (end 5 file-id)))
       =/  name=@t  :((cury cat 3) name '_' uniq)
+      :-  %mor
       :~  [%sav /[dap.bowl]/[name]/torrent file]
-          [%txt "downloaded to .urb/put/{(trip dap.bowl)}/"]
+          [%txt "downloaded to .urb/put/{(trip dap.bowl)}/{(trip name)}"]
       ==
     ==
   ::

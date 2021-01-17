@@ -128,6 +128,10 @@
     :(weld all "&tr=" (en-urlt:html (trip t)))
   ==
 ::
+++  render-file-id
+  |=  =file-id
+  ((x-co:co 40) file-id)
+::
 ++  truncate-info-hash
   |=  =info-hash
   ^-  file-id

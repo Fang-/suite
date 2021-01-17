@@ -455,7 +455,7 @@
       |=  [* file]
       ^-  ?
       ?&  ?|  =('' what)
-              ?=(^ (find (trip what) (trip name)))
+              ?=(^ (find (cass (trip what)) (cass (trip name))))
           ==
           =(from (fall who from))
           ?|  =(~ tag)

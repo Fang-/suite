@@ -175,12 +175,12 @@
   =*  ud  (cork (d-co:co 1) crip)
   %-  some
   %+  rap  3
-  :*  '*'  book  ' '  (ud chap)  ' '
+  :*  '*'  book  ' '  (ud chap)  ':'
       ?@(vers (ud vers) :((cury cat 3) (ud -.vers) '-' (ud +.vers)))
-      ':* \0a'
+      '*\0a'
       %+  join  '\0a'
-      ?@  vers  [(snag vers chat)]~
-      (swag [-.vers (sub +.vers -.vers)] chat)
+      ?@  vers  [(snag (dec vers) chat)]~
+      (swag [(dec -.vers) +((sub +.vers -.vers))] chat)
   ==
 ::  +fold-post-content: collapse into @t post body
 ::

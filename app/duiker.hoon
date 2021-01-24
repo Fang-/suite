@@ -370,12 +370,12 @@
   ::
     %+  qfix  mic
     ;~  pose
-      (stag %select select-hash)
       ;~((glue ace) (perk %get ~) select)
       ;~((glue ace) (perk %delete ~) ;~(plug select (easy ~)))
       ;~((glue ace) (perk %rename ~) select qut:ab)
       ;~((glue ace) (perk %describe ~) select qut:ab)
       ;~((glue ace) (perk %retag ~) select parse-tags)
+      (stag %select select-hash)
     ==
   ==
 ::

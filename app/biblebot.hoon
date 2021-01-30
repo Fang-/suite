@@ -218,6 +218,10 @@
       (numbered 2 (jest 'samuel'))
       (numbered 2 (jest 'kings'))
       (numbered 2 (jest 'chronicles'))
+    ::
+      (numbered 2 (jest 'maccabees'))
+      (numbered 2 (jest 'esdras'))
+    ::
       (numbered 2 (jest 'corinthians'))
       (numbered 2 (jest 'thessalonians'))
       (numbered 2 (jest 'timothy'))
@@ -225,6 +229,21 @@
       (numbered 3 (jest 'john'))
     ::
       (cold %song-of-solomon (jest 'song of solomon'))
+      (cold %wisdom (jest 'wisdom of solomon'))
+      (cold %sirach (jest 'ecclesiasticus'))
+      (cold %bel-and-the-dragon (jest 'bel and the dragon'))
+      %+  cold  %prayer-of-azariah
+      ;~  pose
+        (jest 'prayer of azariah')
+        (jest 'azariah')
+        (jest 'song of the three holy children')
+        (jest 'pr azar')
+      ==
+      %+  cold  %prayer-of-manasseh
+      ;~  pose
+        (jest 'prayer of manasseh')
+        (jest 'manasseh')
+      ==
     ::
       :: (perk titles:word)  ::TODO  why doesn't this just work?
       (jest 'genesis')
@@ -259,6 +278,17 @@
       (jest 'haggai')
       (jest 'zechariah')
       (jest 'malachi')
+    ::
+      (jest 'tobit')
+      (jest 'judith')
+      (jest 'wisdom')
+      (jest 'sirach')
+      (jest 'baruch')
+      (jest 'azariah')
+      (jest 'susanna')
+      (jest 'bel-and-the-dragon')
+      (jest 'prayer-of-manasseh')
+    ::
       (jest 'matthew')
       (jest 'mark')
       (jest 'luke')
@@ -283,7 +313,7 @@
       |=  [n=@ud t=term]
       :((cury cat 3) (rep 3 (reap n 'i')) '-' t)
     ;~  (glue ace)
-      ;~(pose (cook lent (stun [1 m] (just 'i'))) num (easy 1))
+      ;~(pose num (cook lent (stun [1 m] (just 'i'))))
       r
     ==
   ::

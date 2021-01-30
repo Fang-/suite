@@ -230,7 +230,11 @@
     ::
       (cold %song-of-solomon (jest 'song of solomon'))
       (cold %wisdom (jest 'wisdom of solomon'))
-      (cold %sirach (jest 'ecclesiasticus'))
+      %+  cold  %sirach
+      ;~  pose
+        (jest 'ecclesiasticus')
+        (jest 'wisdom of sirach')
+      ==
       (cold %bel-and-the-dragon (jest 'bel and the dragon'))
       %+  cold  %prayer-of-azariah
       ;~  pose

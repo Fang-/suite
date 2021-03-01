@@ -39,7 +39,7 @@
     ::  then overlay the ship name at the end of a random comet
     ::
     %^  cat  3  ship
-    %^  rsh  3  (met 3 ship)
+    %+  rsh  [3 (met 3 ship)]
     %-  ~(rad og eny)
     ~fipfes-fipfes-fipfes-fipfes--fipfes-fipfes-fipfes-fipfes
   --

@@ -85,4 +85,13 @@
 ++  qfix                                                ::  singular prefix
   |*  [p=rule r=rule]
   ;~(pfix p r)
+::
+++  lean                                                ::  measure to parse
+  |*  [measure=rule separate=rule parse=$-(@ud rule)]
+  |=  =nail
+  =/  edge=(like @)  (;~(sfix measure separate) nail)
+  ?~  q.edge  edge
+  =*  size  p.u.q.edge
+  =*  rest  q.u.q.edge
+  ((parse size) rest)
 --

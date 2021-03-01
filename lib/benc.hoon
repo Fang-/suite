@@ -1,5 +1,7 @@
 ::  benc: bencoding library
 ::
+/+  pal
+::
 ^?
 |%
 +$  value
@@ -96,19 +98,9 @@
   ++  e  (just 'e')
   ::
   ++  bytz
-    %^  lean  dim:ag  col
+    %^  lean:pal  dim:ag  col
     |=  size=@ud
     (stun [size size] next)
-  ::
-  ::TODO  stdlib?
-  ++  lean
-    |*  [measure=rule separate=rule parse=$-(@ud rule)]
-    |=  =nail
-    =/  edge=(like @)  (;~(sfix measure separate) nail)
-    ?~  q.edge  edge
-    =*  size  p.u.q.edge
-    =*  rest  q.u.q.edge
-    ((parse size) rest)
   --
 ::
 ++  reparse

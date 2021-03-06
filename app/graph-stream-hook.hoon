@@ -13,7 +13,7 @@
 ::    of the form "!ban ~ship" will result in an ip ban for that ship,
 ::    denying them posting privileges in all local streams.
 ::
-::    usage: poke with an action. ie :graph-stream-hook [%stream /urbit-help]
+::    usage: poke with an action. ie :graph-stream-hook [%stream %urbit-help]
 ::
 /+  graph-store,
     default-agent, verb, dbug,
@@ -401,8 +401,9 @@
     (post:enjs:graph-store post)
   =;  upd
     ?>  ?=(%add-graph +>-.upd)
+    %-  flop
     %+  scag  initial-messages
-    (bap:orm:graph-store graph.q.upd)
+    (tap:orm:graph-store graph.q.upd)
   .^  update:graph-store
     %gx
     (scot %p our.bowl)

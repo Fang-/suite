@@ -5,7 +5,6 @@
     * {
       margin: 0;
       padding: 0;
-      font-family: monospace;
       font-size: 11pt;
     }
     body {
@@ -33,10 +32,11 @@
       max-height: 80vh;
       width: 480px;
       max-width: 80vw;
-      position: 'relative';
+      position: relative;
       border: 2px solid black;
       box-sizing: border-box;
       margin: 0 auto;
+      font-family: monospace;
     }
     .bad {
       border-color: #f60 !important;
@@ -295,7 +295,8 @@
   <div id="head">
     Public gateway to <pre>~paldev/lobby</pre>. Might be slow during busy hours.<br/>
     If you have an Urbit, just join there! It's in the <pre>~paldev/group</pre>.<br/>
-    Keep it civil, rabble-rousers will be banned.
+    Keep it civil, rabble-rousers will be banned.<br/>
+    Hoon source lives <a href="https://github.com/fang-/suite/blob/master/app/graph-stream-hook.hoon" target="_blank">here</a>.
   </div>
 
   <div id="viewport" class="bad">

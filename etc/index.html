@@ -1,0 +1,313 @@
+<html>
+<head>
+  <title>~paldev/lobby</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      font-size: 11pt;
+    }
+    body {
+      overflow: hidden;
+    }
+
+    #head {
+      width: 460px;
+      max-width: 70vw;
+      margin: 2em auto;
+      font-family: sans-serif;
+      line-height: 1.3em;
+      overflow-y: scroll;
+    }
+    #head pre {
+      font-family: monospace;
+      display: inline-block;
+      background-color: #eee;
+    }
+
+    #viewport {
+      /* fake viewport, to establish the height/width that everything else
+         is based on & avoid fixed heights anywhere */
+      height: 480px;
+      max-height: 80vh;
+      width: 480px;
+      max-width: 80vw;
+      position: 'relative';
+      border: 2px solid black;
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+    .bad {
+      border-color: #f60 !important;
+    }
+    #viewport:after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      z-index: -1;
+    }
+    #bottomSnapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    #scroller {
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+      max-height: 100%;
+    }
+
+    .message {
+      border-top: 1px solid black;
+      padding: 8px;
+      line-height: 1.3em;
+    }
+    .timestamp {
+      color: #bbb;
+    }
+    .author {
+      margin-left: 10px;
+      color: #777;
+    }
+    .author.comet {
+      cursor: pointer;
+      color: #888;
+    }
+    .metadata {
+    }
+    .content {
+      margin-left: 10px;
+    }
+    a {
+      color: black;
+    }
+    pre {
+      background-color: #ddd;
+      margin: 0;
+      padding: 2px;
+    }
+    .message pre:nth-child(2) {
+      clear: left;
+      background-color: #eee;
+    }
+
+    #send {
+      border: 2px solid black;
+      border-top: 0;
+      margin-top: 2px;
+      width: 100%;
+      padding: 6px;
+    }
+  </style>
+  <script>
+    let scroller;
+    let viewport;
+    let input;
+    const base = 'https://urb.pal.dev/stream/~paldev/lobby';
+    let latestHeard = -1;
+
+    function prep() {
+      scroller = document.getElementById('scroller');
+      viewport = document.getElementById('viewport');
+      startStream();
+      input = document.getElementById('send')
+      input.focus();
+      input.addEventListener('keydown', (e) => {
+        if (e.key === "Enter" && input.value.length > 0) {
+          sendMessage(input.value);
+          input.value = '';
+        }
+      });
+    }
+
+    function startStream() {
+      let stream = new EventSource(
+        base + '.json',
+        {withCredentials:true}
+      );
+      stream.onopen = e => {
+        console.log('open');
+        showStreamStatus(stream.readyState);
+      }
+      stream.onmessage = e => {
+        handleUpdate(JSON.parse(e.data));
+        showStreamStatus(stream.readyState);
+      }
+      stream.onerror = e => {
+        console.error('EventSource error:', e);
+        console.log(stream.readyState);
+        showStreamStatus(stream.readyState);
+        window.setTimeout(() => {
+          if (stream.readyState !== EventSource.CLOSED) return;
+          console.log('reconnecting...');
+          stream.onopen = null;
+          stream.onmessage = null;
+          stream.onerror = null;
+          stream.close();
+          stream = null;
+          return startStream();
+        }, 10000);
+      }
+    }
+
+    function showStreamStatus(status) {
+      if (status === 1) {
+        viewport.setAttribute('class', '');
+      } else {
+        viewport.setAttribute('class', 'bad');
+      }
+    }
+
+    function showSendStatus(good) {
+      if (good) {
+        input.setAttribute('class', '');
+      } else {
+        input.setAttribute('class', 'bad');
+      }
+    }
+
+    function sendMessage(msg) {
+      fetch(base, {
+        method: 'POST',
+        credentials: 'include',
+        body: msg
+      })
+      .then(response => {
+        showSendStatus(response.status === 200);
+      });
+    }
+
+    function handleUpdate(data) {
+      console.log('event', data);
+      if (!data) return; // heartbeat
+      let messages = data;
+
+      for (i in messages) {
+        const msg = messages[i];
+        //NOTE if server sends us messages out of order, we won't show them!
+        //NOTE nr 0 handling here is a hack around regression of #2510
+        if (msg.index > 0 && msg.index <= latestHeard) continue;
+        latestHeard = Math.max(msg.index, latestHeard);
+        appendMessage(renderPost(msg));
+      }
+    }
+
+    function renderPost(post) {
+      let body = document.createElement('div');
+      body.setAttribute('class', 'message');
+      let meta = document.createElement('span');
+      meta.setAttribute('class', 'metadata');
+      meta.appendChild(renderTimestamp(post['time-sent']));
+      meta.appendChild(renderAuthor(post.author));
+      body.appendChild(meta);
+      body.appendChild(renderContents(post.contents));
+      return body;
+    }
+
+    function renderTimestamp(when) {
+      const date = new Date(when);
+      const hors = "0" + date.getHours();
+      const mins = "0" + date.getMinutes();
+      const secs = "0" + date.getSeconds();
+      const time = `${hors.substr(-2)}:${mins.substr(-2)}:${secs.substr(-2)}`;
+
+      let body = document.createElement('span');
+      body.setAttribute('class', 'timestamp');
+      body.appendChild(document.createTextNode(time));
+      return body;
+    }
+
+    function cite(p) {
+      let c = p;
+      if (p.length === 27) {
+        c = p.slice(-13).replace('-', '^');
+      } else if (p.length > 27) {
+        c = p.slice(0,6) + '_' + p.slice(author.length-6)
+      }
+      return '~' + c;
+    }
+
+    function renderAuthor(author) {
+      let body = document.createElement('span');
+      if (author.length > 27) {
+        body.setAttribute('onClick', `navigator.clipboard.writeText('~${author}')`);
+        body.setAttribute('class', 'author comet');
+      } else {
+        body.setAttribute('class', 'author');
+      }
+      body.appendChild(document.createTextNode(cite(author)));
+      return body;
+    }
+
+    function renderContents(contents) {
+      let body = document.createElement('span');
+      body.setAttribute('class', 'content');
+      while (contents.length > 0) {
+        const c = contents[0];
+        contents = contents.slice(1);
+
+        if (c.text) {
+          body.appendChild(document.createTextNode(c.text));
+        } else if (c.mention) {
+          body.appendChild(document.createTextNode(' '+ cite(c.mention) +' '));
+        } else if (c.url) {
+          let a = document.createElement('a');
+          a.setAttribute('href', c.url);
+          a.appendChild(document.createTextNode(c.url));
+          body.appendChild(a);
+        } else if (c.code) {
+          let code = document.createElement('pre');
+          code.appendChild(document.createTextNode(c.code.expression));
+          body.appendChild(code);
+          let out = document.createElement('pre');
+          out.appendChild(document.createTextNode(c.code.output));
+          body.appendChild(out);
+        } else {
+          body.appendChild(document.createTextNode('???'));
+        }
+      }
+      return body;
+    }
+
+    function appendMessage(body) {
+      let scroller = document.getElementById('scroller');
+
+      const needScroll =
+        (scroller.scrollHeight - scroller.scrollTop === scroller.clientHeight);
+
+      scroller.appendChild(body);
+
+      if (needScroll) {
+        scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight;
+      }
+    }
+
+    window.onload = prep;
+
+  </script>
+</head>
+<body>
+
+  <div id="head">
+    Public gateway to <pre>~paldev/lobby</pre>. Might be slow during busy hours.<br/>
+    If you have an Urbit, just join there! It's in the <pre>~paldev/group</pre>.<br/>
+    Keep it civil, rabble-rousers will be banned.
+  </div>
+
+  <div id="viewport" class="bad">
+    <div id="bottomSnapper">
+      <div id="scroller">
+        Loading...
+      </div>
+    </div>
+    <input id="send" type="text" maxlength="280" />
+  </div>
+
+</body>
+</html>

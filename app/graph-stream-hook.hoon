@@ -1,20 +1,21 @@
-::  chat-stream-hook: chat proxy for earthlings
+::  graph-stream-hook: graph proxy for earthlings
 ::
-::    makes specified chat channels accessible over unauthenticated http
+::    makes specified chat graphs accessible over unauthenticated http
 ::    requests.
-::    GET at /stream/chat-name.json to receive json updates as messages happen.
-::    POST at /stream/chat-name with a body to send a chat message.
+::    GET at /stream/graph-name.json to receive json updates as messages happen.
+::    POST at /stream/graph-name with a body to send a chat message.
 ::
 ::    hands out temporary identities (using fakeid) using which stream viewers
-::    can post to exposed
+::    can post to exposed graphs.
+::    NOTE that the cookie it gives out is marked Secure and SameSite=None!
 ::
-::    when streaming a chat, any messages sent into it (by real identities)
+::    when streaming a graph, any messages sent into it (by real identities)
 ::    of the form "!ban ~ship" will result in an ip ban for that ship,
 ::    denying them posting privileges in all local streams.
 ::
-::    usage: poke with an action. ie :chat-stream-hook [%stream /urbit-help]
+::    usage: poke with an action. ie :graph-stream-hook [%stream /urbit-help]
 ::
-/+  chat-store,
+/+  graph-store,
     default-agent, verb, dbug,
     fid=fakeid, *server
 ::
@@ -23,7 +24,6 @@
   $:  %0
       streams=(set source)
       viewers=(jug source eyre-id)
-      tmp=(set eyre-id)  ::TODO  remove
       ::TODO  we need to expire these to avoid a space-leak
       ::      probably clean up expired ids every +identity-duration
       ::TODO  shouldn't this live in fakeid-store instead? but how update?
@@ -31,10 +31,10 @@
       banned=(set address:eyre)
   ==
 ::
-::NOTE  we could support _streaming_ foreign chats fairly easily,
+::NOTE  we could support _streaming_ foreign graphs fairly easily,
 ::      but posting to them is a way different story,
 ::      so we just go full local-only for now.
-+$  source  path
++$  source  term
 ::
 +$  eyre-id  @ta
 ::
@@ -66,6 +66,7 @@
     :_  this
     :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
         kick-heartbeat:do
+        watch-graphs:do
     ==
   ::
   ++  on-save  !>(state)
@@ -112,7 +113,7 @@
       (on-leave:def path)
     =/  who=eyre-id  i.t.path
     :-  ~
-    =-  this(viewers -, tmp (~(del in tmp) who))
+    =-  this(viewers -)
     ::NOTE  we really only delete from one, but we don't want to keep a
     ::      reverse lookup just for that optimization.
     %-  ~(run by viewers)
@@ -126,28 +127,18 @@
       ?~  p.sign  [~ this]
       %-  (slog leaf+"failed poke on {(spud wire)}" u.p.sign)
       [~ this]
-    ?.  ?=([%chat-updates ^] wire)  (on-agent:def wire sign)
-    ?-  -.sign
+    ?.  ?=([%listen ~] wire)  (on-agent:def wire sign)
+    ?+  -.sign  (on-agent:def wire sign)
         %kick
-      [[(watch-source:do t.wire)]~ this]
-    ::
-        %watch-ack
-      ?~  p.sign  [~ this]
-      =/  =tank  leaf+"{(trip dap.bowl)} failed subscribe. stream disabled!"
-      %-  (slog tank u.p.sign)
-      =^  cards  state
-        (stop-stream:do t.wire)
-      [cards this]
+      [[watch-graphs:do]~ this]
     ::
         %fact
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-        %chat-initial  [~ this]
-      ::
-          %chat-update
+          %graph-update
         =^  cards  state
-          (handle-chat-update:do t.wire !<(update:chat-store vase))
+          (handle-graph-update:do !<(update:graph-store vase))
         [cards this]
       ==
     ==
@@ -156,12 +147,12 @@
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
     ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-        [%e %bound *]
+        [%eyre %bound *]
       ~?  !accepted.sign-arvo
         [dap.bowl 'bind rejected!' binding.sign-arvo]
       [~ this]
     ::
-        [%b %wake *]
+        [%behn %wake *]
       ?.  ?=([%heartbeat ~] wire)  (on-arvo:def wire sign-arvo)
       [send-heartbeat:do this]
     ==
@@ -208,26 +199,14 @@
       `[1 '\0a']
   ==
 ::
-++  watch-source
-  |=  =source
+++  watch-graphs
   ^-  card
   :*  %pass
-      [%chat-updates source]
+      /listen
       %agent
-      [our.bowl %chat-store]
+      [our.bowl %graph-store]
       %watch
-      [%mailbox source]
-  ==
-::
-++  leave-source
-  |=  =source
-  ^-  card
-  :*  %pass
-      [%chat-updates source]
-      %agent
-      [our.bowl %chat-store]
-      %leave
-      ~
+      /updates
   ==
 ::
 ++  send-to-viewers
@@ -265,7 +244,7 @@
           (~(has in streams) source)
       ==
     [~ state]
-  :-  [(watch-source source)]~
+  :-  ~
   state(streams (~(put in streams) source))
 ::
 ++  stop-stream
@@ -273,7 +252,7 @@
   ^-  (quip card _state)
   ?.  (~(has in streams) source)
     [~ state]
-  :-  [(leave-source source)]~
+  :-  ~
   %_  state
     streams  (~(del in streams) source)
     viewers  (~(del by viewers) source)
@@ -298,33 +277,41 @@
 ::
 ::  outgoing flows
 ::
-++  handle-chat-update
-  |=  [=source upd=update:chat-store]
+++  handle-graph-update
+  |=  [upd=update:graph-store]
   ^-  (quip card _state)
-  ?.  ?=(?(%message %messages) -.upd)
+  ?.  ?=(%add-nodes -.q.upd)
+    [~ state]
+  =*  source  name.resource.q.upd
+  ?.  (~(has in streams) source)
     [~ state]
   ::  accept !ban commands from text messages sent by real identities
   ::
   =/  banlist=(list @p)
     %+  murn
-      ?-  -.upd
-        %message   [envelope.upd]~
-        %messages  envelopes.upd
-      ==
-    |=  envelope:chat-store
-    ?.  ?=(%text -.letter)      ~
+      ~(val by nodes.q.upd)
+    |=  [post:graph-store *]
     ?.  (lte (met 3 author) 8)  ~
-    %+  rush  text.letter
+    ~&  contents
+    ?.  ?=([[%text *] *] contents)  ~
+    ?:  ?&  =('!ban' text.i.contents)
+            ?=([[%mention *] *] t.contents)
+        ==
+      (some ship.i.t.contents)
+    %+  rush  text.i.contents
     (ifix [(jest '!ban ~') (star next)] fed:ag)
   =|  cards=(list card)
   |-
   ?~  banlist
     :_  state
     %+  weld  cards
-    ::  forward update to all viewers
+    ::  forward posts to all viewers
     ::
     %+  send-to-viewers  source
-    (update:enjs:chat-store upd)
+    :-  %a
+    %+  turn  ~(val by nodes.q.upd)
+    |=  [=post:graph-store *]
+    (post:enjs:graph-store post)
   =^  caz  state
     (ban-comet i.banlist)
   $(banlist t.banlist, cards (weld caz cards))
@@ -371,9 +358,9 @@
     url.request.inbound-request
   ::  ignore requests that point to unsupported resources
   ::
-  ?.  &(?=([%stream *] site) ?=([~ %json] ext))
+  ?.  &(?=([%stream @ ~] site) ?=([~ %json] ext))
     [[~ not-found:gen] state]
-  =/  =source  t.site
+  =/  =source  i.t.site
   ?.  (~(has in streams) source)
     [[~ not-found:gen] state]
   ::  add eyre-id as viewer for requested source
@@ -390,7 +377,8 @@
     (new-session:fakeid identity-duration)
   =/  =header-list:http
     ?^  who  ~
-    (set-session-cookie:fakeid session-key until.session)
+    ::TODO  don't need samesite=none in some contexts, but how can we tell?
+    (set-session-cookie:fakeid session-key until.session &)
   ::  keep track of all addresses this session has connected from,
   ::  but never track localhost requests
   ::
@@ -406,20 +394,21 @@
   :-  [200 header-list]
   %-  some
   %-  make-stream-data
-  %-  update:enjs:chat-store
-  :-  %messages
-  :^  source  *@ud  *@ud
-  %-  flop
-  %+  scag  initial-messages
-  =<  envelopes  ::  newest-first
-  %-  need
-  .^  (unit mailbox:chat-store)
+  :-  %a
+  =;  recents=(list [* post:graph-store *])
+    %+  turn  recents
+    |=  [* =post:graph-store *]
+    (post:enjs:graph-store post)
+  =;  upd
+    ?>  ?=(%add-graph +>-.upd)
+    %+  scag  initial-messages
+    (bap:orm:graph-store graph.q.upd)
+  .^  update:graph-store
     %gx
     (scot %p our.bowl)
-    %chat-store
+    %graph-store
     (scot %da now.bowl)
-    %mailbox
-    (snoc source %noun)
+    /graph/(scot %p our.bowl)/[source]/graph-update
   ==
 ::
 ++  handle-post
@@ -434,9 +423,9 @@
   =/  [[ext=(unit @ta) site=(list @t)] *]
     %-  parse-request-line
     url.request.inbound-request
-  ?.  &(?=([%stream *] site) ?=(~ ext))
+  ?.  &(?=([%stream @ ~] site) ?=(~ ext))
     `not-found:gen
-  =/  =source  t.site
+  =/  =source  i.t.site
   ::  request must have some content
   ::
   =/  body=@t
@@ -456,19 +445,17 @@
   ::
   :_  [[200 ~] ~]
   %-  some
-  %-  send-message
-  :+  source
+  %^  send-message
+      source
     u.who
-  %-  text-to-letter
-  (end 3 max-message-length body)
+  %-  text-to-content
+  (end 3^max-message-length body)
 ::
-++  text-to-letter
+++  text-to-content
   %+  curr  rash
-  ::TODO  below largely copied from chat-cli
   ::NOTE  we intentionally don't do #expression parsing
   |^  ;~  pose
         (stag %url turl)
-        (stag %me ;~(pfix vat text))
         (stag %text text)
       ==
   ::  +turl: url parser
@@ -485,23 +472,30 @@
   --
 ::
 ++  send-message
-  |=  [=source as=ship =letter:chat-store]
+  |=  [=source as=ship =content:graph-store]
   ^-  card
   :*  %pass
-      [%send source]
+      /send/[source]
       %agent
-      [our.bowl %chat-store]
+      [our.bowl %graph-store]
       %poke
-      %chat-action
+      %graph-update
     ::
-      !>  ^-  action:chat-store
-      :-  %message
-      :-  source
-      ^-  envelope:chat-store
-      ::NOTE  this would be rudimentary spam protection...
-      ::      if only chat-store rejected duplicate uid messages
-      ::      (at least chat-cli doesn't render such messages)
-      :-  (shax (jam (div now.bowl ~m5) as letter))
-      [*@ as now.bowl letter]
+      !>  ^-  update:graph-store
+      ::TODO  this is api, man... move into lib or w/e
+      =|  nodes=(list [index:graph-store node:graph-store])
+      :+  %0  now.bowl
+      :+  %add-nodes  [our.bowl source]
+      %+  ~(put by *(map index:graph-store node:graph-store))
+        [now.bowl]~
+      :_  [%empty ~]
+      ^-  post:graph-store
+      :*  as
+          [now.bowl]~
+          now.bowl
+          [content]~
+          ~
+          ~
+      ==
   ==
 --

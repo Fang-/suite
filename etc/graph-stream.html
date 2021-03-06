@@ -110,7 +110,7 @@
     let viewport;
     let input;
     const base = 'https://urb.pal.dev/stream/lobby';
-    let latestHeard = -1;
+    let known = [];
 
     function prep() {
       scroller = document.getElementById('scroller');
@@ -190,10 +190,8 @@
 
       for (i in messages) {
         const msg = messages[i];
-        //NOTE if server sends us messages out of order, we won't show them!
-        //NOTE nr 0 handling here is a hack around regression of #2510
-        if (msg.index > 0 && msg.index <= latestHeard) continue;
-        latestHeard = Math.max(msg.index, latestHeard);
+        if (known.includes(msg.index)) continue;
+        known.push(msg.index);
         appendMessage(renderPost(msg));
       }
     }

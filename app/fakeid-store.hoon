@@ -12,7 +12,8 @@
 +$  state-0
   $:  %0
       sessions=(map session-key session)
-      names=(map ship session-key)
+      names=(map ship session-key)  ::TODO  also address:eyre
+      ::TODO  banned=(set address:eyre)
   ==
 ::
 +$  card  card:agent:gall
@@ -64,7 +65,7 @@
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
     ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-        [%b %wake *]
+        [%behn %wake *]
       =^  cards  state
         (expire-session:do |+(slav %uv (snag 0 wire)))
       [cards this]

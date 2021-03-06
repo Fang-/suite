@@ -73,14 +73,17 @@
 ++  cookie-name  "fakeid-{(slag 1 (scow %p our.bowl))}"
 ::
 ++  set-session-cookie
-  |=  [=session-key until=time]
+  |=  [=session-key until=time ssn=?]
   ^-  header-list:http
   :_  ~
   :-  'Set-Cookie'
   %-  crip
-  %+  weld
-    "{cookie-name}={(scow %uv session-key)}; Expires="
-  (dust:chrono:userlib (yore until))
+  ;:  weld
+    "{cookie-name}={(scow %uv session-key)}; "
+    ?:(ssn "SameSite=None; Secure; " "")
+    "Expires="
+    (dust:chrono:userlib (yore until))
+  ==
 ::
 ++  identity-from-request
   |=  =inbound-request:eyre
@@ -101,6 +104,8 @@
   =/  key=(unit session-key)  (slaw %uv (crip u.session-cookie))
   ?~  key  ~
   (get-session u.key)
+::
+::TODO  get-or-make-session
 ::
 ::TODO  into /lib/server
 ++  cookies-from-request

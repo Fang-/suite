@@ -87,7 +87,7 @@
   ;~(pfix p r)
 ::
 ++  lean                                                ::  measure to parse
-  |*  [measure=rule separate=rule parse=$-(@ud rule)]
+  |*  [measure=rule separate=rule parse=$-(* rule)]
   |=  =nail
   =/  edge=(like @)  (;~(sfix measure separate) nail)
   ?~  q.edge  edge

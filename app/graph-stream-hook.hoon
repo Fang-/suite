@@ -136,7 +136,7 @@
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-          %graph-update
+          %graph-update-1
         =^  cards  state
           (handle-graph-update:do !<(update:graph-store vase))
         [cards this]
@@ -400,7 +400,7 @@
     |=  [* =post:graph-store *]
     (post:enjs:graph-store post)
   =;  upd
-    ?>  ?=(%add-graph +>-.upd)
+    ?>  ?=(%add-graph +<.upd)
     %-  flop
     %+  scag  initial-messages
     (tap:orm:graph-store graph.q.upd)
@@ -409,7 +409,7 @@
     (scot %p our.bowl)
     %graph-store
     (scot %da now.bowl)
-    /graph/(scot %p our.bowl)/[source]/graph-update
+    /graph/(scot %p our.bowl)/[source]/graph-update-1
   ==
 ::
 ++  handle-post
@@ -480,12 +480,12 @@
       %agent
       [our.bowl %graph-store]
       %poke
-      %graph-update
+      %graph-update-1
     ::
       !>  ^-  update:graph-store
       ::TODO  this is api, man... move into lib or w/e
       =|  nodes=(list [index:graph-store node:graph-store])
-      :+  %0  now.bowl
+      :-  now.bowl
       :+  %add-nodes  [our.bowl source]
       %+  ~(put by *(map index:graph-store node:graph-store))
         [now.bowl]~

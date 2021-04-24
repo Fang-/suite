@@ -7,8 +7,8 @@ usage encouraged! issues welcome! provided "as is"!
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`. (try `|link ~paldev %duiker`!)
 - **bard**: interactive storyteller for use with `|link`.
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
+- **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
 - **djay**: backend for synced viewing of youtube videos, sourced from a chat channel. (outdated)
-- **chat-stream-hook**: allows unauthenticated randos to partake in chat over http. (outdated)
 
 ### userspace infrastructure
 

@@ -81,7 +81,7 @@
       ::
           %fact
         ?+  p.cage.sign  (on-agent:def wire sign)
-            %graph-update
+            %graph-update-2
           =/  upd  !<(update:graph q.cage.sign)
           =^  cards  state
             (process-graph-update:do q.upd)
@@ -111,22 +111,23 @@
     ^-  card
     ::TODO  this is api, man... move into lib or w/e
     =;  upd=update:graph
-      =-  [%pass / %agent [our.bowl -] %poke %graph-update !>(upd)]
+      =-  [%pass / %agent [our.bowl -] %poke %graph-update-2 !>(upd)]
       ?:  =(entity.reid our.bowl)
         %graph-store
       %graph-push-hook
     =|  nodes=(list [index:graph node:graph])
     |-  ^-  upd=update:graph
     ?~  msgs
-      :+  %0  now.bowl
+      :-  now.bowl
       :+  %add-nodes  reid
       (~(gas by *(map index:graph node:graph)) nodes)
     =.  now.bowl  +(now.bowl)  ::NOTE  so we don't re-use indices
     =-  $(nodes [- nodes], msgs t.msgs)
     :-  [now.bowl]~
     :_  [%empty ~]
-    ^-  post:graph
-    :*  our.bowl
+    ^-  maybe-post:graph
+    :*  %&
+        our.bowl
         [now.bowl]~
         now.bowl
         [%text i.msgs]~
@@ -137,7 +138,7 @@
 ::  +process-graph-update: per-response logic
 ::
 ++  process-graph-update
-  |=  upd=update-0:graph
+  |=  upd=action:graph
   ^-  (quip card _state)
   :_  state
   ::  relevancy and sanity checks
@@ -153,7 +154,8 @@
     [(send:talk reid out)]~
   =;  new=(list @t)
     $(out (weld out new), msgs t.msgs)
-  =*  post  post.i.msgs
+  ?:  ?=(%| -.post.i.msgs)  ~
+  =*  post  p.post.i.msgs
   =*  ship  author.post
   ?:  =(our.bowl ship)
     ~

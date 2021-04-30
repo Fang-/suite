@@ -136,7 +136,7 @@
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-          %graph-update-1
+          %graph-update-2
         =^  cards  state
           (handle-graph-update:do !<(update:graph-store vase))
         [cards this]
@@ -290,7 +290,9 @@
   =/  banlist=(list @p)
     %+  murn
       ~(val by nodes.q.upd)
-    |=  [post:graph-store *]
+    |=  [m=maybe-post:graph-store *]
+    ?:  ?=(%| -.m)  ~
+    =+  p.m
     ?.  (lte (met 3 author) 8)  ~
     ~&  contents
     ?.  ?=([[%text *] *] contents)  ~
@@ -309,9 +311,11 @@
     ::
     %+  send-to-viewers  source
     :-  %a
-    %+  turn  ~(val by nodes.q.upd)
-    |=  [=post:graph-store *]
-    (post:enjs:graph-store post)
+    %+  murn  ~(val by nodes.q.upd)
+    |=  [post=maybe-post:graph-store *]
+    ^-  (unit json)
+    ?:  ?=(%| -.post)  ~
+    `(post:enjs:graph-store p.post)
   =^  caz  state
     (ban-comet i.banlist)
   $(banlist t.banlist, cards (weld caz cards))
@@ -395,10 +399,12 @@
   %-  some
   %-  make-stream-data
   :-  %a
-  =;  recents=(list [* post:graph-store *])
-    %+  turn  recents
-    |=  [* =post:graph-store *]
-    (post:enjs:graph-store post)
+  =;  recents=(list [* maybe-post:graph-store *])
+    %+  murn  recents
+    |=  [* m=maybe-post:graph-store *]
+    ^-  (unit json)
+    ?:  ?=(%| -.m)  ~
+    `(post:enjs:graph-store p.m)
   =;  upd
     ?>  ?=(%add-graph +<.upd)
     %-  flop
@@ -409,7 +415,7 @@
     (scot %p our.bowl)
     %graph-store
     (scot %da now.bowl)
-    /graph/(scot %p our.bowl)/[source]/graph-update-1
+    /graph/(scot %p our.bowl)/[source]/graph-update-2
   ==
 ::
 ++  handle-post
@@ -480,7 +486,7 @@
       %agent
       [our.bowl %graph-store]
       %poke
-      %graph-update-1
+      %graph-update-2
     ::
       !>  ^-  update:graph-store
       ::TODO  this is api, man... move into lib or w/e
@@ -490,8 +496,9 @@
       %+  ~(put by *(map index:graph-store node:graph-store))
         [now.bowl]~
       :_  [%empty ~]
-      ^-  post:graph-store
-      :*  as
+      ^-  maybe-post:graph-store
+      :*  %&
+          as
           [now.bowl]~
           now.bowl
           [content]~

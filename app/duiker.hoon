@@ -400,7 +400,7 @@
   (plus ;~(pose nud low hep dot sig))
 ::
 ++  select       ;~(pose select-list select-hash)
-++  select-list  (stag %list dit:ag)
+++  select-list  (stag %list dit)
 ++  select-hash  (stag %hash hex)
 ::
 ++  command-loop

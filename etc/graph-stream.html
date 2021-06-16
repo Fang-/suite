@@ -250,7 +250,7 @@
         const c = contents[0];
         contents = contents.slice(1);
 
-        if (c.text) {
+        if (c.text === '' || c.text) {
           body.appendChild(document.createTextNode(c.text));
         } else if (c.mention) {
           body.appendChild(document.createTextNode(' '+ cite(c.mention) +' '));
@@ -266,8 +266,11 @@
           let out = document.createElement('pre');
           out.appendChild(document.createTextNode(c.code.output));
           body.appendChild(out);
+        } else if (c.reference) {
+          body.appendChild(document.createTextNode('^'));
         } else {
-          body.appendChild(document.createTextNode('???'));
+          console.log('weird node', c);
+          body.appendChild(document.createTextNode('[??]'));
         }
       }
       return body;

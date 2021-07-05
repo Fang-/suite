@@ -73,7 +73,7 @@
     !>  ^-  sole-effect:sole
     :~  %mor
         [%txt ""]
-        [%txt "your unique referral link:"]
+        [%txt "your private page, do not share this:"]
         [%url url]
         [%txt ""]
         [%bye ~]

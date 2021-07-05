@@ -82,7 +82,7 @@
   ?~  sas  (pure:m res)
   =*  next  $(sas t.sas)
   =,  i.sas
-  ;<  ves=(list [evid=@t when=@da name=@t])  bind:m
+  ;<  ves=(list [evid=@t when=@da name=@t round=@t])  bind:m
     (fetch-events stid)
   ?:  =(~ ves)
     ~&  [%no-events-for stid name (~(got by sports) spid:(~(got by templates.db) teid:(~(got by tourneys.db) toid)))]
@@ -91,7 +91,7 @@
     |-
     ?~  ves  res
     =,  i.ves
-    =.  res  (~(put by res) evid name when stid)
+    =.  res  (~(put by res) evid name round when stid)
     $(ves t.ves)
   ;<  ~  bind:m
     (sleep:strandio ~s0..4000)
@@ -100,13 +100,13 @@
 ++  fetch-events
   |=  stid=@t
   =*  x  %fetch-stages
-  =/  m  (strand:strandio ,(list [evid=@t wen=@da name=@t]))
+  =/  m  (strand:strandio ,(list [evid=@t wen=@da name=@t round=@t]))
   ;<  now=@da   bind:m  get-time:strandio
   ;<  jon=json  bind:m
     %-  fetch  ^~
     %-  zing
     :~  "/event/list/"
-        "?includeEventProperties=no"
+        "?includeEventProperties=yes"
         "&tf=U"
         "&tournament_stageFK={(trip stid)}"
     ==
@@ -123,15 +123,27 @@
   %-  pure:m
   %+  murn  ~(tap by p.jon)
   |=  [key=@t jon=json]
-  ^-  (unit [@t @da @t])
+  ^-  (unit [@t @da @t @t])
   ?.  ?=([%o *] jon)
     ~&  [%res-res-res-not-obj x stid key]
     ~
   ~|  [%fev key jon]
-  =;  res=[@t when=@da @t]
-    ?:  &(?=(^ testing) (lth when.res u.testing))
+  =;  [evid=@t when=@da nom=@t]
+    ?:  &(?=(^ testing) (lth when u.testing))
       ~
-    `res
+    ?:  &(?=(~ testing) (lth when start-date))
+      ~
+    =-  `[evid when nom -]
+    ?~  prop=(~(got by p.jon) 'property')  ''
+    ?.  ?=([%o *] prop)  ''
+    %+  roll  ~(tap by p.prop)
+    |=  [[@t jon=json] out=@t]
+    ?.  =('' out)  out
+    =/  [name=@t value=@t]
+      =,  dejs:format
+      %.  jon
+      (ot 'name'^so 'value'^so ~)
+    ?:(=('Round' name) value '')
   :+  key
     %.  (~(got by p.jon) 'startdate')
     %+  cu:dejs:format  ::TMP  for live testing on old data
@@ -214,10 +226,10 @@
     :+  key
       (so:dejs:format (~(got by p.jon) 'gender'))
     (so:dejs:format (~(got by p.jon) 'name'))
-  ?:  ?|  ?=(^ (find "Qualification" (trip name.res)))
-          ?=(^ (find "Placement" (trip name.res)))
-      ==
-    ~
+  :: ?:  ?|  ?=(^ (find "Qualification" (trip name.res)))
+  ::         ?=(^ (find "Placement" (trip name.res)))
+  ::     ==
+  ::   ~
   (some res)
 ::
 ++  fetch-all-tourneys

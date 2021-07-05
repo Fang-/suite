@@ -243,7 +243,7 @@
       %+  skim  ~(tap by events)
       |=  [evid=@t *]
       !(~(has by started) evid)
-    |=([[* * a=@da *] [* * b=@da *]] (lth a b))
+    |=([[* * * a=@da *] [* * * b=@da *]] (lth a b))
   ::
   ++  happening-events
     ^-  (set @t)
@@ -306,7 +306,7 @@
   ::
   ^-  (quip card _state)
   =/  [next=(unit @da) news=(list @t)]
-    =/  eves=(list [evid=@t * when=@da *])
+    =/  eves=(list [evid=@t * * when=@da *])
       unstarted-events:dab
     =|  news=(list @t)
     |-  ::NOTE  assumes sorted eves
@@ -373,7 +373,7 @@
 ++  event-name
   |=  evid=@t
   ^-  @t
-  =/  event=[name=@t when=@da stid=@t]
+  =/  event=[name=@t round=@t when=@da stid=@t]
     (~(got by events.db) evid)
   =/  stage=[name=@t gene=gender toid=@t]
     (~(got by stages.db) stid.event)
@@ -383,7 +383,7 @@
     %-  ~(got by tourneys.db)        toid.stage
   =?  sport  ?=(~ (find "Olympic" (trip name.stage)))
     name.stage  ::TODO  mistake? sucks for boxing, sailing etc
-  (rap 3 sport ': ' name.event ~)
+  (rap 3 sport ': ' name.event ' (' round.event ')' ~)
   ::TODO  if ev name contains men's or women's, leave as is
   ::      if ev name contains male or female, replace with men's or women's
   ::      if ev name contains neither, finds gender, prepend if necessary

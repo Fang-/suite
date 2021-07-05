@@ -11,7 +11,7 @@
 +$  templates-db  (map @t [name=@t gene=gender spid=@t])
 +$  tourneys-db   (map @t [name=@t teid=@t])  ::NOTE  name copied from template
 +$  stages-db     (map @t [name=@t gene=gender toid=@t])
-+$  events-db     (map @t [name=@t when=@da stid=@t])
++$  events-db     (map @t [name=@t round=@t when=@da stid=@t])
 ::
 +$  gender  ?(%male %female %mixed)
 ::

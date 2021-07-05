@@ -11,13 +11,34 @@
 |^
   ;<  results=(map @t (map @t json))  bind:m
     (fetch-all-results events)
-  (pure:m !>(results))
+  %-  pure:m
+  !>  ^-  (map @t result)
+  %-  ~(urn by results)
+  |=  [evid=@t res=(map @t json)]
+  (parse-result evid res)
 ::
-::TODO  more advanced result parsing,
-::      but... what info do we want out?
-::      rankings | match result
-::      need to display various kinds of scores/times/distances
-::      at the very least: winning country, and gold=?
+++  parse-result
+  |=  [evid=@t res=(map @t json)]
+  ^-  result
+  =/  properties=(map @t @t)
+    %-  ~(gas in *(map @t @t))
+    ?~  p=(~(get by res) 'property')  ~
+    ?.  ?=([%o *] u.p)  ~
+    %+  turn  ~(tap by p.u.p)
+    |=  [k=@t j=json]
+    =,  dejs:format
+    ((ot 'name'^so 'value'^so ~) j)
+  =/  pt=?(%team %person)
+    ?.  (~(has by properties) 'ParticipantType')
+      %person
+    =/  type=@t  (~(got by properties) 'ParticipantType')
+    ?:  =('team' type)
+      %team
+    ?:  =('athlete' type)
+      %person
+    ~&  [%strange-pt evid (~(got by properties) 'ParticipantType')]
+    %person
+  *result
 ::
 ++  fetch-all-results
   |=  evs=(list @t)
@@ -56,7 +77,7 @@
     ~&  [%res-not-obj x evid jon]
     (pure:m ~)
   ?.  (~(has by p.jon) 'event')
-    ~&  [%res-weird-keys x evid ~(key by p.jon)]
+    ~&  [%res-weird-keys x evid p.jon]
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'event')
   ?.  ?=([%o *] jon)

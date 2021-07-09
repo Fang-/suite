@@ -195,7 +195,7 @@
   =/  submit=manx
     ?.  closed
       ;div
-        ;b:"{(flop (slag 6 (flop (scow %dr (sub close-date now.bowl)))))} until submissions close."
+        ;b:"{(flop (slag 6 (flop (scow %dr (sub close-date now.bowl)))))} until submissions close. You are free to revise your entry until then."
         ;br;
         ;button(type "submit"):"Submit"
       ==

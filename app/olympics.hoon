@@ -30,16 +30,23 @@
   ==
 ::
 +$  action
-  $%  [%xx ~]
+  $%  [%test-msg ~]
+      [%test-reply msg=@]
+      [%test-update-post ~]
   ==
 ::
 ++  rate
   |%
-  ++  data     ~h4  ::~h1
-  ++  results  ~m5   ::~m5
+  ++  data     ~h1
+  ++  results  ~m5
   --
 ::
-++  live-chat  `resource`[~nec %live-chat-9406]
+::TODO  update!!
+++  group-id  `resource`[~sun %olympics-2020]
+++  live-chat  `resource`[~sun %live-chat-7774]
+++  board  `resource`[~sun %schedule-2803]
+++  schedule  `@`0i170141184505140271778156779315402899456
+::
 +$  card  card:agent:gall
 --
 ::
@@ -59,8 +66,10 @@
   ++  on-init
     ^-  (quip card _this)
     =^  cards  state  on-data-timer:do
-    ::TODO  create group? feeds?
-    [[(once:talk:do live-chat 'greetings!') cards] this]
+    :_  this
+    :+  set-daily-timer:do
+      (once:talk:do live-chat 'greetings!')
+    cards
   ::
   ++  on-save  !>(state)
   ++  on-load
@@ -75,8 +84,23 @@
     ?.  ?=(%noun mark)  (on-poke:def mark vase)
     ?>  =(our.bowl src.bowl)
     =+  !<(=action vase)
-    ::TODO
-    !!
+    ?-  -.action
+        %test-msg
+      ~&  now.bowl
+      [[(once:talk:do live-chat 'hello')]~ this]
+    ::
+        %test-reply
+      [[(reply:talk:do live-chat [msg.action]~ [now.bowl]~ 'bye')]~ this]
+    ::
+        %test-update-post
+      =-  [[-]~ this]
+      %+  edit:publish:do  schedule
+      :~  [%text 'title lol']
+          [%text 'this is the body:']
+          [%text (scot %da now.bowl)]
+          [%text 'over and\0aout!!!']
+      ==
+    ==
   ::
   ++  on-agent
     |=  [=wire =sign:agent:gall]
@@ -134,10 +158,11 @@
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
     ?+  wire  (on-arvo:def wire sign-arvo)
-        [%timer ?(%data %event %results) ~]
+        [%timer ?(%daily %data %event %results) ~]
       ?>  ?=(%wake +<.sign-arvo)
       =^  cards  state
         ?-  i.t.wire
+          %daily    on-daily-timer:do
           %data     on-data-timer:do
           %event    publish-started-events:do
           %results  on-results-timer:do
@@ -196,14 +221,8 @@
 ::
 ++  talk
   |%
-  ::TODO  review & update
-  ++  once
-    |=  [=resource msg=@t]
-    ^-  card
-    (send resource [now.bowl]~^msg ~)
-  ::
-  ++  send
-    |=  [=resource msgs=(list [=index:graph msg=@t])]
+  ++  post
+    |=  [=resource msgs=(list [=index:graph msg=(list content:graph)])]
     ^-  card
     =;  upd=update:graph
       [%pass / %agent [our.bowl %graph-push-hook] %poke %graph-update-2 !>(upd)]
@@ -222,21 +241,98 @@
     :*  our.bowl
         index.i.msgs
         now.bowl
-        [%text msg.i.msgs]~
+        msg.i.msgs
         ~
         ~
     ==
   ::
+  ++  once
+    |=  [=resource msg=@t]
+    ^-  card
+    (send resource [now.bowl]~^msg ~)
+  ::
+  ++  send
+    |=  [=resource msgs=(list [=index:graph msg=@t])]
+    ^-  card
+    %+  post  resource
+    %+  turn  msgs
+    |=  [=index:graph msg=@t]
+    [index [%text msg]~]
+  ::
   ++  reply
-    |=  [=resource parent=@ id=@ msg=@t]
-    ::TODO
-    !!
+    |=  [=resource og=index:graph id=index:graph msg=@t]
+    ::TODO test
+    ^-  card
+    %+  post  resource
+    [id ~[[%reference %graph group-id resource og] [%text msg]]]~
+  --
+::
+++  publish
+  |%
+  ++  next-rev
+    |=  notenum=@
+    ^-  @
+    =/  =update:graph
+      .^  update:graph
+        %gx
+        (scot %p our.bowl)
+        %graph-store
+        (scot %da now.bowl)
+        %node
+        (scot %p entity:board)
+        name:board
+        (scot %ud notenum)
+        /1/graph-update-2
+      ==
+    ?>  ?=(%add-nodes -.q.update)
+    =/  =node:graph  (~(got by nodes.q.update) ~[notenum 1])
+    ?>  ?=(%graph -.children.node)
+    +((roll ~(tap in ~(key by p.children.node)) max))
+  ::
+  ++  edit
+    |=  [notenum=@ contents=(list content:graph)]
+    ^-  card
+    =/  revnum=@  (next-rev notenum)
+    =;  upd=update:graph
+      [%pass / %agent [our.bowl %graph-push-hook] %poke %graph-update-2 !>(upd)]
+    ::TODO  this is api, man... move into lib or w/e
+    =;  =node:graph
+      :-  now.bowl
+      :+  %add-nodes  board
+      =/  nodes=(list [index:graph node:graph])
+        :~  :-  ~[notenum 1 revnum]  node
+        ==
+      (~(gas by *(map index:graph node:graph)) nodes)
+    :_  [%empty ~]
+    ^-  maybe-post:graph
+    :-  %&
+    :*  our.bowl
+        ~[notenum 1 revnum]
+        now.bowl
+        contents
+        ~
+        ~
+    ==
+    :: const newRev: Post = {
+    ::   author: `~${window.ship}`,
+    ::   index: `/${noteId.toString()}/1/${rev}`,
+    ::   'time-sent': now,
+    ::   contents: [{ text: title }, ...tokenisedBody],
+    ::   hash: null,
+    ::   signatures: []
+    :: };
+    :: const nodes = {
+    ::   [newRev.index]: {
+    ::     post: newRev,
+    ::     children: null
+    ::   }
+    :: };
   --
 ::
 ++  dab
   |%
   ++  unstarted-events
-    ^-  (list [evid=@t name=@t when=@da stid=@t])
+    ^-  (list [evid=@t name=@t round=@t when=@da stid=@t])
     =>  [started=started events=events.db ..zuse]
     ~+
     %+  sort
@@ -273,14 +369,26 @@
   ^-  (quip card _state)
   =^  cards  state
     %-  refresh-db
-    ?:  (lte ~d4 (sub now.bowl last-db))
+    ?:  (lte ~d1 (sub now.bowl last-db))
       %full
-    ?:  (lte ~h8 (sub now.bowl last-stages))
+    ?:  (lte ~h4 (sub now.bowl last-stages))
       %stages
     %events
   :_  state
   :_  cards
   (wait:b:sys /timer/data (add now.bowl data:rate))
+::
+++  set-daily-timer
+  ^-  card
+  %+  wait:b:sys  /timer/daily
+  =-  ?:((gth - now.bowl) - (add - ~d1))
+  %+  add  ~h15
+  (sub now.bowl (mod now.bowl ~d1))
+::
+++  on-daily-timer
+  ^-  (quip card _state)
+  ::TODO  actually do daily things
+  [[set-daily-timer]~ state]
 ::
 ::  +|  %data-flow
 ::

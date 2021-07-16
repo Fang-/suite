@@ -202,14 +202,14 @@
     ;p.red:"The Games have begun! Your entry, shown here, is frozen."
   |^  ;html
         ;head
-          ;title:"~paldev/olympics - Fantasy"
+          ;title:"~paldev/olympics-2020 - Fantasy"
           ;meta(charset "utf-8");
           ;style:"{(trip style)}"
         ==
         ;body
           ;h2:"Fantasy Olympics selection for {(scow %p who)}"
           Up-to-date information on rules and scoring can be found in the
-          ~paldev/olympics group.
+          ~paldev/olympics-2020 group.
           ;+  ?~  msg  ;p:""
               ?:  ?=(%& -.u.msg)
                 ;p.green:"{(trip p.u.msg)}"

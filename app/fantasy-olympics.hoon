@@ -75,7 +75,7 @@
         [%txt ""]
         [%txt "your private page, do not share this:"]
         [%url url]
-        [%txt url]
+        [%txt (trip url)]
         [%txt ""]
         [%bye ~]
     ==

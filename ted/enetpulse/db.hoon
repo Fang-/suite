@@ -14,7 +14,8 @@
 /-  *enetpulse
 /+  strandio
 ::
-=/  testing=(unit @da)  ~ ::`~2016.7.4
+=/  testing=(unit @da)  `~2016.7.4
+=/  start-date=@da  ~2021.7.20
 ::
 |=  args=vase
 =+  !<([~ db=full-db] args)
@@ -51,11 +52,11 @@
   =.  events.db  events
   ::
   :: ~&  :-  %event-names
-  ::   ^-  (list [@da @t])
-  ::   =-  (sort - |=([[a=@da *] [b=@da *]] (lth a b)))
+  ::   ^-  (list [@t @t])
+  ::   :: =-  (sort - |=([[a=@da *] [b=@da *]] (lth a b)))
   ::   %+  turn  ~(tap by events)
-  ::   |=  [evid=@t name=@t when=@da stid=@t]
-  ::   :-  when
+  ::   |=  [evid=@t name=@t round=@t when=@da stid=@t]
+  ::   :-  evid
   ::   ^-  @t
   ::   =/  stage=[name=@t gene=gender toid=@t]
   ::     (~(got by stages) stid)
@@ -65,13 +66,13 @@
   ::     %-  ~(got by tourneys)       toid.stage
   ::   =?  sport  ?=(~ (find "Olympic" (trip name.stage)))
   ::     name.stage  ::TODO  mistake? sucks for boxing, sailing etc
-  ::   (rap 3 sport ': ' name ~)
+  ::   (rap 3 sport ': ' name ' (' round ')' ~)
   ::   ::TODO  if name contains men's or women's, leave as is
   ::   ::      if name contains male or female, replace with men's or women's
   ::   ::      if name contains neither, finds gender, prepend if necessary
   ::   ::TODO  maybe include stage name?
-  :: ::
-  :: (pure:m !>(`full-db`[templates tourneys stages events]))
+  ::
+  (pure:m !>(`full-db`[templates tourneys stages events]))
 ::
 ::
 ++  fetch-all-events
@@ -366,7 +367,8 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'tournament_templates')
   ?.  ?=([%o *] jon)
-    ~&  [%res-res-not-obj x sport jon]
+    ~?  !=([%a ~] jon)
+      [%res-res-not-obj x sport jon]
     (pure:m ~)
   %-  pure:m
   %+  murn  ~(tap by p.jon)

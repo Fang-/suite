@@ -12,6 +12,66 @@
 /-  *enetpulse
 ::
 |%
+++  event-name
+  |=  [db=full-db evid=@t]
+  ^-  @t
+  =/  event=[name=@t round=@t when=@da stid=@t]
+    (~(got by events.db) evid)
+  =/  stage=[name=@t gene=gender toid=@t]
+    (~(got by stages.db) stid.event)
+  :: =/  sport=@t
+  ::   =;  spid=@t
+  ::     %+  fall  (sport-to-discipline spid)
+  ::     (~(got by sports) spid)
+  ::                                =<  spid
+  ::   %-  ~(got by templates.db)   =<  teid
+  ::   %-  ~(got by tourneys.db)        toid.stage
+  =/  discipline=@t
+    (event-discipline evid db)
+  =/  dis-icon=?(@t [m=@t w=@t])
+    icon:(~(got by disciplines) discipline)
+  ::TODO  this is mostly sufficient, move on to wrapping up!
+  %+  rap  3
+  ^-  (list @t)
+  :*  ?@  dis-icon  dis-icon
+      ?:(?=(%female gene.stage) w.dis-icon m.dis-icon)
+    ::
+      ' '
+      discipline
+      ': '
+    ::
+      ::NOTE  doesn't jive well with duel events
+      :: ?:  ?|  =('Men\'s' (end 3^5 name.event))
+      ::         =('Women\'s' (end 3^7 name.event))
+      ::         =('Men\'s' (end 3^5 name.stage))
+      ::         =('Women\'s' (end 3^7 name.stage))
+      ::     ==
+      ::   ''
+      :: ?-  gene.stage
+      ::   %mixed   ''
+      ::   %male    'Men\'s '
+      ::   %female  'Women\'s '
+      :: ==
+    ::
+      =/  nom=tape  (trip name.stage)
+      ?:  ?=(^ (find "lympics" nom))  ''
+      =?  nom  =(`0 (find "Greco-Roman " nom))
+        (slag 12 nom)
+      (cat 3 (crip nom) ': ')
+    ::
+      name.event
+    ::
+      ?:  =('' round.event)  ~
+      =?  round.event  ?=(^ (rush round.event dum:ag))
+        (cat 3 'Round ' round.event)
+      :~(' (' round.event ')')
+  ==
+  ::TODO  if ev name contains men's or women's, leave as is
+  ::      if ev name contains male or female, replace with men's or women's
+  ::      if ev name contains neither, finds gender, prepend if necessary
+  ::TODO  should get "semi/finals" etc from stage name?
+  ::      could also parse from "round" property in event results
+::
 ++  disciplines  ^~
   %-  ~(gas by *(map @t [medals=@ud icon=?(@t [m=@t w=@t])]))
   discipline-list
@@ -111,7 +171,7 @@
     %'90'  'Sport climbing'
   ==
 ::
-++  event-discipline
+++  event-discipline  ::TODO  switch arg order
   |=  [evid=@t db=full-db]
   ^-  @t
   =/  event     ~|  [%evid evid]
@@ -126,7 +186,7 @@
     u.dis
   =*  fail
     %+  rap  3
-    ~['xx ' (~(got by sports) spid.template) ': ' name.stage '; ' name.event]
+    ~['?? ' (~(got by sports) spid.template) ': ' name.stage '; ' name.event]
   ?+  spid.template  fail
       %'23'  ::  'Basketball'  ::  ambiguous! 3x3 or no?
     ?:  ?=(^ (find "3x3" (trip name.stage)))
@@ -850,5 +910,519 @@
       :+  'SOM'  'Somalia'  1
       :+  'SSD'  'South Sudan'  1
       :+  'TUV'  'Tuvalu'  1
+  ==
+::
+++  countryfk-to-ioc
+  |=  fk=@t
+  ^-  @t  ~+
+  =/  iso=@t
+    ~|  fk=fk
+    (~(got by countryfk-to-iso) fk)
+  ?~  ioc=(~(get by iso-to-ioc) iso)
+    ~&  [%yooo-missing-ioc iso=iso]
+    iso
+  ~?  &(!(~(has by members) u.ioc) !=('RUS' u.ioc) !=('PRK' u.ioc))
+    [%strange-not-member ioc=u.ioc]
+  u.ioc
+::
+++  iso-to-ioc  ^~
+  %-  ~(gas by *(map @t @t))
+  :~
+    ['SSD' 'SSD']
+    ['RKS' 'KOS']
+    ['ANT' 'ANT']
+  ::
+    ['AFG' 'AFG']
+    :: ['ALA' 'XXX']
+    ['ALB' 'ALB']
+    ['DZA' 'ALG']
+    ['ASM' 'ASA']
+    ['AND' 'AND']
+    ['AGO' 'ANG']
+    :: ['AIA' 'XXX']
+    :: ['ATA' 'XXX']
+    ['ATG' 'ANT']
+    ['ARG' 'ARG']
+    ['ARM' 'ARM']
+    ['ABW' 'ARU']
+    ['AUS' 'AUS']
+    ['AUT' 'AUT']
+    ['AZE' 'AZE']
+    ['BHS' 'BAH']
+    ['BHR' 'BRN']
+    ['BGD' 'BAN']
+    ['BRB' 'BAR']
+    ['BLR' 'BLR']
+    ['BEL' 'BEL']
+    ['BLZ' 'BIZ']
+    ['BEN' 'BEN']
+    ['BMU' 'BER']
+    ['BTN' 'BHU']
+    ['BOL' 'BOL']
+    ['BES' 'AHO']
+    ['BIH' 'BIH']
+    ['BWA' 'BOT']
+    :: ['BVT' 'XXX']
+    ['BRA' 'BRA']
+    :: ['IOT' 'XXX']
+    ['VGB' 'IVB']
+    ['BRN' 'BRU']
+    ['BGR' 'BUL']
+    ['BFA' 'BUR']
+    ['BDI' 'BDI']
+    ['KHM' 'CAM']
+    ['CMR' 'CMR']
+    ['CAN' 'CAN']
+    ['CPV' 'CPV']
+    ['CYM' 'CAY']
+    ['CAF' 'CAF']
+    ['TCD' 'CHA']
+    ['CHL' 'CHI']
+    ['CHN' 'CHN']
+    :: ['CXR' 'XXX']
+    :: ['CCK' 'XXX']
+    ['COL' 'COL']
+    ['COM' 'COM']
+    ['COD' 'COD']
+    ['COG' 'CGO']
+    ['COK' 'COK']
+    ['CRI' 'CRC']
+    ['CIV' 'CIV']
+    ['HRV' 'CRO']
+    ['CUB' 'CUB']
+    :: ['CUW' 'XXX']
+    ['CYP' 'CYP']
+    ['CZE' 'CZE']
+    ['DNK' 'DEN']
+    ['DJI' 'DJI']
+    ['DMA' 'DMA']
+    ['DOM' 'DOM']
+    ['ECU' 'ECU']
+    ['EGY' 'EGY']
+    ['SLV' 'ESA']
+    ['GNQ' 'GEQ']
+    ['ERI' 'ERI']
+    ['EST' 'EST']
+    ['ETH' 'ETH']
+    :: ['FLK' 'XXX']
+    ['FRO' 'DEN']  ::NOTE  faroe recognition shenanigans
+    ['FJI' 'FIJ']
+    ['FIN' 'FIN']
+    ['FRA' 'FRA']
+    :: ['GUF' 'XXX']
+    :: ['PYF' 'XXX']
+    :: ['ATF' 'XXX']
+    ['GAB' 'GAB']
+    ['GMB' 'GAM']
+    ['GEO' 'GEO']
+    ['DEU' 'GER']
+    ['GHA' 'GHA']
+    :: ['GIB' 'XXX']
+    ['GRC' 'GRE']
+    :: ['GRL' 'XXX']
+    ['GRD' 'GRN']
+    :: ['GLP' 'XXX']
+    ['GUM' 'GUM']
+    ['GTM' 'GUA']
+    :: ['GGY' 'XXX']
+    ['GIN' 'GUI']
+    ['GNB' 'GBS']
+    ['GUY' 'GUY']
+    ['HTI' 'HAI']
+    :: ['HMD' 'XXX']
+    ['HND' 'HON']
+    ['HKG' 'HKG']
+    ['HUN' 'HUN']
+    ['ISL' 'ISL']
+    ['IND' 'IND']
+    ['IDN' 'INA']
+    ['IRN' 'IRI']
+    ['IRQ' 'IRQ']
+    ['IRL' 'IRL']
+    :: ['IMN' 'XXX']
+    ['ISR' 'ISR']
+    ['ITA' 'ITA']
+    ['JAM' 'JAM']
+    ['JPN' 'JPN']
+    :: ['JEY' 'XXX']
+    ['JOR' 'JOR']
+    ['KAZ' 'KAZ']
+    ['KEN' 'KEN']
+    ['KIR' 'KIR']
+    ['PRK' 'PRK']
+    ['KOR' 'KOR']
+    ['KWT' 'KUW']
+    ['KGZ' 'KGZ']
+    ['LAO' 'LAO']
+    ['LVA' 'LAT']
+    :: ['LBN' 'LIB']
+    ['LBN' 'LBN']
+    ['LIB' 'LIB']
+    ['LSO' 'LES']
+    ['LBR' 'LBR']
+    ['LBY' 'LBA']
+    ['LIE' 'LIE']
+    ['LTU' 'LTU']
+    ['LUX' 'LUX']
+    :: ['MAC' 'XXX']
+    ['MKD' 'MKD']
+    ['MDG' 'MAD']
+    ['MWI' 'MAW']
+    ['MYS' 'MAS']
+    ['MDV' 'MDV']
+    ['MLI' 'MLI']
+    ['MLT' 'MLT']
+    ['MHL' 'MHL']
+    :: ['MTQ' 'XXX']
+    ['MRT' 'MTN']
+    ['MUS' 'MRI']
+    :: ['MYT' 'XXX']
+    ['MEX' 'MEX']
+    ['FSM' 'FSM']
+    ['MDA' 'MDA']
+    ['MCO' 'MON']
+    ['MNG' 'MGL']
+    ['MNE' 'MNE']
+    :: ['MSR' 'XXX']
+    ['MAR' 'MAR']
+    ['MOZ' 'MOZ']
+    ['MMR' 'MYA']
+    ['NAM' 'NAM']
+    ['NRU' 'NRU']
+    ['NPL' 'NEP']
+    ['NLD' 'NED']
+    :: ['NCL' 'XXX']
+    ['NZL' 'NZL']
+    ['NIC' 'NCA']
+    ['NER' 'NIG']
+    ['NGA' 'NGR']
+    :: ['NIU' 'XXX']
+    :: ['NFK' 'XXX']
+    :: ['MNP' 'XXX']
+    ['NOR' 'NOR']
+    ['OMN' 'OMA']
+    ['PAK' 'PAK']
+    ['PLW' 'PLW']
+    ['PSE' 'PLE']
+    ['PAN' 'PAN']
+    ['PNG' 'PNG']
+    ['PRY' 'PAR']
+    ['PER' 'PER']
+    ['PHL' 'PHI']
+    :: ['PCN' 'XXX']
+    ['POL' 'POL']
+    ['PRT' 'POR']
+    ['PRI' 'PUR']
+    ['QAT' 'QAT']
+    :: ['REU' 'XXX']
+    ['ROU' 'ROU']
+    ['RUS' 'RUS']
+    ['RWA' 'RWA']
+    :: ['BLM' 'XXX']
+    :: ['SHN' 'XXX']
+    ['KNA' 'SKN']
+    ['LCA' 'LCA']
+    :: ['SPM' 'XXX']
+    ['VCT' 'VIN']
+    ['WSM' 'SAM']
+    ['SMR' 'SMR']
+    ['STP' 'STP']
+    ['SAU' 'KSA']
+    ['SEN' 'SEN']
+    ['SRB' 'SRB']
+    ['SYC' 'SEY']
+    ['SLE' 'SLE']
+    ['SGP' 'SGP']
+    ['SIN' 'SGP']  ::  until 2016
+    :: ['SXM' 'XXX']
+    ['SVK' 'SVK']
+    ['SVN' 'SLO']
+    ['SLB' 'SOL']
+    ['SOM' 'SOM']
+    ['ZAF' 'RSA']
+    :: ['SGS' 'XXX']
+    ['ESP' 'ESP']
+    ['LKA' 'SRI']
+    ['SDN' 'SUD']
+    ['SUR' 'SUR']
+    :: ['SJM' 'XXX']
+    ['SWZ' 'SWZ']
+    ['SWE' 'SWE']
+    ['CHE' 'SUI']
+    ['SYR' 'SYR']
+    ['TWN' 'TPE']
+    ['TJK' 'TJK']
+    ['TZA' 'TAN']
+    ['THA' 'THA']
+    ['TLS' 'TLS']
+    ['TGO' 'TOG']
+    :: ['TKL' 'XXX']
+    ['TON' 'TGA']
+    ['TTO' 'TTO']
+    ['TUN' 'TUN']
+    ['TUR' 'TUR']
+    ['TKM' 'TKM']
+    :: ['TCA' 'XXX']
+    ['TUV' 'TUV']
+    ['UGA' 'UGA']
+    ['UKR' 'UKR']
+    ['ARE' 'UAE']
+    ['GBR' 'GBR']
+    ['USA' 'USA']
+    :: ['UMI' 'XXX']
+    ['VIR' 'ISV']
+    ['URY' 'URU']
+    ['UZB' 'UZB']
+    ['VUT' 'VAN']
+    :: ['VAT' 'XXX']
+    ['VEN' 'VEN']
+    ['VNM' 'VIE']
+    :: ['WLF' 'XXX']
+    :: ['ESH' 'XXX']
+    ['YEM' 'YEM']
+    ['ZMB' 'ZAM']
+    ['ZWE' 'ZIM']
+  ==
+::
+++  countryfk-to-iso  ^~
+  %-  ~(gas by *(map @t @t))
+  :~
+    :-  '174'  'AFG'
+    :-  '71'  'ALB'
+    :-  '85'  'DZA'
+    :-  '193'  'ASM'
+    :-  '76'  'AND'
+    :-  '119'  'AGO'
+    :-  '661'  'AIA'
+    :-  '192'  'ATG'
+    :-  '48'  'ARG'
+    :-  '72'  'ARM'
+    :-  '195'  'ABW'
+    :-  '39'  'AUS'
+    :-  '34'  'AUT'
+    :-  '64'  'AZE'
+    :-  '140'  'BHS'
+    :-  '144'  'BHR'
+    :-  '188'  'BGD'
+    :-  '149'  'BRB'
+    :-  '57'  'BLR'
+    :-  '14'  'BEL'
+    :-  '194'  'BLZ'
+    :-  '131'  'BEN'
+    :-  '183'  'BMU'
+    :-  '189'  'BTN'
+    :-  '81'  'BOL'
+    :-  '681'  'BES'
+    :-  '70'  'BIH'
+    :-  '151'  'BWA'
+    :-  '51'  'BRA'
+    :-  '214'  'VGB'
+    :-  '180'  'BRN'
+    :-  '56'  'BGR'
+    :-  '110'  'BFA'
+    :-  '196'  'BDI'
+    :-  '203'  'KHM'
+    :-  '32'  'CMR'
+    :-  '23'  'CAN'
+    :-  '153'  'CPV'
+    :-  '197'  'CYM'
+    :-  '185'  'CAF'
+    :-  '209'  'TCD'
+    :-  '77'  'CHL'
+    :-  '125'  'CHN'
+    :-  '660'  'CXR'
+    :-  '78'  'COL'
+    :-  '211'  'COM'
+    :-  '107'  'COG'
+    :-  '202'  'COK'
+    :-  '117'  'CRI'
+    :-  '44'  'HRV'
+    :-  '137'  'CUB'
+    :-  '664'  'CUW'
+    :-  '59'  'CYP'
+    :-  '19'  'CZE'
+    :-  '1'  'DNK'
+    :-  '198'  'DJI'
+    :-  '199'  'DMA'
+    :-  '164'  'DOM'
+    :-  '108'  'COD'
+    :-  '674'  'IDN'
+    :-  '653'  'TLS'
+    :-  '80'  'ECU'
+    :-  '31'  'EGY'
+    :-  '116'  'SLV'
+    :-  '2'  'GBR'
+    :-  '200'  'GNQ'
+    :-  '201'  'ERI'
+    :-  '60'  'EST'
+    :-  '210'  'SWZ'
+    :-  '177'  'ETH'
+    :-  '67'  'FRO'
+    :-  '94'  'FJI'
+    :-  '24'  'FIN'
+    :-  '5'  'FRA'
+    :-  '204'  'GUF'
+    :-  '168'  'PYF'
+    :-  '152'  'GAB'
+    :-  '205'  'GMB'
+    :-  '226'  'IRL'
+    :-  '55'  'GEO'
+    :-  '3'  'DEU'
+    :-  '102'  'GHA'
+    :-  '655'  'GIB'
+    :-  '170'  'GBR'
+    :-  '33'  'GRC'
+    :-  '86'  'GRL'
+    :-  '213'  'GRD'
+    :-  '229'  'GLP'
+    :-  '186'  'GUM'
+    :-  '136'  'GTM'
+    :-  '680'  'GGY'
+    :-  '146'  'GIN'
+    :-  '656'  'GNB'
+    :-  '216'  'GUY'
+    :-  '139'  'HTI'
+    :-  '118'  'HND'
+    :-  '128'  'HKG'
+    :-  '26'  'HUN'
+    :-  '69'  'ISL'
+    :-  '133'  'IND'
+    :-  '141'  'IDN'
+    :-  '122'  'IRN'
+    :-  '123'  'IRQ'
+    :-  '45'  'IRL'
+    :-  '679'  'IMN'
+    :-  '38'  'ISR'
+    :-  '4'  'ITA'
+    :-  '111'  'CIV'
+    :-  '112'  'JAM'
+    :-  '25'  'JPN'
+    :-  '659'  'JEY'
+    :-  '127'  'JOR'
+    :-  '129'  'KAZ'
+    :-  '147'  'KEN'
+    :-  '212'  'KIR'
+    :-  '668'  'RKS'
+    :-  '87'  'KWT'
+    :-  '150'  'KGZ'
+    :-  '135'  'LAO'
+    :-  '61'  'LVA'
+    :-  '160'  'LBN'
+    :-  '175'  'LSO'
+    :-  '103'  'LBR'
+    :-  '98'  'LBY'
+    :-  '74'  'LIE'
+    :-  '66'  'LTU'
+    :-  '41'  'LUX'
+    :-  '228'  'MAC'
+    :-  '120'  'MDG'
+    :-  '109'  'MWI'
+    :-  '89'  'MYS'
+    :-  '161'  'MDV'
+    :-  '126'  'MLI'
+    :-  '54'  'MLT'
+    :-  '657'  'MHL'
+    :-  '138'  'MTQ'
+    :-  '217'  'MRT'
+    :-  '178'  'MUS'
+    :-  '114'  'MEX'
+    :-  '182'  'FSM'
+    :-  '65'  'MDA'
+    :-  '190'  'MCO'
+    :-  '173'  'MNG'
+    :-  '230'  'MNE'
+    :-  '662'  'MSR'
+    :-  '52'  'MAR'
+    :-  '215'  'MOZ'
+    :-  '96'  'MMR'
+    :-  '105'  'NAM'
+    :-  '184'  'NRU'
+    :-  '176'  'NPL'
+    :-  '9'  'NLD'
+    :-  '187'  'ANT'
+    :-  '654'  'NCL'
+    :-  '93'  'NZL'
+    :-  '115'  'NIC'
+    :-  '207'  'NER'
+    :-  '30'  'NGA'
+    :-  '677'  'NIU'
+    :-  '121'  'PRK'
+    :-  '68'  'MKD'
+    :-  '42'  'GBR'
+    :-  '667'  'MNP'
+    :-  '7'  'NOR'
+    :-  '134'  'OMN'
+    :-  '163'  'PAK'
+    :-  '223'  'PLW'
+    :-  '157'  'PSE'
+    :-  '143'  'PAN'
+    :-  '208'  'PNG'
+    :-  '82'  'PRY'
+    :-  '83'  'PER'
+    :-  '172'  'PHL'
+    :-  '47'  'POL'
+    :-  '12'  'PRT'
+    :-  '142'  'PRI'
+    :-  '91'  'QAT'
+    :-  '684'  'RUN'
+    :-  '21'  'ROU'
+    :-  '22'  'RUS'
+    :-  '145'  'RWA'
+    :-  '206'  'LCA'
+    :-  '682'  'MAF'
+    :-  '166'  'VCT'
+    :-  '224'  'WSM'
+    :-  '73'  'SMR'
+    :-  '221'  'STP'
+    :-  '63'  'SAU'
+    :-  '15'  'GBR'
+    :-  '106'  'SEN'
+    :-  '20'  'SRB'
+    :-  '179'  'SYC'
+    :-  '104'  'SLE'
+    :-  '90'  'SGP'
+    :-  '678'  'SXM'
+    :-  '62'  'SVK'
+    :-  '17'  'SVN'
+    :-  '169'  'SLB'
+    :-  '219'  'SOM'
+    :-  '28'  'ZAF'
+    :-  '88'  'KOR'
+    :-  '666'  'SSD'
+    :-  '8'  'ESP'
+    :-  '156'  'LKA'
+    :-  '165'  'KNA'
+    :-  '101'  'SDN'
+    :-  '220'  'SUR'
+    :-  '6'  'SWE'
+    :-  '37'  'CHE'
+    :-  '158'  'SYR'
+    :-  '95'  'TWN'
+    :-  '159'  'TJK'
+    :-  '218'  'TZA'
+    :-  '50'  'THA'
+    :-  '99'  'TGO'
+    :-  '171'  'TON'
+    :-  '113'  'TTO'
+    :-  '29'  'TUN'
+    :-  '13'  'TUR'
+    :-  '162'  'TKM'
+    :-  '663'  'TCA'
+    :-  '658'  'TUV'
+    :-  '181'  'VIR'
+    :-  '35'  'ARE'
+    :-  '154'  'UGA'
+    :-  '53'  'UKR'
+    :-  '79'  'URY'
+    :-  '16'  'USA'
+    :-  '130'  'UZB'
+    :-  '167'  'VUT'
+    :-  '84'  'VEN'
+    :-  '155'  'VNM'
+    :-  '58'  'GBR'
+    :-  '148'  'YEM'
+    :-  '100'  'ZMB'
+    :-  '665'  'TZA'
+    :-  '92'  'ZWE'
   ==
 --

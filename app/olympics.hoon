@@ -37,7 +37,7 @@
 ::
 ++  rate
   |%
-  ++  data     ~h1
+  ++  data     ~m15
   ++  results  ~m5
   --
 ::

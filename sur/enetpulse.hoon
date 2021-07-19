@@ -15,13 +15,16 @@
 ::
 +$  gender  ?(%male %female %mixed)
 ::
+::NOTE  do not count medals for losses, as in 2355688
 +$  result
   $%  [%duel win=result-entry los=result-entry]
       [%rank rank=(list result-entry)]
+      [%deft one=result-entry]
   ==
 ::
 +$  result-entry
   $:  =participant
+      record=?(%or %wr ~)
       =score
       =medal
   ==
@@ -34,9 +37,23 @@
   ==
 ::
 +$  score
-  $%  [%simple n=@ud]
-      [%time t=@dr]
+  $%  [%points n=@t]  ::TODO  account for draws? such as 2217778?
+      [%time t=@t]  ::NOTE  append s if doesn't contain :
+      [%weight k=@ud]
+      [%distance m=@t]
+      [%errors e=@t]
+      [%par d=@t]
+    ::
+      [%wl ?(%w %l)]
+    ::
+      [%dns ~]  ::  did not start
+      [%dnf ~]  ::  did not finish
+      [%nm ~]  ::  no measured result
+      [%dq ~]  ::  disqualified
+      [%elim ~]  ::  eliminated
+      [%lap ~]  ::  lapped/hd (too slow, forced to stop before finishing)
       ::TODO
-      [%unknown j=(map @t json)]
+      [%running t=@t]
+      [%unknown r=(map @t @t)]
   ==
 --

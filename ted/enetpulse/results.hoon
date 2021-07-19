@@ -204,7 +204,7 @@
     next
   =.  res  (~(put by res) i.evs u.ver)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)  ::TODO  what if two threads run at once?
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  fetch-result

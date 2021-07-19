@@ -14,7 +14,7 @@
 /-  *enetpulse
 /+  strandio
 ::
-=/  testing=(unit @da)  `~2016.7.4
+=/  testing=(unit @da)  ~  ::`~2016.7.4
 =/  start-date=@da  ~2021.7.20
 ::
 |=  args=vase
@@ -86,7 +86,7 @@
   ;<  ves=(list [evid=@t when=@da name=@t round=@t])  bind:m
     (fetch-events stid)
   ?:  =(~ ves)
-    ~&  [%no-events-for stid name (~(got by sports) spid:(~(got by templates.db) teid:(~(got by tourneys.db) toid)))]
+    :: ~&  [%no-events-for stid name (~(got by sports) spid:(~(got by templates.db) teid:(~(got by tourneys.db) toid)))]
     next
   =.  res
     |-
@@ -95,7 +95,7 @@
     =.  res  (~(put by res) evid name round when stid)
     $(ves t.ves)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  fetch-events
@@ -119,7 +119,7 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'events')
   ?.  ?=([%o *] jon)
-    ~&  [%res-res-not-obj x stid jon]
+    :: ~&  [%res-res-not-obj x stid jon]
     (pure:m ~)
   %-  pure:m
   %+  murn  ~(tap by p.jon)
@@ -149,13 +149,12 @@
     %.  (~(got by p.jon) 'startdate')
     %+  cu:dejs:format  ::TMP  for live testing on old data
       ?~  testing
-        ::TODO  drop events prior to ~2021.7.20
         same
       |=  when=@da
       ?:  (lth when u.testing)  when
       %+  add  now
       %+  add  ~m5
-      %+  mul  ~m1
+      %+  mul  ~s5
       (div (sub when u.testing) ~h1)
     %-  su:dejs:format
     (cook from-unix:chrono:userlib dum:ag)
@@ -172,7 +171,7 @@
   ;<  sas=(list [stid=@t gender=@t name=@t])  bind:m
     (fetch-stages toid)
   ?:  =(~ sas)
-    ~&  [%no-stages-for toid name]
+    :: ~&  [%no-stages-for toid name]
     next
   =.  res
     |-
@@ -182,7 +181,7 @@
       [name.i.sas (parse-gender gender.i.sas) toid]
     $(sas t.sas)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  old-fetch-all-stages
@@ -196,7 +195,7 @@
     (fetch-stages otid)
   =.  res  (~(put by res) otid [temp sas])
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  fetch-stages
@@ -213,7 +212,7 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'tournament_stages')
   ?.  ?=([%o *] jon)
-    ~&  [%res-res-not-obj x otid jon]
+    :: ~&  [%res-res-not-obj x otid jon]
     (pure:m ~)
   %-  pure:m
   %+  murn  ~(tap by p.jon)
@@ -254,7 +253,7 @@
     =.  res  (~(put by res) i.tos name teid)
     $(tos t.tos)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  old-fetch-all-tourneys
@@ -271,7 +270,7 @@
     next
   =.  res  (~(put by res) ted (snag 0 tos) sid temp)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  fetch-tourneys
@@ -288,7 +287,7 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'tournaments')
   ?.  ?=([%o *] jon)
-    ~&  [%res-res-not-obj x tempid jon]
+    :: ~&  [%res-res-not-obj x tempid jon]
     (pure:m ~)
   %-  pure:m
   %+  murn  ~(tap by p.jon)
@@ -319,7 +318,7 @@
     =.  res  (~(put by res) teid name (parse-gender gender) i.spo)
     $(tur t.tur)
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  parse-gender
@@ -350,7 +349,7 @@
   =?  res  !=(~ tur)
     (~(put by res) id.i.spo [name.i.spo tur])
   ;<  ~  bind:m
-    (sleep:strandio ~s0..4000)
+    (sleep:strandio ~s0..5000)
   next
 ::
 ++  fetch-tourney-templates
@@ -367,8 +366,8 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'tournament_templates')
   ?.  ?=([%o *] jon)
-    ~?  !=([%a ~] jon)
-      [%res-res-not-obj x sport jon]
+    :: ~?  !=([%a ~] jon)
+      :: [%res-res-not-obj x sport jon]
     (pure:m ~)
   %-  pure:m
   %+  murn  ~(tap by p.jon)

@@ -19,13 +19,6 @@
     (~(got by events.db) evid)
   =/  stage=[name=@t gene=gender toid=@t]
     (~(got by stages.db) stid.event)
-  :: =/  sport=@t
-  ::   =;  spid=@t
-  ::     %+  fall  (sport-to-discipline spid)
-  ::     (~(got by sports) spid)
-  ::                                =<  spid
-  ::   %-  ~(got by templates.db)   =<  teid
-  ::   %-  ~(got by tourneys.db)        toid.stage
   =/  discipline=@t
     (event-discipline evid db)
   =/  dis-icon=?(@t [m=@t w=@t])
@@ -66,11 +59,6 @@
         (cat 3 'Round ' round.event)
       :~(' (' round.event ')')
   ==
-  ::TODO  if ev name contains men's or women's, leave as is
-  ::      if ev name contains male or female, replace with men's or women's
-  ::      if ev name contains neither, finds gender, prepend if necessary
-  ::TODO  should get "semi/finals" etc from stage name?
-  ::      could also parse from "round" property in event results
 ::
 ++  disciplines  ^~
   %-  ~(gas by *(map @t [medals=@ud icon=?(@t [m=@t w=@t])]))

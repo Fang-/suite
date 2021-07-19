@@ -1,5 +1,4 @@
 ::
-::
 |%
 +$  full-db
   $:  templates=templates-db

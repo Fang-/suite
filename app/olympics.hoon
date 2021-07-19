@@ -11,7 +11,7 @@
 ::
 /-  *enetpulse,
     *resource, graph=graph-store
-/+  static=enetpulse-static,
+/+  static=enetpulse-static, gr=graph, pal,
     dbug, verb, default-agent
 ::
 |%
@@ -21,7 +21,7 @@
       last-db=@da
       last-stages=@da
     ::
-      results=(map @t *)  ::TODO
+      results=(map @t result)
     ::
       ::NOTE  event ids
       happening=(set @t)  ::  (~(dif in ~(key by started)) ~(key by results))
@@ -38,14 +38,14 @@
 ++  rate
   |%
   ++  data     ~m15
-  ++  results  ~m5
+  ++  results  ~m2
   --
 ::
 ::TODO  update!!
-++  group-id  `resource`[~sun %olympics-2020]
-++  live-chat  `resource`[~sun %live-chat-7774]
-++  board  `resource`[~sun %schedule-2803]
-++  schedule  `@`0i170141184505140271778156779315402899456
+++  group-id  `resource`[~zod %muholympics]
+++  live-chat  `resource`[~zod %live-1224]
+++  board  `resource`[~zod %board-4663]
+++  schedule  `@`0i170141184505159259090517052396438290432
 ::
 +$  card  card:agent:gall
 --
@@ -67,16 +67,21 @@
     ^-  (quip card _this)
     =^  cards  state  on-data-timer:do
     :_  this
-    :+  set-daily-timer:do
-      (once:talk:do live-chat 'greetings!')
-    cards
+    :*  set-daily-timer:do
+        (once:talk:do live-chat 'greetings!')
+        (wait:b:sys:do /timer/results (add now.bowl results:rate))
+        cards
+    ==
   ::
   ++  on-save  !>(state)
   ++  on-load
     |=  old=vase
     ^-  (quip card _this)
-    :_  this(state !<(state-0 old))
-    [(once:talk:do live-chat 'reloaded!')]~
+    =^  caz  this
+      :_  this(state !<(state-0 old))
+      [(once:talk:do live-chat 'I\'ve freshened up!')]~
+    =.  results  ~
+    [caz this]
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -90,7 +95,7 @@
       [[(once:talk:do live-chat 'hello')]~ this]
     ::
         %test-reply
-      [[(reply:talk:do live-chat [msg.action]~ [now.bowl]~ 'bye')]~ this]
+      [[(replies:talk:do live-chat [[msg.action]~ [now.bowl]~ 'bye']~)]~ this]
     ::
         %test-update-post
       =-  [[-]~ this]
@@ -111,8 +116,7 @@
           (spider-event full-db on-full-db:do)
         ::
             [%results ~]
-          ::TODO
-          !!
+          (spider-event (map @t result) on-event-results:do)
         ==
     ::
     ++  spider-event
@@ -182,6 +186,7 @@
   --
 ::
 |_  =bowl:gall
++*  g  ~(. gr bowl)
 ::TODO  /lib/sys.hoon?
 ++  sys
   |%
@@ -259,12 +264,13 @@
     |=  [=index:graph msg=@t]
     [index [%text msg]~]
   ::
-  ++  reply
-    |=  [=resource og=index:graph id=index:graph msg=@t]
-    ::TODO test
+  ++  replies
+    |=  [=resource rep=(list [id=index:graph og=index:graph msg=@t])]
     ^-  card
     %+  post  resource
-    [id ~[[%reference %graph group-id resource og] [%text msg]]]~
+    %+  turn  rep
+    |=  [id=index:graph og=index:graph msg=@t]
+    [id ~[[%reference %graph group-id resource og] [%text msg]]]
   --
 ::
 ++  publish
@@ -272,20 +278,7 @@
   ++  next-rev
     |=  notenum=@
     ^-  @
-    =/  =update:graph
-      .^  update:graph
-        %gx
-        (scot %p our.bowl)
-        %graph-store
-        (scot %da now.bowl)
-        %node
-        (scot %p entity:board)
-        name:board
-        (scot %ud notenum)
-        /1/graph-update-2
-      ==
-    ?>  ?=(%add-nodes -.q.update)
-    =/  =node:graph  (~(got by nodes.q.update) ~[notenum 1])
+    =/  =node:graph  (got-node:g board ~[notenum 1])
     ?>  ?=(%graph -.children.node)
     +((roll ~(tap in ~(key by p.children.node)) max))
   ::
@@ -313,20 +306,6 @@
         ~
         ~
     ==
-    :: const newRev: Post = {
-    ::   author: `~${window.ship}`,
-    ::   index: `/${noteId.toString()}/1/${rev}`,
-    ::   'time-sent': now,
-    ::   contents: [{ text: title }, ...tokenisedBody],
-    ::   hash: null,
-    ::   signatures: []
-    :: };
-    :: const nodes = {
-    ::   [newRev.index]: {
-    ::     post: newRev,
-    ::     children: null
-    ::   }
-    :: };
   --
 ::
 ++  dab
@@ -388,6 +367,8 @@
 ++  on-daily-timer
   ^-  (quip card _state)
   ::TODO  actually do daily things
+  ::  - update schedule
+  ::  - update fantasy scoreboard
   [[set-daily-timer]~ state]
 ::
 ::  +|  %data-flow
@@ -448,17 +429,35 @@
   :-  (wait:b:sys /timer/results (add now.bowl results:rate))
   =/  happening=(set @t)
     happening-events:dab
-  ~&  [%would-fetch-results ~(wyt in happening)]
-  ~
-  :: ?~  happening  ~
-  :: %^  start-thread:spider
-  ::     /results
-  ::   %enetpulse-results
-  :: !>(`(set @t)`happening)
+  ?~  happening  ~
+  %^  start-thread:spider
+      /results
+    %enetpulse-results
+  !>(`(set @t)`happening)
 ::
 ++  on-event-results
-  |=  (map @t *)  ::TODO
-  !!
+  |=  rez=(map @t result)
+  ^-  (quip card _state)
+  :_  state(results (~(uni by results) rez))
+  =/  rez=(list [evid=@t res=result])
+    (sort ~(tap by rez) aor)
+  ~&  [%results n=(lent rez)]
+  =|  mez=(list [id=index:graph og=index:graph msg=@t])
+  =/  id=@  now.bowl
+  :_  ~
+  |-  ^-  card
+  ?~  rez  (replies:talk live-chat (flop mez))
+  =,  i.rez
+  ::  if we already had this result somehow, ignore it
+  ?:  =(`res (~(get by results) evid))
+    $(rez t.rez)
+  =-  $(rez t.rez, mez [- mez], id +(id))
+  :+  [id]~
+    ?~  og=(~(get by started) evid)
+      ~&  [%yooo-wtf-missing-started-msg evid]
+      [0]~
+    u.og
+  (result-msg res)
 ::
 ::  +|  %renderers
 ::
@@ -467,40 +466,98 @@
   ^-  @t
   %+  rap  3
   :~  'Happening: '
-      (event-name evid)
-      ' ('
-      evid
-      ')'
+      (event-name:static db evid)
   ==
 ::
 ++  result-msg
-  |=  evid=@t
+  |=  res=result
   ^-  @t
-  (cat 3 'The results are in: ' (event-result evid))
-::
-++  event-name
-  |=  evid=@t
-  ^-  @t
-  =/  event=[name=@t round=@t when=@da stid=@t]
-    (~(got by events.db) evid)
-  =/  stage=[name=@t gene=gender toid=@t]
-    (~(got by stages.db) stid.event)
-  =/  sport=@t
-    %-  ~(got by sports.static)  =<  spid
-    %-  ~(got by templates.db)   =<  teid
-    %-  ~(got by tourneys.db)        toid.stage
-  =?  sport  ?=(~ (find "Olympic" (trip name.stage)))
-    name.stage  ::TODO  mistake? sucks for boxing, sailing etc
-  (rap 3 sport ': ' name.event ' (' round.event ')' ~)
-  ::TODO  if ev name contains men's or women's, leave as is
-  ::      if ev name contains male or female, replace with men's or women's
-  ::      if ev name contains neither, finds gender, prepend if necessary
-  ::TODO  should get "semi/finals" etc from stage name?
-  ::      could also parse from "round" property in event results
+  (cat 3 'The results are in!\0a' (event-result res))
 ::
 ++  event-result
-  |=  evid=@t
+  |=  res=result
+  =-  ~&  [%res-to res -]  -
   ^-  @t
-  ::TODO
-  'its complicated...'
+  |^  ?-  -.res
+          %duel
+        %+  rap  3
+        :~  (show-entry win.res)
+            ' won against '
+            (show-entry los.res)
+            '.'
+        ==
+      ::
+          %rank
+        %+  rap  3
+        %+  snoc
+          %+  turn  (fuse:pal (gulf 1 3) (scag 3 rank.res))
+          |=  [n=@ud e=result-entry]
+          ^-  @t
+          %+  rap  3
+          :~  (scot %ud n)
+              '. '
+              (show-entry e)
+              '\0a'
+          ==
+        ?:((gth (lent rank.res) 3) '...' '')
+      ::
+          %deft
+        (rap 3 (show-entry one.res) ' won by default.' ~)
+      ==
+  ::
+  ++  show-entry
+    |=  e=result-entry
+    ^-  @t
+    %+  rap  3
+    :~  ?-  medal.e
+          ~        ''
+          %gold    '🥇 '
+          %silver  '🥈 '
+          %bronze  '🥉 '
+        ==
+      ::
+        (show-participant participant.e)
+      ::
+        ?~  s=(show-score [score record]:e)  ''
+        (rap 3 ' (' u.s ')' ~)
+    ==
+  ::
+  ++  show-score
+    |=  [s=score r=?(%or %wr ~)]
+    ^-  (unit @t)
+    =;  t=(unit @t)
+      ?~  t  ~
+      ?~  r  t
+      ?-  r
+        %or  `(cat 3 u.t ', **OR!**')
+        %wr  `(cat 3 u.t ', **WR!!**')
+      ==
+    ?+  -.s  `+.s
+      %time      `?:(?=(~ (find ":" (trip t.s))) (cat 3 t.s 's') t.s)
+      %weight    `(cat 3 k.s 'kg')
+      %distance  `?:(?=(~ (find "m" (trip m.s))) (cat 3 m.s 'm') m.s)
+      %errors    `(cat 3 e.s ' errors')
+    ::
+      %wl        ~
+    ::
+      %dns       `'did not start'
+      %dnf       `'did not finish'
+      %nm        `'no measured result'
+      %dq        `'disqualified'
+      %elim      `'eliminated'
+      %lap       `'lapped'
+    ::
+      %unknown   ~
+    ==
+  ::
+  ++  show-participant
+    |=  p=participant
+    ^-  @t
+    ?-  -.p
+      %person  (rap 3 name.p ' (' country-code.p ')' ~)
+      %nation  ?~  m=(~(get by members.static) country-code.p)
+                 country-code.p
+               name.u.m
+    ==
+  --
 --

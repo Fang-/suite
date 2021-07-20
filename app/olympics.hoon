@@ -31,7 +31,7 @@
 ::
 +$  action
   $%  [%test-msg ~]
-      [%test-reply msg=@]
+      [%update-db wat=?(%full %stages %events)]
       [%update-posts ~]
   ==
 ::
@@ -93,13 +93,15 @@
     ?-  -.action
         %test-msg
       =/  msgs=(list [index:graph @t])
-        :~  [now.bowl]~^'hello'
-            [+(now.bowl)]~^'world'
+        :~  [now.bowl]~^'test 1 2 3'
+            [+(now.bowl)]~^'test 4 5 6'
         ==
       [(send:talk:do live-chat msgs) this]
     ::
-        %test-reply
-      [(replies:talk:do live-chat [[msg.action]~ [now.bowl]~ 'bye']~) this]
+        %update-db
+      =^  cards  state
+        (refresh-db:do wat.action)
+      [cards this]
     ::
         %update-posts
       [~[update-schedule:do update-scoreboard:do] this]

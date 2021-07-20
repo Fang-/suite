@@ -392,7 +392,7 @@
 ++  render-schedule
   ^-  @t
   =/  next=@da   next-day
-  =/  until=@da  (add next ~d4)
+  =/  until=@da  (add next ~d5)
   ~&  [now=now.bowl nex=next til=until]
   %+  rap  3
   :-  'All times are in JST (UTC+9).\0a\0a'
@@ -595,21 +595,17 @@
   :_  state(results (~(uni by results) rez))
   =/  rez=(list [evid=@t res=result])
     (sort ~(tap by rez) aor)
-  =|  mez=(list [id=index:graph og=index:graph msg=@t])
+  =|  mez=(list [id=index:graph msg=@t])
   =/  id=@  now.bowl
   |-  ^-  (list card)
-  ?~  rez  (replies:talk live-chat (flop mez))
+  ?~  rez  (send:talk live-chat (flop mez))
   =,  i.rez
   ::  if we already had this result somehow, ignore it
   ?:  =(`res (~(get by results) evid))
     $(rez t.rez)
   =-  $(rez t.rez, mez [- mez], id +(+(id)))
-  :+  [id]~
-    ?~  og=(~(get by started) evid)
-      ~&  [%yooo-wtf-missing-started-msg evid]
-      [0]~
-    u.og
-  (result-msg res)
+  :-  [id]~
+  (result-msg evid res)
 ::
 ::  +|  %renderers
 ::
@@ -626,9 +622,14 @@
   ==
 ::
 ++  result-msg
-  |=  res=result
+  |=  [evid=@t res=result]
   ^-  @t
-  (cat 3 'The results are in!\0a' (event-result res))
+  %+  rap  3
+  :~  'The results are in!\0a'
+      (event-name:static db evid)
+      '\0a'
+      (event-result res)
+  ==
 ::
 ++  event-result
   |=  res=result
@@ -709,7 +710,13 @@
     |=  p=participant
     ^-  @t
     ?-  -.p
-      %person  (rap 3 name.p ' (' country-code.p ')' ~)
+      %person  %+  rap  3
+               :-  name.p
+               ?:  ?&  (~(has by members.static) country-code.p)
+                       =(name.p name:(~(got by members.static) country-code.p))
+                   ==
+                 ~
+               ~[' (' country-code.p ')']
       %nation  ?~  m=(~(get by members.static) country-code.p)
                  country-code.p
                name.u.m

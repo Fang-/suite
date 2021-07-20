@@ -168,7 +168,7 @@
         ?-  i.t.wire
           %daily    on-daily-timer:do
           %data     on-data-timer:do
-          %event    publish-started-events:do
+          %event    on-event-timer:do
           %results  on-results-timer:do
         ==
       [cards this]
@@ -544,9 +544,9 @@
         (~(uni by stages.db) stages.new)
         (~(uni by events.db) events.new)
     ==
-  publish-started-events
+  on-event-timer
 ::
-++  publish-started-events
+++  on-event-timer
   ::  posts "started" msgs for newly started events,
   ::  and stores the posted node indices in state
   ::
@@ -559,7 +559,7 @@
     ?~  eves  [~ (flop news)]
     ?:  (gth when.i.eves now.bowl)
       :_  (flop news)
-      ?~(t.eves ~ `when.i.t.eves)
+      `when.i.eves
     $(news [evid.i.eves news], eves t.eves)
   ::
   =|  msgs=(list [=index:graph body=@t])

@@ -909,7 +909,7 @@
   ?~  ioc=(~(get by iso-to-ioc) iso)
     ~&  [%yooo-missing-ioc iso=iso]
     iso
-  ~?  &(!(~(has by members) u.ioc) !=('RUS' u.ioc) !=('PRK' u.ioc))
+  ~?  &(!(~(has by members) u.ioc) !=('PRK' u.ioc))
     [%strange-not-member ioc=u.ioc]
   u.ioc
 ::
@@ -1104,7 +1104,7 @@
     ['QAT' 'QAT']
     :: ['REU' 'XXX']
     ['ROU' 'ROU']
-    ['RUS' 'RUS']
+    ['RUS' 'ROC']  ::NOTE  special
     ['RWA' 'RWA']
     :: ['BLM' 'XXX']
     :: ['SHN' 'XXX']

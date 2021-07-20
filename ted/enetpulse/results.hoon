@@ -14,13 +14,15 @@
     (fetch-all-results events)
   %-  pure:m
   !>  ^-  (map @t result)
-  %-  ~(urn by results)
+  %-  ~(gas by *(map @t result))
+  %+  murn  ~(tap by results)
   |=  [evid=@t res=(map @t json)]
-  (parse-result evid res)
+  (bind (parse-result evid res) (lead evid))
 ::
 ++  parse-result
   |=  [evid=@t res=(map @t json)]
-  ^-  result
+  :: =/  m  (strand:strandio ,result)
+  ^-  (unit result)
   ~|  evid
   =/  properties=(map @t @t)
     %-  ~(gas by *(map @t @t))
@@ -40,7 +42,7 @@
       %person
     ~&  [%strange-pt evid (~(got by properties) 'ParticipantType')]
     %person
-  =/  participants=(list [nr=@t [name=@t country-fk=@t type=@t] res=(map @t @t)])
+  =/  participants=(list [nr=@t [name=@t id=@t country-fk=@t type=@t] res=(map @t @t)])
     ~|  res
     ?~  p=(~(get by res) 'event_participants')  ~
     =,  dejs:format
@@ -53,25 +55,35 @@
     %.  jon
     %-  ot
     :~  'number'^so
-        'participant'^(ot 'name'^so 'countryFK'^so 'type'^so ~)
+        'participant'^(ot 'name'^so 'id'^so 'countryFK'^so 'type'^so ~)
         'result'^(cu ~(gas by *(map @t @t)) (or (ot 'result_code'^so 'value'^so ~)))
     ==
+  ?:  =(~ participants)  ~
+  %-  some
   =/  duel=?  =(2 (lent participants))
   :: ~&  [%got-participants evid participants]
   =/  entries=(list result-entry)
     =-  (turn - (cork tail tail))
     %+  sort
       %+  turn  participants
-      |=  [nr=@t [name=@t country-fk=@t type=@t] res=(map @t @t)]
+      |=  [nr=@t [name=@t id=@t country-fk=@t type=@t] res=(map @t @t)]
       ^-  [nr=@t rank=@ud result-entry]
       ~|  res
       =/  country-code=@t
         ?:  =('11' country-fk)
-          ?:  =(name 'ROC')  'ROC'
-          ?:  =(name 'EOR')  'EOR'
-          ~&  [%hmmm evid name]
-          ::TODO  this is just a guess! that's bad!
-          ::      we need to do a participant request for organizationFK
+          ?:  =(name 'ROC')  name
+          ?:  =(name 'EOR')  name
+          ::TODO  ids by filtering https://eapi.enetpulse.com/tournament/participants/?id=16367&includeCountryCodes=yes&includeProperties=yes&participantType=athlete&username=paldevapiusr&token=fb5706db03c473ae89d9d5f6cdb5753f for appropriate organizationFK manually. should be kept up to date?
+          ::  EOR = 865529
+          ::  ROC = 921001
+          ?:  ?=(^ (find [id]~ ~['3630908' '3640721' '3641181' '3642765' '3642766' '3643196' '3643355' '3644152' '3644154' '3644156' '3644162' '3644163' '3644164' '3644165' '3644166' '3644167' '3644169' '3644170' '3644172' '3644174' '3644180' '3644194' '3644195' '3644196' '3644197' '3644198' '3644199']))
+            ~&  %eor-gottem
+            'EOR'
+          ?:  ?=(^ (find [id]~ ~['3627990' '3628040' '3631251' '3631288' '3631628' '3631793' '3631851' '3632229' '3632441' '3632536' '3632559' '3632764' '3632832' '3632837' '3632847' '3632852' '3633226' '3633230' '3633241' '3633245' '3633246' '3633247' '3633248' '3633249' '3633420' '3633421' '3633422' '3633423' '3635195' '3635196' '3635210' '3635211' '3635275' '3635276' '3640790' '3640826' '3640834' '3640887' '3640911' '3640917' '3640922' '3640980' '3640991' '3641008' '3641032' '3641048' '3641122' '3641149' '3641186' '3641233' '3641290' '3641313' '3641337' '3641369' '3641415' '3641440' '3641479' '3641521' '3641620' '3641728' '3641731' '3641732' '3641968' '3641970' '3641971' '3642356' '3642357' '3642367' '3642370' '3642552' '3642554' '3642556' '3642570' '3642572' '3642574' '3642575' '3642576' '3642703' '3642770' '3642771' '3642773' '3642775' '3643079' '3643199' '3643274' '3643357' '3643509' '3643593' '3643597' '3643717' '3643909' '3643925' '3643926' '3643927' '3643928' '3643929' '3643930' '3643931' '3644633' '3644654' '3644709' '3644760' '3644761' '3645026' '3645123' '3645258' '3645325' '3645513' '3645514' '3645518' '3645529' '3645532' '3645535' '3645536' '3645537' '3645539' '3645548' '3645549' '3645551' '3645553' '3645554' '3645556' '3645557' '3645560' '3645561' '3645611' '3645648' '3645694' '3645774' '3645810' '3645852' '3645875' '3645927' '3645973' '3646012' '3646050' '3646097' '3646127' '3647607' '3647725' '3647733' '3649442' '3649449' '3649452' '3649456' '3649459' '3649468' '3649537' '3649561' '3649566' '3649580' '3649588' '3649623' '3649629' '3649632' '3651361' '3651365' '3651368' '3651370' '3652011' '3652012' '3652013' '3652014' '3652015' '3652016' '3652017' '3652018' '3652019' '3652020' '3652021' '3652022' '3652023' '3652024' '3652026' '3652027' '3652028' '3652029' '3652030' '3652031' '3652032' '3652033' '3652034' '3652035' '3652036' '3652038' '3652039' '3652040' '3652041' '3652042' '3652043' '3652044' '3652045' '3652046' '3652047' '3653434' '3653435' '3653436' '3653437' '3653439' '3653440' '3653442' '3653515' '3653518' '3653531' '3653601' '3653668' '3653680' '3653743' '3653811' '3653941' '3654285' '3654874' '3654883' '3654891' '3654906' '3654918' '3654932' '3654954' '3654963' '3654974' '3654978' '3654987' '3655001' '3655010' '3655027' '3655032' '3655050' '3655055' '3655058' '3655757' '3655759' '3655854' '3655999']))
+            ~&  %roc-gottem
+            'ROC'
+          ~&  [%guessing-roc-very-bad evid=evid pid=id name]
+          ::TODO  uhhh
           'ROC'
         ~|  name
         (countryfk-to-ioc:static country-fk)
@@ -168,6 +180,7 @@
     ?:  !=(999.999 ra)
       ::NOTE  tie, likely
       &
+    ::TODO  maybe don't produce a result if we hit this for all entries?
     ~&  [%strange-compare evid ~(key by properties) ra=ra rb=rb a=ea b=eb]
     &
   ?:  =(1 (lent entries))

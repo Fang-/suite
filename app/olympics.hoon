@@ -405,6 +405,7 @@
   =|  out=(list @t)
   |^
     ?~  evs  (flop out)
+    =.  when.i.evs  (add when.i.evs ~h1)  ::NOTE  offset hack??
     =,  i.evs
     ?:  (gth when until)  (flop out)
     =/  d=@da  (get-day when)
@@ -557,6 +558,7 @@
     =|  news=(list @t)
     |-  ::NOTE  assumes sorted eves
     ?~  eves  [~ (flop news)]
+    =.  when.i.eves  (add when.i.eves ~h1)  ::NOTE  offset hack??
     ?:  (gth when.i.eves now.bowl)
       :_  (flop news)
       `when.i.eves

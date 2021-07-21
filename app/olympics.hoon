@@ -619,7 +619,7 @@
   =/  when=@da
     when:(~(got by events.db) evid)
   %+  rap  3
-  :~  ?:  (lth when (sub now.bowl ~m30))
+  :~  ?:  (lth (add when ~h1) (sub now.bowl ~m30))
         'This happened: '
       'Happening: '
       (event-name:static db evid)

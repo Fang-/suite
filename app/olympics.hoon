@@ -78,11 +78,7 @@
   ++  on-load
     |=  old=vase
     ^-  (quip card _this)
-    =^  caz  this
-      :_  this(state !<(state-0 old))
-      (once:talk:do live-chat '`beep boop`')
-    :: =.  results  ~
-    [caz this]
+    [~ this(state !<(state-0 old))]
   ::
   ++  on-poke
     |=  [=mark =vase]

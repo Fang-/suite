@@ -394,6 +394,7 @@
 ++  render-schedule
   ^-  @t
   =/  next=@da   next-day
+  =/  from=@da   (sub next ~d1)
   =/  until=@da  (add next ~d5)
   ~&  [now=now.bowl nex=next til=until]
   %+  rap  3
@@ -407,6 +408,7 @@
     ?~  evs  (flop out)
     =.  when.i.evs  (add when.i.evs ~h1)  ::NOTE  offset hack??
     =,  i.evs
+    ?:  (lth when from)   $(evs t.evs)
     ?:  (gth when until)  (flop out)
     =/  d=@da  (get-day when)
     ?:  (lth when next)

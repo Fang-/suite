@@ -402,7 +402,7 @@
   =|  out=(list @t)
   |^
     ?~  evs  (flop out)
-    =.  when.i.evs  (add when.i.evs ~h1)  ::NOTE  offset hack??
+    =.  when.i.evs  when.i.evs
     =,  i.evs
     ?:  (lth when from)   $(evs t.evs)
     ?:  (gth when until)  (flop out)
@@ -554,7 +554,7 @@
     =|  news=(list @t)
     |-  ::NOTE  assumes sorted eves
     ?~  eves  [~ (flop news)]
-    =.  when.i.eves  (add when.i.eves ~h1)  ::NOTE  offset hack??
+    =.  when.i.eves  when.i.eves
     ?:  (gth when.i.eves now.bowl)
       :_  (flop news)
       `when.i.eves
@@ -615,7 +615,7 @@
   =/  when=@da
     when:(~(got by events.db) evid)
   %+  rap  3
-  :~  ?:  (lth (add when ~h1) (sub now.bowl ~m30))
+  :~  ?:  (lth when (sub now.bowl ~m30))
         'This happened: '
       'Happening: '
       (event-name:static db evid)

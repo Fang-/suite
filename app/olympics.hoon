@@ -667,12 +667,14 @@
     %+  rap  3
     :~  ?-  medal.e
           ~        ''
-          %gold    '🥇 '
+          %gold    '**🥇 '
           %silver  '🥈 '
           %bronze  '🥉 '
         ==
       ::
         (show-participant participant.e)
+      ::
+        ?:(?=(%gold medal.e) '**' '')
       ::
         ?~  s=(show-score [score record]:e)  ''
         (rap 3 ' (' u.s ')' ~)

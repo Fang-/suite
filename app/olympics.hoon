@@ -425,7 +425,7 @@
   =/  until=@da  (add next ~d5)
   ~&  [now=now.bowl nex=next til=until]
   %+  rap  3
-  :-  'All times are in JST (UTC+9).\0a\0a'
+  :-  'All times are in [JST (UTC+9)](https://time.is/JST).\0a\0a'
   =/  evs=(list [evid=@t * * when=@da *])
     dated-events:dab
   =|  day=@da
@@ -552,7 +552,7 @@
     %+  sort  scores
     |=([[* a=@ud] [* b=@ud]] (gth a b))
   %+  rap  3
-  :-  'Updated approximately every ~h24.\0a\0a'
+  :-  'Updated at least every ~h24.\0a\0a'
   %+  turn  scores
   |=  [=ship score=@ud]
   =-  (rap 3 '`' (crip -) ' : ' (scot %ud score) '`\0a' ~)

@@ -15,13 +15,15 @@
     dbug, verb, default-agent
 ::
 |%
-+$  state-0
-  $:  %0
++$  state-1
+  $:  %1
       db=full-db
       last-db=@da
       last-stages=@da
     ::
-      results=(map @t result)
+      $:  doubted=(set @t)
+          results=(map @t result)
+      ==
     ::
       ::NOTE  event ids
       happening=(set @t)  ::  (~(dif in ~(key by started)) ~(key by results))
@@ -50,7 +52,7 @@
 +$  card  card:agent:gall
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -76,9 +78,34 @@
   ::
   ++  on-save  !>(state)
   ++  on-load
-    |=  old=vase
+    |=  ole=vase
     ^-  (quip card _this)
-    [~ this(state !<(state-0 old))]
+    |^  =/  old=state-x  !<(state-x ole)
+        =?  old  ?=(%0 -.old)  (state-0-to-1 old)
+        ?>       ?=(%1 -.old)
+        [~ this(state old)]
+    ::
+    ++  state-0-to-1
+      |=  s=state-0
+      ^-  state-1
+      s(- %1, results [~ results.s])
+    ::
+    +$  state-x  $%(state-1 state-0)
+    ::
+    +$  state-0
+      $:  %0
+          db=full-db
+          last-db=@da
+          last-stages=@da
+        ::
+          results=(map @t result)
+        ::
+          ::NOTE  event ids
+          happening=(set @t)  ::  (~(dif in ~(key by started)) ~(key by results))
+          started=(map @t index:graph)
+          next-event-timer=(unit @da)
+      ==
+    --
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -592,9 +619,49 @@
 ++  on-event-results
   |=  rez=(map @t result)
   ^-  (quip card _state)
-  :_  state(results (~(uni by results) rez))
-  =/  rez=(list [evid=@t res=result])
-    (sort ~(tap by rez) aor)
+  =/  [noz=(list @t) rez=(list [evid=@t res=result])]
+    ::  we may have partial ranking results. if we suspect this
+    ::  is the case, wait once for refreshed results.
+    ::
+    =;  [noz=(list [@t result]) rez=(list [@t result])]
+      [(turn noz head) rez]
+    %+  skid  ~(tap by rez)
+    |=  [evid=@t r=result]
+    ::  only doubt once
+    ?:  (~(has in doubted) evid)  |
+    ::  always doubt defaults
+    ?:  ?=(%deft -.r)  &
+    =/  d=@t  (event-discipline:static evid db)
+    ::  detect duel result in sports other than duel sports
+    ?&  ?=(%duel -.r)
+    ?!  ?|  =('Water polo' d)
+            =('Baseball' d)
+            =('Softball' d)
+            =('Basketball' d)
+            =('3x3 basketball' d)
+            =('Boxing' d)
+            =('Fencing' d)
+            =('Field hockey' d)
+            =('Soccer' d)
+            =('Handball' d)
+            =('Judo' d)
+            =('Karate kata' d)
+            =('Karate kumite' d)
+            =('Rugby sevens' d)
+            =('Table tennis' d)
+            =('Taekwondo' d)
+            =('Tennis' d)
+            =('Volleyball' d)
+            =('Beach volleyball' d)
+            =('Freestyle wrestling' d)
+            =('Greco-Roman wrestling' d)
+        ==
+    ==
+  :_  %_  state
+        doubted  (~(gas in doubted) noz)
+        results  (~(gas by results) rez)
+      ==
+  =.  rez  (sort rez aor)
   =|  mez=(list [id=index:graph msg=@t])
   =/  id=@  now.bowl
   |-  ^-  (list card)

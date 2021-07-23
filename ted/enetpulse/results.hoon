@@ -101,8 +101,8 @@
       :-  ?:  ?=(%team pt)  [%nation country-code]
           [%person name country-code]
       :-  =/  com=(unit @t)  (~(get by res) 'comment')
-          ?:  =(`'WR' com)  ~&  [%record-wr evid]  %wr
-          ?:  =(`'OR' com)  ~&  [%record-or evid]  %or
+          ?:  |(=(`'WR' com) =(`'WB' com))  %wr
+          ?:  |(=(`'OR' com) =(`'OB' com))  %or
           ~
       :_  ?.  (~(has by res) 'medal')  ~
           (rash (~(got by res) 'medal') (perk %gold %silver %bronze ~))

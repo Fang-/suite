@@ -45,6 +45,7 @@
       ::   %female  'Women\'s '
       :: ==
     ::
+      ?:  =('Artistic Gymnastics' name.stage)  ''
       =/  nom=tape  (trip name.stage)
       ?:  ?=(^ (find "lympics" nom))  ''
       =?  nom  =(`0 (find "Greco-Roman " nom))

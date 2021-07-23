@@ -341,7 +341,11 @@
   ++  dated-events
     ^-  (list [evid=@t name=@t round=@t when=@da stid=@t])
     %+  sort  ~(tap by events.db)
-    |=([[* * * a=@da *] [* * * b=@da *]] (lth a b))
+    |=  [a=[evid=@t * * when=@da *] b=[evid=@t * * when=@da *]]
+    ?.  =(when.a when.b)  (lth when.a when.b)
+    %+  aor
+      (event-discipline:static evid.a db)
+    (event-discipline:static evid.b db)
   ::
   ++  unstarted-events
     ^-  (list [evid=@t name=@t round=@t when=@da stid=@t])
@@ -425,6 +429,7 @@
   =/  evs=(list [evid=@t * * when=@da *])
     dated-events:dab
   =|  day=@da
+  =|  dil=@t
   =|  diz=(set @t)
   =|  out=(list @t)
   |^
@@ -433,22 +438,25 @@
     =,  i.evs
     ?:  (lth when from)   $(evs t.evs)
     ?:  (gth when until)  (flop out)
-    =/  d=@da  (get-day when)
+    =/  d=@da   (get-day when)
+    =/  dis=@t  (event-discipline:static evid db)
     ?:  (lth when next)
       =?  out  !=(d day)
         :_  out
-        (rap 3 '\0a**' (render-day when) '**\0a' ~)
+        (rap 3 '\0a\0a**' (render-day when) '**\0a' ~)
       =.  day  d
+      =?  out  !=(dis dil)
+        ['\0a' out]
+      =.  dil  dis
       =.  out
         :_  out
         (rap 3 '`' (render-time when) '` ' (event-name:static db evid) '\0a' ~)
       $(evs t.evs)
     =?  out  !=(d day)
       :_  out
-      (rap 3 '\0a\0a**' (render-day when) '**\0a' ~)
+      (rap 3 '\0a\0a\0a**' (render-day when) '**\0a' ~)
     =?  diz  !=(d day)
       ~
-    =/  dis=@t  (event-discipline:static evid db)
     ?:  (~(has in diz) dis)
       $(evs t.evs)
     =.  diz  (~(put in diz) dis)

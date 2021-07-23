@@ -23,7 +23,6 @@
     (event-discipline evid db)
   =/  dis-icon=?(@t [m=@t w=@t])
     icon:(~(got by disciplines) discipline)
-  ::TODO  this is mostly sufficient, move on to wrapping up!
   %+  rap  3
   ^-  (list @t)
   :*  ?@  dis-icon  dis-icon

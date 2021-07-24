@@ -5,7 +5,7 @@
     strandio
 ::
 |=  args=vase
-=+  !<([~ events=(set @t)] args)
+=+  !<([~ events=(set @t) db=full-db] args)
 =/  events=(list @t)  ~(tap in events)
 =/  m  (strand:strandio ,vase)
 ?:  =(~ events)  (pure:m !>(~))
@@ -193,7 +193,36 @@
     [%deft (snag 0 entries)]
   ?:  duel
     [%duel (snag 0 entries) (snag 1 entries)]
-  [%rank entries]
+  ::  handle 2v2 results specially
+  ?.  ?&  =(4 (lent entries))
+        ::
+          =/  d=@t  (event-discipline:static evid db)
+          ?|  =(d 'Badminton')
+              =(d 'Beach volleyball')
+              =(d 'Table tennis')
+              =(d 'Tennis')
+          ==
+      ==
+    [%rank entries]
+  =|  win=[c=@t s=score m=medal]
+  =|  los=[c=@t s=score m=medal]
+  =*  don  [%duel [nation+c ~ s m]:win [nation+c ~ s m]:los]
+  |-
+  ?~  entries
+    ~&  [%so-strange evid=evid]
+    don
+  =/  cc=@t
+    ?-  -.participant.i.entries
+      %nation  country-code.participant.i.entries
+      %person  country-code.participant.i.entries
+    ==
+  ?:  =('' c.win)
+    =.  win  [cc [score medal]:i.entries]
+    $(entries t.entries)
+  ?:  &(=('' c.los) !=(cc c.win))
+    =.  los  [cc [score medal]:i.entries]
+    don
+  $(entries t.entries)
 ::
 ++  or-soft
   |*  wit=fist:dejs-soft:format

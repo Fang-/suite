@@ -621,7 +621,7 @@
   %^  start-thread:spider
       /results
     %enetpulse-results
-  !>(`(set @t)`happening)
+  !>(`[(set @t) full-db]`[happening db])
 ::
 ++  on-event-results
   |=  rez=(map @t result)

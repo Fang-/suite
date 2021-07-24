@@ -145,7 +145,6 @@
     ++  spider-event
       |*  [res=mold on-res=$-(* (quip card _state))]
       ^-  (quip card _this)
-      ~&  [%spider-event wire -.sign]
       ?-  -.sign
           %poke-ack
         ?~  p.sign

@@ -171,7 +171,7 @@
     ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.eb)  |
     ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.ea)  &
     ?:  ?&  ?=(%points -.score.ea)  ?=(%points -.score.eb)
-            ?=(^ (rush n.score.ea dum:ag) ?=(^ (rush n.score.eb dum:ag)))
+            ?=(^ (rush n.score.ea dum:ag))  ?=(^ (rush n.score.eb dum:ag))
         ==
       (gth (rash n.score.ea dum:ag) (rash n.score.eb dum:ag))
     ?:  &(?=(%time -.score.ea) ?=(%time -.score.eb))

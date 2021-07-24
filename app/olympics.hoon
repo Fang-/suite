@@ -645,6 +645,7 @@
     ?!  ?|  =('Water polo' d)
             =('Baseball' d)
             =('Softball' d)
+            =('Badminton' d)
             =('Basketball' d)
             =('3x3 basketball' d)
             =('Boxing' d)

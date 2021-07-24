@@ -62,6 +62,7 @@
   %-  some
   =/  duel=?  =(2 (lent participants))
   :: ~&  [%got-participants evid participants]
+  ::TODO  if 4 participants and badminton (or tennis? or other?), it's doubles
   =/  entries=(list result-entry)
     =-  (turn - (cork tail tail))
     %+  sort
@@ -153,16 +154,6 @@
     ?.  =(ra rb)  (lth ra rb)
     ?:  &(?=([%wl %w] score.ea) ?=([%wl %l] score.eb))  &
     ?:  &(?=([%wl %w] score.eb) ?=([%wl %l] score.ea))  |
-    ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.eb)  |
-    ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.ea)  &
-    ?:  &(?=(%points -.score.ea) ?=(%points -.score.eb))
-      !(aor n.score.ea n.score.eb)
-    ?:  &(?=(%time -.score.ea) ?=(%time -.score.eb))
-      (aor t.score.ea t.score.eb)  ::TODO  broken, fix me!
-    ?:  &(?=(%distance -.score.ea) ?=(%distance -.score.eb))
-      !(aor m.score.ea m.score.eb)  ::TODO  sanity-check
-    ?:  &(?=(%errors -.score.ea) ?=(%errors -.score.eb))
-      (aor e.score.ea e.score.eb)
     ?:  &(duel (~(has by properties) 'Winner'))
       =/  winner=@t  (~(got by properties) 'Winner')
       ?|  &(=('1' na) =('Home' winner))
@@ -177,6 +168,21 @@
       ?:  ?=(%silver medal.ea)  |
       ~&  [%wth-medals medal.ea medal.eb]
       &
+    ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.eb)  |
+    ?:  ?=(?(%dns %dnf %nm %dq %elim %lap) -.score.ea)  &
+    ?:  ?&  ?=(%points -.score.ea)  ?=(%points -.score.eb)
+            ?=(^ (rush n.score.ea dum:ag) ?=(^ (rush n.score.eb dum:ag)))
+        ==
+      (gth (rash n.score.ea dum:ag) (rash n.score.eb dum:ag))
+    ?:  &(?=(%time -.score.ea) ?=(%time -.score.eb))
+      ~&  [%questionable-result-ordering score.ea score.eb]
+      (aor t.score.ea t.score.eb)  ::TODO  broken, fix me!
+    ?:  &(?=(%distance -.score.ea) ?=(%distance -.score.eb))
+      ~&  [%questionable-result-ordering score.ea score.eb]
+      !(aor m.score.ea m.score.eb)  ::TODO  sanity-check
+    ?:  &(?=(%errors -.score.ea) ?=(%errors -.score.eb))
+      ~&  [%questionable-result-ordering score.ea score.eb]
+      (aor e.score.ea e.score.eb)
     ?:  !=(999.999 ra)
       ::NOTE  tie, likely
       &

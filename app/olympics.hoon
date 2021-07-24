@@ -427,6 +427,8 @@
   :-  'All times are in [JST (UTC+9)](https://time.is/JST).\0a\0a'
   =/  evs=(list [evid=@t * * when=@da *])
     dated-events:dab
+  =/  happening=(set @t)
+    happening-events:dab
   =|  day=@da
   =|  dil=@t
   =|  diz=(set @t)
@@ -449,7 +451,15 @@
       =.  dil  dis
       =.  out
         :_  out
-        (rap 3 '`' (render-time when) '` ' (event-name:static db evid) '\0a' ~)
+        %+  rap  3
+        :~  ?:((~(has in happening) evid) '**' '')
+            '`'
+            (render-time when)
+            '` '
+            (event-name:static db evid)
+            ?:((~(has in happening) evid) '**' '')
+            '\0a'
+        ==
       $(evs t.evs)
     =?  out  !=(d day)
       :_  out
@@ -606,7 +616,7 @@
   :_  state(next-event-timer next)
   =*  nite  next-event-timer
   %-  zing
-  :~  ?~(msgs ~ (send:talk live-chat msgs))
+  :~  ?~(msgs ~ [update-schedule (send:talk live-chat msgs)])
       ?~(nite ~ ~[(rest:b:sys /timer/event u.next-event-timer)])
       ?~(next ~ ~[(wait:b:sys /timer/event u.next)])
   ==
@@ -669,6 +679,21 @@
         doubted  (~(gas in doubted) noz)
         results  (~(gas by results) rez)
       ==
+  =;  caz=(list card)
+    ::  also update the scoreboard if there were new gold medals
+    ::
+    =?  caz  ?=(^ caz)
+      [update-schedule caz]
+    =;  gold=?
+      ?.  gold  caz
+      [update-scoreboard caz]
+    %+  lien  rez
+    |=  [@t res=result]
+    ?-  -.res
+      %duel  ?=(%gold medal.win.res)
+      %deft  ?=(%gold medal.one.res)
+      %rank  ?~(rank.res | ?=(%gold medal.i.rank.res))
+    ==
   =.  rez  (sort rez aor)
   =|  mez=(list [id=index:graph msg=@t])
   =/  id=@  now.bowl

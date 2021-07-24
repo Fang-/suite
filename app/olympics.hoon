@@ -768,7 +768,7 @@
       ==
     ?+  -.s  `+.s
       %time      `?:(?=(~ (find ":" (trip t.s))) (cat 3 t.s 's') t.s)
-      %weight    `(cat 3 k.s 'kg')
+      %weight    `(cat 3 (scot %ud k.s) 'kg')
       %distance  `?:(?=(~ (find "m" (trip m.s))) (cat 3 m.s 'm') m.s)
       %errors    `(cat 3 e.s ' errors')
     ::

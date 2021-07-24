@@ -427,8 +427,6 @@
   :-  'All times are in [JST (UTC+9)](https://time.is/JST).\0a\0a'
   =/  evs=(list [evid=@t * * when=@da *])
     dated-events:dab
-  =/  happening=(set @t)
-    happening-events:dab
   =|  day=@da
   =|  dil=@t
   =|  diz=(set @t)
@@ -452,12 +450,10 @@
       =.  out
         :_  out
         %+  rap  3
-        :~  ?:((~(has in happening) evid) '**' '')
-            '`'
+        :~  '`'
             (render-time when)
             '` '
             (event-name:static db evid)
-            ?:((~(has in happening) evid) '**' '')
             '\0a'
         ==
       $(evs t.evs)
@@ -561,7 +557,7 @@
     %+  sort  scores
     |=([[* a=@ud] [* b=@ud]] (gth a b))
   %+  rap  3
-  :-  'Updated at least every ~h24.\0a\0a'
+  :-  'Updated for every gold medal.\0a\0a'
   %+  turn  scores
   |=  [=ship score=@ud]
   =-  (rap 3 '`' (crip -) ' : ' (scot %ud score) '`\0a' ~)
@@ -616,7 +612,7 @@
   :_  state(next-event-timer next)
   =*  nite  next-event-timer
   %-  zing
-  :~  ?~(msgs ~ [update-schedule (send:talk live-chat msgs)])
+  :~  ?~(msgs ~ (send:talk live-chat msgs))
       ?~(nite ~ ~[(rest:b:sys /timer/event u.next-event-timer)])
       ?~(next ~ ~[(wait:b:sys /timer/event u.next)])
   ==
@@ -682,8 +678,6 @@
   =;  caz=(list card)
     ::  also update the scoreboard if there were new gold medals
     ::
-    =?  caz  ?=(^ caz)
-      [update-schedule caz]
     =;  gold=?
       ?.  gold  caz
       [update-scoreboard caz]

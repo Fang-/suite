@@ -343,8 +343,8 @@
     |=  [a=[evid=@t * * when=@da *] b=[evid=@t * * when=@da *]]
     ?.  =(when.a when.b)  (lth when.a when.b)
     %+  aor
-      (event-discipline:static evid.a db)
-    (event-discipline:static evid.b db)
+      (event-name:static db evid.a)
+    (event-name:static db evid.b)
   ::
   ++  unstarted-events
     ^-  (list [evid=@t name=@t round=@t when=@da stid=@t])

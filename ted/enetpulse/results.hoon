@@ -152,6 +152,8 @@
       unknown+res
     |=  [[na=@t ra=@ud ea=result-entry] [nb=@t rb=@ud eb=result-entry]]
     ?.  =(ra rb)  (lth ra rb)
+    ::NOTE  early-out
+    ?:  =(score.ea score.eb)  &
     ?:  &(?=([%wl %w] score.ea) ?=([%wl %l] score.eb))  &
     ?:  &(?=([%wl %w] score.eb) ?=([%wl %l] score.ea))  |
     ?:  &(duel (~(has by properties) 'Winner'))
@@ -279,7 +281,7 @@
     (pure:m ~)
   =+  jon=(~(got by p.jon) 'event')
   ?.  ?=([%o *] jon)
-    ~&  [%res-res-not-obj x evid jon]
+    :: ~&  [%res-res-not-obj x evid jon]
     (pure:m ~)
   ?.  (~(has by p.jon) evid)
     ~&  [%res-no-evid evid ~(key by p.jon)]

@@ -106,7 +106,8 @@
           ?:  |(=(`'OR' com) =(`'OB' com))  %or
           ~
       :_  ?.  (~(has by res) 'medal')  ~
-          (rash (~(got by res) 'medal') (perk %gold %silver %bronze ~))
+          =-  (fall - ~)
+          (rush (~(got by res) 'medal') (perk %gold %silver %bronze ~))
       ?:  (~(has by res) 'finalresult')
         =/  final=@t  (~(got by res) 'finalresult')
         ?:  =('won' final)   wl+%w

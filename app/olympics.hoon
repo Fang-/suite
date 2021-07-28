@@ -713,7 +713,15 @@
   %^  start-thread:spider
       /results-refresh
     %enetpulse-results
-  !>(`[(set @t) full-db]`[~(key by results) db])
+  =-  ~&  [%refreshing (lent -)]
+      !>(`[(set @t) full-db]`[(~(gas in *(set @t)) -) db])
+  %+  skim  ~(tap in ~(key by results))
+  |=  evid=@t
+  ^-  ?
+  ::NOTE  we only refresh for the last two days, to avoid huge request batches
+  %+  gte
+    when:(~(got by events.db) evid)
+  (sub now.bowl ~d2)
 ::
 ++  on-results-refresh
   |=  rez=(map @t result)

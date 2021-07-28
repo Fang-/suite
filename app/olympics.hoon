@@ -243,7 +243,7 @@
     ?:  (~(has by wex.bowl) wire dude)
       ~&  [%still-running thread %not-starting]
       ~
-    =/  tid=@ta  (rap 3 thread '--' (scot %uv eny.bowl) ~)
+    =/  tid=@ta  (rap 3 thread '--' (spat wire) '--' (scot %uv (end 7 eny.bowl)) ~)
     =/  args     [~ `tid thread arg]
     :~  [%pass wire %agent dude %watch /thread-result/[tid]]
         [%pass wire %agent dude %poke %spider-start !>(args)]

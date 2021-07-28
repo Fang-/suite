@@ -35,6 +35,7 @@
   $%  [%test-msg ~]
       [%update-db wat=?(%full %stages %events)]
       [%update-posts ~]
+      [%refresh-results ~]  ::  silently update known results
   ==
 ::
 ++  rate
@@ -128,6 +129,9 @@
     ::
         %update-posts
       [~[update-schedule:do update-scoreboard:do] this]
+    ::
+        %refresh-results
+      [refresh-results:do this]
     ==
   ::
   ++  on-agent
@@ -140,6 +144,9 @@
         ::
             [%results ~]
           (spider-event (map @t result) on-event-results:do)
+        ::
+            [%results-refresh ~]
+          (spider-event (map @t result) on-results-refresh:do)
         ==
     ::
     ++  spider-event
@@ -406,9 +413,9 @@
 ++  on-daily-timer
   ^-  (quip card _state)
   :_  state
-  :~  set-daily-timer
+  :*  set-daily-timer
       update-schedule
-      update-scoreboard
+      refresh-results
   ==
 ::
 ++  update-schedule
@@ -700,6 +707,25 @@
   =-  $(rez t.rez, mez [- mez], id +(+(id)))
   :-  [id]~
   (result-msg evid res)
+::
+++  refresh-results
+  ^-  (list card)
+  %^  start-thread:spider
+      /results-refresh
+    %enetpulse-results
+  !>(`[(set @t) full-db]`[~(key by results) db])
+::
+++  on-results-refresh
+  |=  rez=(map @t result)
+  ^-  (quip card _state)
+  ~&  :-  %refreshed-results
+      ^=  dif
+      %~  wyt  in
+      %-  %~  dif  in
+          (~(gas in *(set [@t result])) ~(tap by rez))
+      (~(gas in *(set [@t result])) ~(tap by results))
+  =.  results  (~(uni by results) rez)
+  [[update-scoreboard]~ state]
 ::
 ::  +|  %renderers
 ::

@@ -176,6 +176,7 @@
   ?^  dis=(sport-to-discipline spid.template)
     u.dis
   =*  fail
+    ~&  [%discipline-fail spid.template name.stage name.event]
     %+  rap  3
     ~['?? ' (~(got by sports) spid.template) ': ' name.stage '; ' name.event]
   ?+  spid.template  fail
@@ -244,6 +245,14 @@
     :: fail
   ::
       %'89'  ::  'Karate'  ::  ambiguous! kata or kumite
+    ?:  ?=(^ (find "Kata" (trip name.stage)))
+      'Karate kata'
+    ?:  ?=(^ (find "Kumite" (trip name.stage)))
+      'Karate kumite'
+    ?:  ?=(^ (find "Kata" (trip name.event)))
+      'Karate kata'
+    ?:  ?=(^ (find "Kumite" (trip name.event)))
+      'Karate kumite'
     fail
   ==
 ::

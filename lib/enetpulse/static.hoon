@@ -22,6 +22,9 @@
   =/  discipline=@t
     (event-discipline evid db)
   =/  dis-icon=?(@t [m=@t w=@t])
+    ?.  (~(has by disciplines) discipline)
+      ~&  [%wtf-missing-discipline discipline]
+      '?'
     icon:(~(got by disciplines) discipline)
   %+  rap  3
   ^-  (list @t)

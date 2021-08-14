@@ -5,6 +5,7 @@ usage encouraged! issues welcome! provided "as is"!
 
 - **serval**: a torrent tracker: implements the bittorrent http tracker protocol.
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`. (try `|link ~paldev %duiker`!)
+- **pals**: friendlist, for manual peer discovery.
 - **bard**: interactive storyteller for use with `|link`.
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
 - **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.

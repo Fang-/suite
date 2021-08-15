@@ -17,7 +17,7 @@
 ::
 /+  graph-store,
     default-agent, verb, dbug,
-    fid=fakeid, *server
+    fid=fakeid, *server, graph
 ::
 |%
 +$  state-0
@@ -163,6 +163,7 @@
 ::
 |_  =bowl:gall
 +*  fakeid  ~(. fid bowl)
+    g       ~(. graph bowl)
 ::
 ::  config
 ::
@@ -405,18 +406,10 @@
     ^-  (unit json)
     ?:  ?=(%| -.m)  ~
     `(post:enjs:graph-store p.m)
-  =;  upd
-    ?>  ?=(%add-graph +<.upd)
-    %-  flop
-    %+  scag  initial-messages
-    (tap:orm:graph-store graph.q.upd)
-  .^  update:graph-store
-    %gx
-    (scot %p our.bowl)
-    %graph-store
-    (scot %da now.bowl)
-    /graph/(scot %p our.bowl)/[source]/graph-update-2
-  ==
+  %-  flop
+  %+  scag  initial-messages
+  %-  tap:orm:graph-store
+  (get-graph-mop:g our.bowl source)
 ::
 ++  handle-post
   |=  [=eyre-id =inbound-request]

@@ -12,6 +12,13 @@
   :-  [i.a i.b]
   $(a t.a, b t.b)
 ::
+++  snug                                                ::  unitized snag
+  |*  [a=@ b=(list)]
+  |-  ^+  (some ?>(?=(^ b) i.b))
+  ?~  b  ~
+  ?:  =(0 a)  (some i.b)
+  $(b t.b, a (dec a))
+::
 ::  data structures
 ::
 ++  mip                                                 ::  map of maps
@@ -40,6 +47,10 @@
   ++  gut
     |*  [b=* c=* d=*]
     (~(gut by (~(gut by a) b ~)) c d)
+  ::
+  ++  key
+    |*  b=*
+    ~(key by (~(gut by a) b ~))
   ::
   ++  put
     |*  [b=* c=* d=*]

@@ -56,6 +56,10 @@
     .red { font-weight: bold; color: #dd2222; }
     .green { font-weight: bold; color: #229922; }
 
+    table#pals tr td:nth-child(2) {
+      padding: 0 0.5em;
+    }
+
     .status {
       height: 10px;
       width: 10px;
@@ -78,7 +82,17 @@
       background-color: #ccc;
       border-radius: 3px;
       margin-right: 0.5em;
-      padding: 0.1em 0.5em;
+      padding: 0.1em;
+    }
+    .label input[type="text"] {
+      max-width: 100px;
+    }
+    .label span {
+      margin: 0 0 0 0.2em;
+    }
+
+    button {
+      padding: 0.2em 0.5em;
     }
     '''
   ::
@@ -96,14 +110,13 @@
             ?:  o.u.msg  ::TODO  lightly refactor
               ;p.green:"{(trip t.u.msg)}"
             ;p.red:"{(trip t.u.msg)}"
-        ;table
+        ;table#pals
           ;form(method "post")
             ;tr(style "font-weight: bold")
               ;td:""
               ;td:""
               ;td:"@p"
               ;td:"tags"
-              ;td:"add tags"
             ==
             ;tr
               ;td:""
@@ -113,8 +126,7 @@
               ;td
                 ;input(type "text", name "who", placeholder "~sampel");
               ==
-              ;td:""
-              ;td
+              ;td.label
                 ;input(type "text", name "lists", placeholder "some, tags");
               ==
             ==
@@ -131,8 +143,7 @@
     |=  name=@ta
     ^-  manx
     ;form.label(method "post")
-      ::TODO  there should be a better way to write this, but ;/ syntax-errors
-      ;*  [:/(trip name) ~]
+      ;span:"{(trip name)}"
       ;input(type "hidden", name "who", value "{(scow %p ship)}");
       ;input(type "hidden", name "lists", value "{(trip name)}");
       ;button(type "submit", name "what", value "unlist"):"x"
@@ -141,10 +152,10 @@
   ++  list-adder
     |=  =ship
     ^-  manx
-    ;form(method "post")
+    ;form.label(method "post")
       ;input(type "text", name "lists", placeholder "some, tags");
       ;input(type "hidden", name "who", value "{(scow %p ship)}");
-      ;button(type "submit", name "what", value "enlist"):"+"
+      ;input(type "hidden", name "what", value "enlist");
     ==
   ::
   ++  friend-adder
@@ -182,12 +193,10 @@
             ;+  (friend-remover ship)
           ==
       ;td:"{(scow %p ship)}"
-      ;td
-        ;*  (turn (sort ~(tap in lists) aor) (list-label ship))
-      ==
       ;+  ?:  ?=(%leeche kind)  ;td;
           ;td
             ;+  (list-adder ship)
+            ;*  (turn (sort ~(tap in lists) aor) (list-label ship))
           ==
     ==
   ::

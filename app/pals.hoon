@@ -19,7 +19,7 @@
 ::      reading
 ::    external applications likely want to interact with this via scries,
 ::    which are outlined below. finding interaction targets or mutuals to
-::    pokke or subscribe to, using mutual status as permission check, etc.
+::    poke or subscribe to, using mutual status as permission check, etc.
 ::    one might be tempted to use list names for namespacing (ie %yourapp
 ::    would only retrieve targets from the ~.yourapp list), but beware that
 ::    this overlaps with user-facing organizational purposes.
@@ -235,35 +235,53 @@
   ^-  (unit (unit cage))
   ?>  ?=([@ *] path)
   =*  care  i.path
+  =*  leeches=(set @p)  (~(dif in incoming) ~(key by outgoing))
+  =*  targets=(set @p)  (~(dif in ~(key by outgoing)) incoming)
+  =*  mutuals=(set @p)  (~(int in incoming) ~(key by outgoing))
   ?:  =(%y care)
     ?+  t.path  [~ ~]
-        ~
+        ~  ::NOTE  gall catches/prevents this?
       :^  ~  ~  %noun
       !>  ^-  arch
       :-  ~
       %-  ~(gas by *(map @ta ~))
       (turn `(list @ta)`~[%leeches %targets %mutuals] (late ~))
     ::
-        [%leeches ~]
+        [?(%targets %mutuals) ~]  ::NOTE  %leeches makes no sense here
       :^  ~  ~  %noun
       !>  ^-  arch
-      [~ ~]
-    ::
-        [?(%targets %mutuals) ~]
-      :^  ~  ~  %noun
-      !>  ^-  arch
-      ::TODO
-      !!
+      :-  ~
+      %-  ~(gas by *(map @ta ~))
+      =;  lists=(list @ta)
+        (turn lists (late ~))
+      %-  zing
+      =+  ?-(i.t.path %targets targets, %mutuals mutuals)
+      (turn ~(tap in -) |=(p=@p ~(tap in (~(got by outgoing) p))))
     ==
   ::
   ?.  =(%x care)  [~ ~]
   ::
-  ?+  t.path  [~ ~]
-    [%leeches ~]  ``noun+!>((~(dif in incoming) ~(key by outgoing)))
-    [%targets ~]  ``noun+!>(~(key by outgoing))
-    [%mutuals ~]  ``noun+!>((~(int in incoming) ~(key by outgoing)))
-  ::
-    ::TODO  others
+  ?.  ?=([?(%leeches %targets %mutuals) *] t.path)  [~ ~]
+  =*  what  i.t.path
+  ?:  ?=(%leeches i.t.path)
+    ?~  t.t.path  ``noun+!>(leeches)
+    ?~  who=(slaw %p i.t.t.path)  [~ ~]
+    ``noun+!>((~(has in leeches) u.who))
+  =/  where=@ta
+    ?~(t.t.path ~. i.t.t.path)
+  ?:  ?=([@ @ ~] t.t.path)
+    ?~  who=(slaw %p i.t.t.t.path)  [~ ~]
+    ?-  what
+      %targets  ``noun+!>((~(has in targets) u.who))
+      %mutuals  ``noun+!>((~(has in mutuals) u.who))
+    ==
+  =-  ``noun+!>((~(gas in *(set @p)) -))
+  %+  murn  ~(tap by outgoing)
+  |=  [p=@p s=(set @ta)]
+  ^-  (unit @p)
+  =-  ?:(- `p ~)
+  ?&  |(=(~. where) (~(has in s) where))
+      (~(has in ?-(what %targets targets, %mutuals mutuals)) p)
   ==
 ::
 ++  on-arvo

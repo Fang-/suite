@@ -233,56 +233,42 @@
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
-  ?>  ?=([@ *] path)
-  =*  care  i.path
-  =*  leeches=(set @p)  (~(dif in incoming) ~(key by outgoing))
-  =*  targets=(set @p)  (~(dif in ~(key by outgoing)) incoming)
-  =*  mutuals=(set @p)  (~(int in incoming) ~(key by outgoing))
-  ?:  =(%y care)
-    ?+  t.path  [~ ~]
-        ~  ::NOTE  gall catches/prevents this?
-      :^  ~  ~  %noun
-      !>  ^-  arch
-      :-  ~
-      %-  ~(gas by *(map @ta ~))
-      (turn `(list @ta)`~[%leeches %targets %mutuals] (late ~))
-    ::
-        [?(%targets %mutuals) ~]  ::NOTE  %leeches makes no sense here
-      :^  ~  ~  %noun
-      !>  ^-  arch
-      :-  ~
-      %-  ~(gas by *(map @ta ~))
-      =;  lists=(list @ta)
-        (turn lists (late ~))
-      %-  zing
-      =+  ?-(i.t.path %targets targets, %mutuals mutuals)
-      (turn ~(tap in -) |=(p=@p ~(tap in (~(got by outgoing) p))))
-    ==
-  ::
-  ?.  =(%x care)  [~ ~]
-  ::
-  ?.  ?=([?(%leeches %targets %mutuals) *] t.path)  [~ ~]
-  =*  what  i.t.path
-  ?:  ?=(%leeches i.t.path)
-    ?~  t.t.path  ``noun+!>(leeches)
-    ?~  who=(slaw %p i.t.t.path)  [~ ~]
-    ``noun+!>((~(has in leeches) u.who))
-  =/  where=@ta
-    ?~(t.t.path ~. i.t.t.path)
-  ?:  ?=([@ @ ~] t.t.path)
-    ?~  who=(slaw %p i.t.t.t.path)  [~ ~]
-    ?-  what
-      %targets  ``noun+!>((~(has in targets) u.who))
-      %mutuals  ``noun+!>((~(has in mutuals) u.who))
-    ==
-  =-  ``noun+!>((~(gas in *(set @p)) -))
-  %+  murn  ~(tap by outgoing)
-  |=  [p=@p s=(set @ta)]
-  ^-  (unit @p)
-  =-  ?:(- `p ~)
-  ?&  |(=(~. where) (~(has in s) where))
-      (~(has in ?-(what %targets targets, %mutuals mutuals)) p)
-  ==
+  |^  ?+  path  [~ ~]
+        [%y ~]                 (arc %leeches %targets %mutuals ~)
+        [%y %targets ~]        (arc (las targets))
+        [%y %mutuals ~]        (arc (las mutuals))
+        [%x %leeches ~]        (alp leeches)
+        [%x %leeches @ ~]      (ask (bind (slaw %p i.t.t.path) (sin leeches)))
+        [%x %targets ~]        (alp targets)
+        [%x %targets ~ ~]      [~ ~]
+        [%x %targets @ta ~]    (alp (lap targets i.t.t.path))
+        [%x %targets @ta @ ~]  (ask (bind (wat t.t.path) (hal targets)))
+        [%x %mutuals ~]        (alp mutuals)
+        [%x %mutuals ~ ~]      [~ ~]
+        [%x %mutuals @ta ~]    (alp (lap mutuals i.t.t.path))
+        [%x %mutuals @ta @ ~]  (ask (bind (wat t.t.path) (hal mutuals)))
+      ==
+  ::  scry results
+  ++  arc  |=  l=(list @ta)     (any `arch`~^(malt (turn l (late ~))))
+  ++  alp  |=  s=(set @p)       (any s)
+  ++  alf  |=  f=?              (any f)
+  ++  ask  |=  u=(unit ?)  ?^(u (any u.u) [~ ~])
+  ++  any  |*  n=*              ``noun+!>(n)
+  ::  data wrestling
+  ++  wat  |=([l=@ta p=@ta ~] ?~(p=(slaw %p p) ~ (some [l u.p])))
+  ++  nab  ~(got by outgoing)
+  ++  las  |=(s=(set @p) (zing (turn (sit s) |=(p=@p (sit (nab p))))))
+  ++  lap  |=([s=(set @p) l=@ta] (ski s |=(p=@p ((sin (nab p)) l))))
+  ++  hal  |=(s=(set @p) |=([l=@ta p=@p] ((sin ?~(l s (lap s l))) p)))
+  ::  set shorthands
+  ++  sin  |*(s=(set) ~(has in s))
+  ++  sit  |*(s=(set) ~(tap in s))
+  ++  ski  |*([s=(set) f=$-(* ?)] (sy (skim (sit s) f)))
+  ::  pals
+  ++  leeches  (~(dif in incoming) ~(key by outgoing))
+  ++  targets  (~(dif in ~(key by outgoing)) incoming)
+  ++  mutuals  (~(int in incoming) ~(key by outgoing))
+  --
 ::
 ++  on-arvo
   |=  [=wire =sign-arvo]

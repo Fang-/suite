@@ -19,6 +19,21 @@
       [%part =ship in=(set @ta)]  ::  empty set implies un-targeting
   ==
 ::
++$  effect  ::  to ourselves
+  $%  target-effect
+      leeche-effect
+  ==
+::
++$  target-effect
+  $%  [%meet =ship]  ::  hey to target
+      [%part =ship]  ::  bye to target
+  ==
+::
++$  leeche-effect
+  $%  [%near =ship]  ::  hey from leeche
+      [%away =ship]  ::  bye from leeche
+  ==
+::
 +$  webpage
   $_  ^|
   |_  records

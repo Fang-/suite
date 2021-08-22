@@ -17,9 +17,11 @@
 ::    implementation might almost be factored out into a generic library.)
 ::
 ::      reading
-::    external applications likely want to interact with this via scries,
-::    which are outlined below. finding interaction targets or mutuals to
-::    poke or subscribe to, using mutual status as permission check, etc.
+::    external applications likely want to read from this via scries or
+::    watches, both of which are outlined below.
+::    finding interaction targets or mutuals to poke or subscribe to, using
+::    mutual status as permission check, etc.
+::    libraries for handling generalizable behavior are in the works.
 ::    one might be tempted to use list names for namespacing (ie %yourapp
 ::    would only retrieve targets from the ~.yourapp list), but beware that
 ::    this overlaps with user-facing organizational purposes.
@@ -44,7 +46,10 @@
 ::    x  /targets/[list]/[ship]  ?  is ship a target? list may be ~. for all
 ::    x  /mutuals/[list]/[ship]  ?  is ship a mutual? list may be ~. for all
 ::
-::TODO  subscription endpoints?
+::      subscription endpoints (local ship only, all %pals-effect marks)
+::    /targets   target-effect   effect for every addition/removal
+::    /leeches   leeche-effect   effect for every addition/removal
+::
 ::
 /-  *pals
 /+  dbug, verb, default-agent,
@@ -114,9 +119,14 @@
       ^-  (quip card _this)
       :_  this(outgoing.state outgoing)
       ?.  yow  ~
-      =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])
-      =/  =cage     [%pals-gesture !>(gesture)]
-      [%pass `wire`/[-.gesture] %agent [ship.cmd %pals] %poke cage]~
+      :~  =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])
+          =/  =cage     [%pals-gesture !>(gesture)]
+          [%pass /[-.gesture] %agent [ship.cmd %pals] %poke cage]
+        ::
+          =/  =effect   ?-(-.cmd %meet [- ship]:cmd, %part [- ship]:cmd)
+          =/  =cage     [%pals-effect !>(effect)]
+          [%give %fact [/targets]~ cage]
+      ==
     ::
     ?-  -.cmd
         %meet
@@ -148,12 +158,19 @@
     ::
       %pals-gesture
     ?<  =(our src):bowl
+    =*  ship  src.bowl
     =+  !<(=gesture vase)
-    =-  [~ this(incoming -)]
-    ?-  -.gesture
-      %hey  (~(put in incoming) src.bowl)
-      %bye  (~(del in incoming) src.bowl)
-    ==
+    =/  [yow=? =_incoming]
+      =*  has  (~(has in incoming) ship)
+      ?-  -.gesture
+        %hey  :-  !has  (~(put in incoming) ship)
+        %bye  :-   has  (~(del in incoming) ship)
+      ==
+    :_  this(incoming.state incoming)
+    ?.  yow  ~
+    =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
+    =/  =cage    [%pals-effect !>(effect)]
+    [%give %fact [/leeches]~ cage]~
   ::
     ::  %handle-http-request: incoming from eyre
     ::
@@ -216,8 +233,20 @@
 ++  on-watch
   |=  =path
   ^-  (quip card _this)
-  ?:  ?=([%http-response *] path)  [~ this]
-  (on-watch:def path)
+  ?>  =(our.bowl src.bowl)
+  ?+  path  (on-watch:def path)
+    [%http-response *]  [~ this]
+  ::
+      [%targets ~]
+    :_  this
+    %+  turn  ~(tap in ~(key by outgoing))
+    |=(=@p [%give %fact ~ %pals-effect !>(`effect`[%meet p])])
+  ::
+      [%leeches ~]
+    :_  this
+    %+  turn  ~(tap in incoming)
+    |=(=@p [%give %fact ~ %pals-effect !>(`effect`[%near p])])
+  ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]

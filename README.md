@@ -1,11 +1,10 @@
-various apps, tools, and crazy experiments.
+various apps, tools, and crazy experiments.  
 usage encouraged! issues welcome! provided "as is"!
 
 ### applications
 
 - **serval**: a torrent tracker: implements the bittorrent http tracker protocol.
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`. (try `|link ~paldev %duiker`!)
-- **pals**: friendlist, for manual peer discovery.
 - **bard**: interactive storyteller for use with `|link`.
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
 - **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
@@ -13,8 +12,9 @@ usage encouraged! issues welcome! provided "as is"!
 
 ### userspace infrastructure
 
+- **pals**: friendlist, for manual peer discovery. (usable wip)
 - **fakeid**: store + helpers for generating and tracking fake local identities.
-- **podium**: helper app for exposing subscriptions over unauthenticated http.
+- **podium**: helper app for exposing subscriptions over unauthenticated http. (maybe broken?)
 
 ### libraries
 

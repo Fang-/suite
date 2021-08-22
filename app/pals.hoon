@@ -106,6 +106,8 @@
     ?:  (~(has in in.cmd) ~.)
       ~|  [%illegal-empty-list-name in=-.cmd]
       !!
+    ?:  =(our.bowl ship.cmd)
+      [~ this]
     ::
     =/  known=?  (~(has by outgoing) ship.cmd)
     =;  [yow=? =_outgoing]

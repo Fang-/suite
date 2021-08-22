@@ -264,6 +264,7 @@
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
+  ?>  =(our src):bowl
   |^  ?+  path  [~ ~]
         [%y ~]                 (arc %leeches %targets %mutuals ~)
         [%y %targets ~]        (arc (las targets))
@@ -288,17 +289,17 @@
   ::  data wrestling
   ++  wat  |=([l=@ta p=@ta ~] ?~(p=(slaw %p p) ~ (some [l u.p])))
   ++  nab  ~(got by outgoing)
-  ++  las  |=(s=(set @p) (zing (turn (sit s) |=(p=@p (sit (nab p))))))
-  ++  lap  |=([s=(set @p) l=@ta] (ski s |=(p=@p ((sin (nab p)) l))))
-  ++  hal  |=(s=(set @p) |=([l=@ta p=@p] ((sin ?~(l s (lap s l))) p)))
+  ++  las  |=(s=(set @p) (zing (turn (sit s) |=(=@p (sit (nab p))))))
+  ++  lap  |=([s=(set @p) l=@ta] (ski s |=(=@p ((sin (nab p)) l))))
+  ++  hal  |=(s=(set @p) |=([l=@ta =@p] ((sin ?~(l s (lap s l))) p)))
   ::  set shorthands
   ++  sin  |*(s=(set) ~(has in s))
   ++  sit  |*(s=(set) ~(tap in s))
   ++  ski  |*([s=(set) f=$-(* ?)] (sy (skim (sit s) f)))
   ::  pals
-  ++  leeches  (~(dif in incoming) ~(key by outgoing))
-  ++  targets  (~(dif in ~(key by outgoing)) incoming)
-  ++  mutuals  (~(int in incoming) ~(key by outgoing))
+  ++  leeches  incoming
+  ++  targets  ~(key by outgoing)
+  ++  mutuals  (~(int in targets) leeches)
   --
 ::
 ++  on-arvo

@@ -68,6 +68,8 @@
 ::    - for facts on those watches, we +on-agent them into the inner agent.
 ::    - for nacks on those watches, we (TODO) retry later/on-leeche.
 ::
+/-  pals
+::
 |%
 ++  invent
   |=  =cage
@@ -93,8 +95,8 @@
   +$  state-0
     $:  %0
         $=  prev
-        $:  =mode
-            =perm
+        $:  =^mode
+            =^perm
         ==
     ==
   ::TODO  maybe we should wrap _anyway_ to add a "hops" counter,
@@ -119,7 +121,7 @@
   ::       :: [%give %fact ~[/~/gossip/source /~/gossip/gossip] %gossip-wrapper vase]
   ++  agent
     |=  inner=agent:gall
-    =>  |%
+    =>  |_  =bowl:gall
         ++  watch-pals
           ^-  card:agent:gall
           ::TODO  also watch leeches?
@@ -150,7 +152,7 @@
           ==
         ::
         ++  mode-changed
-          |=  [old=mode new=mode]
+          |=  [old=^mode new=^mode]
           ^-  (list card:agent:gall)
           ::TODO  implement %gossip
           ?+  [old new]  ~&([%gossip %strange-mode-change old new] ~)
@@ -162,7 +164,7 @@
           ==
         ::
         ++  perm-changed
-          |=  [old=perm new=perm our=@p now=@da sub=(list [ship path])]
+          |=  [old=^perm new=^perm sub=(list [ship path])]
           ^-  (list card:agent:gall)
           ?+  [old new]  ~&([%gossip %strange-perm-change old new] ~)
               [%leeches %mutuals]
@@ -174,7 +176,7 @@
             ::  perms got tighter, we need to kick stragglers
             ::
             =/  targets=(set ship)
-              =/  base=path  /(scot %p our.bowl)/pals/(scot %da now)
+              =/  base=path  /(scot %p our.bowl)/pals/(scot %da now.bowl)
               ?.  .^(? %gu base)  ~
               .^((set ship) %gx (snoc base %targets))
             %+  murn  sub
@@ -187,13 +189,16 @@
             ==
           ==
         --
+    =*  help  -
     =|  state-0
     =*  state  -
     ::TODO  if warn then we want to sanity-check /~/gossip facts?
     |_  =bowl:gall
-    +*  og  ~(. inner bowl)
+    +*  this  .
+        og  ~(. inner bowl)
+        do  ~(. help bowl)
     ++  on-init
-      ^-  (quip card:agent:gall agent:gall)
+      ^-  (quip card:agent:gall _this)
       =^  cards  inner
         on-init:og
       =.  prev  [mode perm]
@@ -202,7 +207,7 @@
     ++  on-save  !>([[%gossip state] on-save:og])
     ++  on-load
       |=  ole=vase
-      ^-  (quip card:agent:gall agent:gall)
+      ^-  (quip card:agent:gall _this)
       ?.  ?=([[%gossip *] *] q.ole)
         =^  og-cards  inner  (on-load:og ole)
         ::TODO  deduplicate with +on-init
@@ -212,16 +217,19 @@
       =+  !<([[%gossip old=state-0] ile=vase] ole)
       =^  cards  inner  (on-load:og ile)
       =?  cards  !=(mode mode.prev.old)
-        (weld card (mode-changed mode.prev.old mode))
+        (weld cards (mode-changed mode.prev.old mode))
       =?  cards  !=(perm perm.prev.old)
-        (weld card (perm-changed perm.prev.old perm ~(val by sup.bowl)))
+        (weld cards (perm-changed perm.prev.old perm ~(val by sup.bowl)))
       [cards this]
     ::
     ++  on-watch
       |=  =path
-      ^-  (quip card:agent:gall agent:gall)
-      ?.  ?=([%~.~ %gossip *] path)
-        (on-watch:og path)
+      ^-  (quip card:agent:gall _this)
+      ::TODO
+      ?.  ?=([%~.~ ?(%source %gossip) *] path)
+        =^  cards  inner
+          (on-watch:og path)
+        [cards this]
       ::
       ?:  ?=([%source ~] t.path)  ::TODO  implement %gossip
         [~ this]
@@ -235,7 +243,7 @@
         =^  cards  inner  (on-agent:og wire sign)
         [cards this]
       ::
-      ?-  t.t.wire  ~|([%gossip %unexpected-wire wire] !!)
+      ?+  t.t.wire  ~|([%gossip %unexpected-wire wire] !!)
           [%source ~]
         ?-  -.sign
             %fact
@@ -290,13 +298,14 @@
             %poke-ack
           ~&  [%gossip %unexpected-poke-ack wire]
           [~ this]
+        ==
       ==
     ::
-    ++  on-leave  on-leave:og
-    ++  on-poke   on-poke:og
+    ++  on-leave  (cork on-leave:og |*([a=* b=*] [a this(inner b)]))
+    ++  on-poke   (cork on-poke:og |*([a=* b=*] [a this(inner b)]))
+    ++  on-arvo   (cork on-arvo:og |*([a=* b=*] [a this(inner b)]))
+    ++  on-fail   (cork on-fail:og |*([a=* b=*] [a this(inner b)]))
     ++  on-peek   on-peek:og
-    ++  on-arvo   on-arvo:og
-    ++  on-fail   on-fail:og
     --
   --
 --

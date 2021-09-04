@@ -176,7 +176,16 @@
     ::
       %handle-http-request
     =+  !<([=eyre-id =inbound-request:eyre] vase)
-    ?>  authenticated.inbound-request
+    ?.  authenticated.inbound-request
+      :_  this
+      ::TODO  probably put a function for this into /lib/server
+      ::      we can't use +require-authorization because we also update state
+      %+  give-simple-payload:app:server
+        eyre-id
+      =-  [[307 ['location' -]~] ~]
+      %^  cat  3
+        '/~/login?redirect='
+      url.request.inbound-request
     ::  parse request url into path and query args
     ::
     =/  ,request-line:server

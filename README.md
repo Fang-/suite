@@ -19,6 +19,7 @@ usage encouraged! issues welcome! provided "as is"!
 ### libraries
 
 - **multipart**: parsing for http multipart form-data.
+- **sigil**: sigil-js but in hoon.
 - **benc**: b-encoding and -decoding.
 - **torn**: parsing and rendering of torrent files & magnet links.
 - **word**: kjv structured for easy lookup.

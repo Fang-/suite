@@ -61,8 +61,8 @@
     ^-  @rd
     ::TODO  accounting for margin here feels a bit ugly?
     ?+  syc  !!
-      %1  ?:(margin .~0.4 .~1)
-      %2  ?:(margin .~0.4 .~0.5)
+      %1        ?:(margin .~0.4 .~1)
+      ?(%2 %4)  ?:(margin .~0.4 .~0.5)
     ==
   ::
   ++  grid  ::  size in symbols

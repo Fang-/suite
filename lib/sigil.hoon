@@ -13,9 +13,10 @@
 ::        icon    &
 ::      ==
 ::
-::NOTE  below, some positional calculations assume a canvas size of 256x256.
-::TODO  should we refactor to make use of svg-internal coordinate system?
-::      might make logic look cleaner.
+::NOTE  svg construction logic is coupled to the symbols definitions.
+::      the symbols' elements assume they live in a space of 128x128.
+::      what we do here is assume an svg _canvas_ of 128x128, draw the
+::      symbols at their original sizes, and then scale them down to fit.
 ::
 /+  sigil-symbols
 ::
@@ -23,7 +24,7 @@
 ::
 =/  fg=tape   "white"
 =/  bg=tape   "black"
-=/  size=@ud  256
+=/  size=@ud  128
 =/  margin=?  &
 =/  icon=?    |
 ::
@@ -37,6 +38,8 @@
     =.  who  ship
     =/  syz  (simp who)
     =.  syc  (lent syz)
+    ::  shift the sigil to account for the margin
+    ::  scale the sigil to account for the amount of symbols
     ::
     =/  sire=@rd  (sun:rd size)
     =/  tr=tape
@@ -45,24 +48,25 @@
         ?.  margin  ~
         =+  grid:pos
         `[(gird:pos x) (gird:pos y)]
-      `(div:rd (mul:rd sire span:pos) .~128)
+      `span:pos
+    ::
     =/  sw=@rd  ::TODO
       ?:  icon  .~0.8  ::TODO  scale with size?
       (add:rd .~0.33 (div:rd sire .~128))
     ::
-    %+  outer:svg  size
-    %^  sigil:svg  [size margin icon]
+    %-  outer:svg
+    %+  sigil:svg
       [tr sw]
-    (symbols:svg syz icon)
+    (symbols:svg syz)
 ::
 ++  pos
   |%
   ++  span  ::  symbol scale (relative to full canvas)
     ^-  @rd
     ::TODO  accounting for margin here feels a bit ugly?
-    ?+  syc  !!
-      %1        ?:(margin .~0.4 .~1)
-      ?(%2 %4)  ?:(margin .~0.4 .~0.5)
+    ?+  (max grid)  !!
+      %1  ?:(margin .~0.4 .~1)
+      %2  ?:(margin .~0.4 .~0.5)
     ==
   ::
   ++  grid  ::  size in symbols
@@ -76,23 +80,23 @@
   ++  gird  ::  calculate margin
     |=  n=@ud
     ^-  @rd
-    =-  (div:rd - .~2)         ::  / sides
-    %+  sub:rd  (sun:rd size)  ::  size -
-    %+  mul:rd  (sun:rd n)     ::  symbols *
-    %+  mul:rd  span:pos       ::  symbol scale *
-    (sun:rd size)              ::  size
+    =-  (div:rd - .~2)     ::  / both sides
+    %+  sub:rd  .~128      ::  canvas size -
+    %+  mul:rd  (sun:rd n) ::  symbols *
+    %+  mul:rd  span:pos   ::  symbol scale *
+    .~128                  ::  symbol size
   ::
-  ++  plan  ::  as translation on 256x256 canvas
+  ++  plan  ::  as position on symbol grid
     |=  i=@ud
     ^-  [x=@ud y=@ud]
     ?+  [syc i]  !!
       [%4 %0]  [0 0]
-      [%4 %1]  [128 0]
-      [%4 %2]  [0 128]
-      [%4 %3]  [128 128]
+      [%4 %1]  [1 0]
+      [%4 %2]  [0 1]
+      [%4 %3]  [1 1]
     ::
       [%2 %0]  [0 0]
-      [%2 %1]  [128 0]
+      [%2 %1]  [1 0]
     ::
       [%1 %0]  [0 0]
     ==
@@ -101,25 +105,25 @@
 ++  svg
   |%
   ++  outer
-    |=  [size=@ud inner=manx]
+    |=  inner=manx
     ^-  manx
     =/  s=tape  ((d-co:co 1) size)
     ;svg
-      =style  "display: block;"  ::  prevent bottom margin on svg tag
-      =viewBox  "0 0 {s} {s}"
+      =style  "display: block; width: {s}px; height: {s}px;"  ::  prevent bottom margin on svg tag
+      =viewBox  "0 0 128 128"
       =version  "1.1"
       =xmlns  "http://www.w3.org/2000/svg"
       ::TODO  additional attributes from config arg?
       ;rect
         =fill  bg
-        =width  s
-        =height  s;
+        =width  "128"
+        =height  "128";
       ;+  inner
     ==
   ::
   ::TODO  should it be possible to get these svg elements out of this lib?
   ++  sigil
-    |=  [[size=@ud margin=? icon=?] [tr=tape sw=@rd] symbols=(list manx)]
+    |=  [[tr=tape sw=@rd] symbols=(list manx)]
     ^-  manx
     ;g
       =transform  tr
@@ -134,7 +138,7 @@
     ==
   ::
   ++  symbols
-    |=  [noms=(list @t) icon=?]
+    |=  noms=(list @t)
     ^-  (list manx)
     =|  i=@ud
     =/  l=@ud  (lent noms)
@@ -144,7 +148,7 @@
     :_  $(noms t.noms, i +(i))
     ::TODO  exclude if both 0
     =+  (plan:pos i)
-    ;g(transform (transform `[(sun:rd x) (sun:rd y)] ~))
+    ;g(transform (transform `[(sun:rd (mul x 128)) (sun:rd (mul y 128))] ~))
       ;*  =+  (sym i.noms)
           ?.(icon - (scag 1 -))
     ==

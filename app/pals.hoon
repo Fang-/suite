@@ -210,7 +210,7 @@
       i.t.site
     ?.  (~(has by webui) page)
       [[404 `:/"no such page: {(trip page)}"] ~ state]
-    =*  view  ~(. (~(got by webui) page) +.state)
+    =*  view  ~(. (~(got by webui) page) bowl +.state)
     ::
     ?+  method.request.inbound-request  [[405 ~] ~ state]
         %'GET'

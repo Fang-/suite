@@ -1,9 +1,10 @@
 ::  pals index
 ::
-/-  *pals
+/-  *pals, contact=contact-store
+/+  sigil-svg=sigil
 ::
 ^-  webpage
-|_  records
+|_  [=bowl:gall records]
 ++  argue
   |=  arg=(list [k=@t v=@t])
   ^-  (unit command)  ::TODO  maybe (each command @t) for error messages?
@@ -51,6 +52,8 @@
     '''
     * { margin: 0.2em; padding: 0.2em; font-family: monospace; }
 
+    p { max-width: 50em; }
+
     form { margin: 0; padding: 0; }
 
     .red { font-weight: bold; color: #dd2222; }
@@ -58,6 +61,19 @@
 
     table#pals tr td:nth-child(2) {
       padding: 0 0.5em;
+    }
+
+    .sigil {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 0.5em 0 0;
+      padding: 0.2em;
+      border-radius: 0.2em;
+    }
+
+    .sigil * {
+      margin: 0;
+      padding: 0;
     }
 
     .label {
@@ -89,6 +105,18 @@
       ==
       ;body
         ;h2:"%pals manager"
+
+        Keep track of your friends! Other applications can use this list to
+        find ships to talk to, do permission checks, etc.
+
+        Tags are there mostly for your own book-keeping. Applications could
+        make use of them for grouping content, but should not change their
+        core behavior based on the presence or absence of specific tags.
+
+        The status icons below indicate whether the ship is a mutual,
+        a target (outgoing only), or a leeche (incoming only).
+
+
         ;+  ?~  msg  ;p:""
             ?:  o.u.msg  ::TODO  lightly refactor
               ;p.green:"{(trip t.u.msg)}"
@@ -175,7 +203,10 @@
           ;td
             ;+  (friend-remover ship)
           ==
-      ;td:"{(scow %p ship)}"
+      ;td
+        ;+  (sigil ship)
+        ;+  :/(scow %p ship)
+      ==
       ;+  ?:  ?=(%leeche kind)  ;td;
           ;td
             ;+  (list-adder ship)
@@ -204,6 +235,35 @@
     |=  =ship
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)
+  ::
+  ++  sigil
+    |=  =ship
+    ^-  manx
+    =/  base=path
+      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
+    =/  bg=@ux
+      ?.  .^(? %gu base)  0xff.ffff
+      ::TODO  contact-store should have a %u scry for existence checks,
+      ::      so that we can safely do a /x/contact/~ship scry
+      =+  .^(=rolodex:contact %gx (weld base /all/noun))
+      ?~(p=(~(get by rolodex) ship) 0xff.ffff color.u.p)
+    =/  fg=tape
+      ::TODO  move into sigil.hoon or elsewhere?
+      =+  avg=(div (roll (rip 3 bg) add) 3)
+      ?:((gth avg 0xc1) "black" "white")
+    =/  bg=tape
+      '#'^((x-co:co 6) bg)
+    =-  ;div.sigil(style "background-color: {bg};")
+          ;+  -
+        ==
+    %.  ship
+    %_  sigil-svg
+      size    20
+      fg      fg
+      bg      bg
+      margin  |
+      icon    &
+    ==
   ::
   ++  status
     |=  [kind=?(%leeche %mutual %target) ack=(unit ?)]

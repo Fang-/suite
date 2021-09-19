@@ -12,6 +12,8 @@
 ::    whenever the application sends a subscription update, expected to be
 ::    of the %json mark, that is sent to the subscribers as-is.
 ::
+::TODO  need a heartbeat?
+::
 /+  *server, default-agent, verb, dbug
 ::
 |%

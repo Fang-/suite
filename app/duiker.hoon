@@ -6,12 +6,8 @@
 ::    |link-ed to from a user's ship. it renders a simple text-based interface
 ::    for browsing submitted files and adding your own.
 ::
-::    for simplicity's sake, duiker only supports files in the form of magnet
-::    links. this may change in the future, but seems sufficient for now.
-::
 ::TODO  able to list total up/down stats for ship
 ::TODO  refactor this for local-first by the time app distribution becomes real
-::TODO  download torrent files using %sav !!!
 ::
 /+  srvl=serval, torn, benc, multipart, *pal,
     shoe, server, default-agent, verb, dbug

@@ -1,8 +1,5 @@
 ::  multipart: multipart/form-data request decoding
 ::
-::NOTE  this parses really narrowly!
-::      it does not support multipart/mixed (aka multi-file upload).
-::
 |%
 +$  part
   $:  file=(unit @t)                   ::  filename

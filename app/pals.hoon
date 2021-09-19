@@ -35,6 +35,8 @@
 ::    is bad manners. managing pals without informing the user is evil.
 ::
 ::      scry endpoints (all %noun marks)
+::TODO  consider removing /mutuals, only meaningful to ui ...right?
+::      or do apps want it to avoid permission-based poke/watch nacks?
 ::    y  /                       arch        [%leeches %targets %mutuals ~]
 ::    y  /[status]               arch        non-empty lists listing
 ::
@@ -87,6 +89,7 @@
 ::
 ++  on-init
   ^-  (quip card _this)
+  ::TODO  maybe auto-target ~paldev as an example? author's privilege...
   :_  this
   [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]~
 ::
@@ -212,6 +215,7 @@
       [[404 `:/"no such page: {(trip page)}"] ~ state]
     =*  view  ~(. (~(got by webui) page) bowl +.state)
     ::
+    ::TODO  switch higher up: get never changes state!
     ?+  method.request.inbound-request  [[405 ~] ~ state]
         %'GET'
       :_  [~ state]

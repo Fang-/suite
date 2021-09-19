@@ -22,9 +22,7 @@
 ::      for ease of change, we leave excluded attributes as comments here.
 ::
 ::
-|=  [fg=tape bg=tape]
-~+
-::TODO  0x?? for suffix, 0x??00 for prefix ?
+|=  [fg=tape bg=tape]  ~+
 %-  ~(gas by *(map cord (list manx)))
 :~
   :-  'bac'

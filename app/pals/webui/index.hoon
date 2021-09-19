@@ -269,7 +269,12 @@
   ::
   ++  status
     |=  [kind=?(%leeche %mutual %target) ack=(unit ?)]
-    ^-  manx
+    ::NOTE  making ack more likely to be equal across calls by discarding any
+    ::      resolution on it we don't currently use lets ~+ be more effective.
+    =.  ack
+      ?.  ?=(%target kind)  ~
+      `(fall ack |)
+    ^-  manx  ~+
     ?-  kind
         %leeche
       ;svg

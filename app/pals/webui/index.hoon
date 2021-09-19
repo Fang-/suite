@@ -48,6 +48,8 @@
   ^-  manx
   |^  page
   ::
+  ++  icon-color  "black"
+  ::
   ++  style
     '''
     * { margin: 0.2em; padding: 0.2em; font-family: monospace; }
@@ -284,7 +286,7 @@
               C77.6412 85.9984 72.6804 89.3131 67.2208 91.5746
               C61.7611 93.836 55.9095 95 50 95
               """
-          =stroke  "black"
+          =stroke  icon-color
           =stroke-width  "10";
         ;path
           =d  """
@@ -306,7 +308,7 @@
               L53.0962 51.0607
               Z
               """
-          =fill  "black";
+          =fill  icon-color;
       ==
     ::
         %mutual
@@ -324,7 +326,7 @@
               C51.0653 95 39.6193 90.2589 31.1802 81.8198
               C22.7411 73.3807 18 61.9347 18 50
               """
-          =stroke  "black"
+          =stroke  icon-color
           =stroke-width  "10";
         ;path
           =d  """
@@ -341,7 +343,7 @@
               C48.4879 37.3523 51.0767 34.7635 51.0767 31.5994
               Z
               """
-          =fill  "black";
+          =fill  icon-color;
       ==
     ::
         %target
@@ -359,7 +361,7 @@
               C14.0016 77.6412 10.6869 72.6804 8.42542 67.2208
               C6.16396 61.7611 5 55.9095 5 50
               """
-          =stroke  "black"
+          =stroke  icon-color
           =stroke-width  "10";
         ;+  ?:  =([~ &] ack)
           ::  plain arrow
@@ -383,7 +385,7 @@
                 L34.0901 69.4454
                 Z
                 """
-            =fill  "black";
+            =fill  icon-color;
         ::  dotted arrow
         ;path
           =d  """
@@ -470,7 +472,7 @@
               L60.6066 42.9289
               Z
               """
-          =fill  "black";
+          =fill  icon-color;
       ==
     ==
   --

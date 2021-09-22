@@ -1,0 +1,9 @@
+:~  title+'pals'
+    info+'friendlist for peer discovery'
+    color+0x99.d3bd
+    site+/pals
+    base+'pals'
+    version+[1 0 0]
+    website+'https://pal.dev/suite'
+    license+'MIT'
+==

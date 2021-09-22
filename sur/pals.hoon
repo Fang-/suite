@@ -14,6 +14,11 @@
       receipts=(map ship ?)
   ==
 ::
++$  gesture  ::  to/from others
+  $%  [%hey ~]
+      [%bye ~]
+  ==
+::
 +$  command  ::  from ourselves
   $%  [%meet =ship in=(set @ta)]  ::  empty set allowed
       [%part =ship in=(set @ta)]  ::  empty set implies un-targeting

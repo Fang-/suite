@@ -62,11 +62,6 @@
 |%
 +$  state-0  [%0 records]
 ::
-+$  gesture  ::  from others
-  $%  [%hey ~]
-      [%bye ~]
-  ==
-::
 +$  eyre-id  @ta
 +$  card  (wind note gift)
 +$  gift  gift:agent:gall

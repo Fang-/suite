@@ -263,7 +263,7 @@
       size    20
       fg      fg
       bg      bg
-      margin  |
+      margin  &
       icon    &
     ==
   ::

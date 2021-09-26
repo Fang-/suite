@@ -84,9 +84,10 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  ::TODO  maybe auto-target ~paldev as an example? author's privilege...
-  :_  this
-  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]~
+  =^  cards  this
+    (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
+  =-  [[- cards] this]
+  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]
 ::
 ++  on-save  !>(state)
 ::

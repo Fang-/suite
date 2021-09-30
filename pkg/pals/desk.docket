@@ -4,6 +4,6 @@
     site+/pals
     base+'pals'
     version+[1 0 0]
-    website+'https://pal.dev/suite'
+    website+'https://pal.dev/suite/pals'
     license+'MIT'
 ==

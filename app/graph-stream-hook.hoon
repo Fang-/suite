@@ -136,7 +136,7 @@
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-          %graph-update-2
+          %graph-update-3
         =^  cards  state
           (handle-graph-update:do !<(update:graph-store vase))
         [cards this]
@@ -479,7 +479,7 @@
       %agent
       [our.bowl %graph-store]
       %poke
-      %graph-update-2
+      %graph-update-3
     ::
       !>  ^-  update:graph-store
       ::TODO  this is api, man... move into lib or w/e

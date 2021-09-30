@@ -109,15 +109,17 @@
         ;h2:"%pals manager"
 
         Keep track of your friends! Other applications can use this list to
-        find ships to talk to, do permission checks, etc.
+        find ships to talk to, pull content from, etc.
 
         Tags are there mostly for your own book-keeping. Applications could
         make use of them for grouping content, but should not change their
         core behavior based on the presence or absence of specific tags.
 
+        (The list of applications that uses this is currently... empty.
+        Watch this space!)
+
         The status icons below indicate whether the ship is a mutual,
         a target (outgoing only), or a leeche (incoming only).
-
 
         ;+  ?~  msg  ;p:""
             ?:  o.u.msg  ::TODO  lightly refactor

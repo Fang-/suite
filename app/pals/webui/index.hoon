@@ -190,9 +190,10 @@
     ==
   ::
   ++  peers
+    ::TODO  maybe take acks in pez and do sorting internally?
     |=  [kind=?(%leeche %mutual %target) pez=(list [ship (set @ta)])]
     ^-  (list manx)
-    %+  turn  (sort pez dor)
+    %+  turn  pez
     |=  [=ship lists=(set @ta)]
     ^-  manx
     =/  ack=(unit ?)  (~(get by receipts) ship)
@@ -221,7 +222,7 @@
   ++  mutuals
     ^-  (list manx)
     %+  peers  %mutual
-    %+  skim  ~(tap by outgoing)
+    %+  skim  (sort ~(tap by outgoing) dor)
     |=  [=ship *]
     (~(has in incoming) ship)
   ::
@@ -232,15 +233,16 @@
       %+  skip  ~(tap by outgoing)
       |=  [=ship *]
       (~(has in incoming) ship)
-    |=  [[sa=ship *] [sb=ship *]]
+    |=  [[sa=ship ma=*] [sb=ship mb=*]]
     =+  a=(~(get by receipts) sa)
     =+  b=(~(get by receipts) sb)
+    ?:  =(a b)  (dor ma mb)
     ?~(a ?=(~ b) ?~(b & |(u.a !u.b)))
   ::
   ++  leeches
     ^-  (list manx)
     %+  peers  %leeche
-    %+  murn  ~(tap in incoming)
+    %+  murn  (sort ~(tap in incoming) dor)
     |=  =ship
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)

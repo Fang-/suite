@@ -228,9 +228,14 @@
   ++  targets
     ^-  (list manx)
     %+  peers  %target
-    %+  skip  ~(tap by outgoing)
-    |=  [=ship *]
-    (~(has in incoming) ship)
+    %+  sort
+      %+  skip  ~(tap by outgoing)
+      |=  [=ship *]
+      (~(has in incoming) ship)
+    |=  [[sa=ship *] [sb=ship *]]
+    =+  a=(~(get by receipts) sa)
+    =+  b=(~(get by receipts) sb)
+    ?~(a ?=(~ b) ?~(b & |(u.a !u.b)))
   ::
   ++  leeches
     ^-  (list manx)

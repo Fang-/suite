@@ -63,11 +63,22 @@
   ::
   ++  on-init
     ^-  (quip card _this)
-    :_  this
-    :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
-        kick-heartbeat:do
-        watch-graphs:do
-    ==
+    ::NOTE  careful! install currently proceeds fine if this crashes.
+    ::      you'll need to |uninstall the desk and |nuke the app.
+    |^  =+  (check-dependency %fakeid-store)
+        =+  (check-dependency %graph-store)
+        :_  this
+        :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
+            kick-heartbeat:do
+            watch-graphs:do
+        ==
+    ::
+    ++  check-dependency
+      |=  app=dude:gall
+      ~|  [%missing-dependency %app app]
+      ?>  .^(? %gu /(scot %p our.bowl)/[app]/(scot %da now.bowl))
+      ~
+    --
   ::
   ++  on-save  !>(state)
   ::

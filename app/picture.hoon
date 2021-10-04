@@ -40,7 +40,6 @@
 ++  on-load
   |=  ole=vase
   ^-  (quip card _this)
-  ~&  %on-load
   =/  old=state-0  !<(state-0 ole)
   [~ this(state old)]
 ::

@@ -3,7 +3,7 @@
   info+'A picture frame for the garden.'
   color+0xdd.dddd
   image+'/picture/image'
-  version+[1 0 0]
+  version+[1 0 1]
   website+'https://pal.dev/suite/picture'
   license+'MIT'
   base+'picture'

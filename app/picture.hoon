@@ -120,7 +120,9 @@
     =;  [[status=@ud out=(unit manx)] caz=(list card) =_state]
       :_  [caz state]
       ^-  simple-payload:http
-      :-  [status ~]
+      :-  :-  status
+          ?~  out  ~
+          ['content-type'^'text/html']~
       ?~  out  ~
       `(as-octt (en-xml:html u.out))
     ::TODO  mostly copied from pals, dedupe!

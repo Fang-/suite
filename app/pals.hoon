@@ -196,7 +196,9 @@
       :: ;;  (list card)  ::NOTE  this is hilariously slow
       %+  give-simple-payload:app:server
         eyre-id
-      :-  [status ~]
+      :-  :-  status
+          ?~  out  ~
+          ['content-type'^'text/html']~
       ?~  out  ~
       `(as-octt:mimes:html (en-xml:html u.out))
     ::  405 to all unexpected requests

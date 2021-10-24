@@ -203,7 +203,6 @@
 ++  parse-response
   |=  text=@t
   |^  ^-  query
-      =-  ~!  -  -
       (fall (rest pointers) ~)
   ::
   ++  rest    |*(r=rule (rust (cass (trip text)) r))
@@ -251,7 +250,7 @@
         (jest 'manasseh')
       ==
     ::
-      :: (perk titles:word)  ::TODO  why doesn't this just work?
+      :: (perk labels:word)  ::TODO  why doesn't this just work?
       (jest 'genesis')
       (jest 'exodus')
       (jest 'leviticus')

@@ -1,0 +1,10 @@
+:~  title+''
+    info+'a random Bible verse, every day'
+    color+0xee.eedd
+    image+'/verse/verse'
+    site+/
+    base+'verse'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/verse'
+    license+'MIT'
+==

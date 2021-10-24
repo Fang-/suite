@@ -94,7 +94,6 @@
 ++  on-load
   |=  ole=vase
   ^-  (quip card _this)
-  ~&  [dap.bowl %load]
   =/  old=state-0  !<(state-0 ole)
   [~ this(state old)]
 ::
@@ -292,11 +291,10 @@
         [%x %mutuals @ta @ ~]  (ask (bind (wat t.t.path) (hal mutuals)))
       ==
   ::  scry results
-  ++  arc  |=  l=(list @ta)     (any `arch`~^(malt (turn l (late ~))))
-  ++  alp  |=  s=(set @p)       (any s)
-  ++  alf  |=  f=?              (any f)
-  ++  ask  |=  u=(unit ?)  ?^(u (any u.u) [~ ~])
-  ++  any  |*  n=*              ``noun+!>(n)
+  ++  arc  |=  l=(list @ta)  ``noun+!>(`arch`~^(malt (turn l (late ~))))
+  ++  alp  |=  s=(set @p)    ``noun+!>(s)
+  ++  alf  |=  f=?           ``noun+!>(f)
+  ++  ask  |=  u=(unit ?)  ?^(u (alf u.u) [~ ~])
   ::  data wrestling
   ++  wat  |=([l=@ta p=@ta ~] ?~(p=(slaw %p p) ~ (some [l u.p])))
   ++  nab  ~(got by outgoing)

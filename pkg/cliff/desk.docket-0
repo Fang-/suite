@@ -1,0 +1,9 @@
+:~  title+'cliff (beta)'
+    info+'filesystem explorer'
+    color+0xbf.9d85
+    site+/cliff/view/our/base/now
+    base+'cliff'
+    version+[0 0 1]
+    website+'https://pal.dev/suite/cliff'
+    license+'MIT'
+==

@@ -211,7 +211,7 @@
           ==
       ;td
         ;+  (sigil ship)
-        ;+  :/(scow %p ship)
+        ; {(scow %p ship)}
       ==
       ;+  ?:  ?=(%leeche kind)  ;td;
           ;td

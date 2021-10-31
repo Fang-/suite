@@ -106,7 +106,7 @@
         ;div#ours
           ;form(method "post")
             ;label
-              ;+  :/"your face (image url): "
+              ; your face (image url):
               ;br;
               ;input
                 =type  "text"
@@ -140,7 +140,7 @@
   ++  dependency-warning
     ^-  manx
     ;p.warn
-      ;+  :/"This app requires %pals for peer discovery. "
+      ; This app requires %pals for peer discovery.
       ;a(href "/apps/grid/perma/~paldev/pals/"):"Install it from ~paldev/pals."
     ==
   ::

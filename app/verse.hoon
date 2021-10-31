@@ -162,7 +162,7 @@
                   line-height: 1.1em;
                   text-align: justify;
                   """
-          ;+  :/verse
+          ; {verse}
         ==
       ==
     ::
@@ -183,7 +183,7 @@
                   font-size: 6pt;
                   text-align: right;
                   """
-          ;+  :/t
+          ; {t}
         ==
       ==
     --

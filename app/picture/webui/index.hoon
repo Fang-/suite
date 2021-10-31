@@ -52,14 +52,14 @@
         Be careful not to upload crazy big files, this could put
         your ship under memory pressure.
 
-        ;+  ?~  msg  ;p:""
+        ;+  ?~  msg  :/""
             ?:  o.u.msg
               ;p.green:"{(trip t.u.msg)}"
             ;p.red:"{(trip t.u.msg)}"
 
         ;form(method "post", enctype "multipart/form-data")
           ;label
-            ;+  :/"image: "
+            ; image:
             ;input(type "file", name "image", accept "image/*");
           ==
           ;br;

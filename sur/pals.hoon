@@ -14,6 +14,11 @@
       receipts=(map ship ?)
   ==
 ::
++$  gesture  ::  to/from others
+  $%  [%hey ~]
+      [%bye ~]
+  ==
+::
 +$  command  ::  from ourselves
   $%  [%meet =ship in=(set @ta)]  ::  empty set allowed
       [%part =ship in=(set @ta)]  ::  empty set implies un-targeting
@@ -36,7 +41,7 @@
 ::
 +$  webpage
   $_  ^|
-  |_  records
+  |_  [bowl:gall records]
   ++  build  |~([(list [k=@t v=@t]) (unit [? @t])] *manx)  ::  get to page
   ++  argue  |~((list [k=@t v=@t]) *(unit command))        ::  post to cmd
   --

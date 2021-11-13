@@ -91,4 +91,18 @@
   =*  size  p.u.q.edge
   =*  rest  q.u.q.edge
   ((parse size) rest)
+::
+::  randomness
+::
+++  wild                                                ::  weighted choice
+  |=  [eny=@ all=(list @ud)]
+  =/  sum=@ud  (roll all add)
+  =+  rad=(~(rad og eny) sum)
+  =|  v=@ud
+  =|  i=@ud
+  |-
+  ?~  all  i
+  =.  v  (add v i.all)
+  ?:  (gth v rad)  i
+  $(i +(i), all t.all)
 --

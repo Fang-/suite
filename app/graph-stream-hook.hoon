@@ -63,11 +63,22 @@
   ::
   ++  on-init
     ^-  (quip card _this)
-    :_  this
-    :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
-        kick-heartbeat:do
-        watch-graphs:do
-    ==
+    ::NOTE  careful! install currently proceeds fine if this crashes.
+    ::      you'll need to |uninstall the desk and |nuke the app.
+    |^  =+  (check-dependency %fakeid-store)
+        =+  (check-dependency %graph-store)
+        :_  this
+        :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
+            kick-heartbeat:do
+            watch-graphs:do
+        ==
+    ::
+    ++  check-dependency
+      |=  app=dude:gall
+      ~|  [%missing-dependency %app app]
+      ?>  .^(? %gu /(scot %p our.bowl)/[app]/(scot %da now.bowl))
+      ~
+    --
   ::
   ++  on-save  !>(state)
   ::
@@ -136,7 +147,7 @@
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-          %graph-update-2
+          %graph-update-3
         =^  cards  state
           (handle-graph-update:do !<(update:graph-store vase))
         [cards this]
@@ -479,7 +490,7 @@
       %agent
       [our.bowl %graph-store]
       %poke
-      %graph-update-2
+      %graph-update-3
     ::
       !>  ^-  update:graph-store
       ::TODO  this is api, man... move into lib or w/e

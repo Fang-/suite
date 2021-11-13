@@ -35,6 +35,8 @@
 ::    is bad manners. managing pals without informing the user is evil.
 ::
 ::      scry endpoints (all %noun marks)
+::TODO  consider removing /mutuals, only meaningful to ui ...right?
+::      or do apps want it to avoid permission-based poke/watch nacks?
 ::    y  /                       arch        [%leeches %targets %mutuals ~]
 ::    y  /[status]               arch        non-empty lists listing
 ::
@@ -60,11 +62,6 @@
 |%
 +$  state-0  [%0 records]
 ::
-+$  gesture  ::  from others
-  $%  [%hey ~]
-      [%bye ~]
-  ==
-::
 +$  eyre-id  @ta
 +$  card  (wind note gift)
 +$  gift  gift:agent:gall
@@ -87,15 +84,16 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :_  this
-  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]~
+  =^  cards  this
+    (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
+  =-  [[- cards] this]
+  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]
 ::
 ++  on-save  !>(state)
 ::
 ++  on-load
   |=  ole=vase
   ^-  (quip card _this)
-  ~&  [dap.bowl %load]
   =/  old=state-0  !<(state-0 ole)
   [~ this(state old)]
 ::
@@ -197,7 +195,9 @@
       :: ;;  (list card)  ::NOTE  this is hilariously slow
       %+  give-simple-payload:app:server
         eyre-id
-      :-  [status ~]
+      :-  :-  status
+          ?~  out  ~
+          ['content-type'^'text/html']~
       ?~  out  ~
       `(as-octt:mimes:html (en-xml:html u.out))
     ::  405 to all unexpected requests
@@ -210,8 +210,9 @@
       i.t.site
     ?.  (~(has by webui) page)
       [[404 `:/"no such page: {(trip page)}"] ~ state]
-    =*  view  ~(. (~(got by webui) page) +.state)
+    =*  view  ~(. (~(got by webui) page) bowl +.state)
     ::
+    ::TODO  switch higher up: get never changes state!
     ?+  method.request.inbound-request  [[405 ~] ~ state]
         %'GET'
       :_  [~ state]
@@ -290,11 +291,10 @@
         [%x %mutuals @ta @ ~]  (ask (bind (wat t.t.path) (hal mutuals)))
       ==
   ::  scry results
-  ++  arc  |=  l=(list @ta)     (any `arch`~^(malt (turn l (late ~))))
-  ++  alp  |=  s=(set @p)       (any s)
-  ++  alf  |=  f=?              (any f)
-  ++  ask  |=  u=(unit ?)  ?^(u (any u.u) [~ ~])
-  ++  any  |*  n=*              ``noun+!>(n)
+  ++  arc  |=  l=(list @ta)  ``noun+!>(`arch`~^(malt (turn l (late ~))))
+  ++  alp  |=  s=(set @p)    ``noun+!>(s)
+  ++  alf  |=  f=?           ``noun+!>(f)
+  ++  ask  |=  u=(unit ?)  ?^(u (alf u.u) [~ ~])
   ::  data wrestling
   ++  wat  |=([l=@ta p=@ta ~] ?~(p=(slaw %p p) ~ (some [l u.p])))
   ++  nab  ~(got by outgoing)

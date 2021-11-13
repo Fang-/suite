@@ -1,0 +1,9 @@
+:~  title+'face'
+    info+'see your friends'
+    color+0x3b.5998
+    site+/face
+    base+'face'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/face'
+    license+'MIT'
+==

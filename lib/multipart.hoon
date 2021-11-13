@@ -1,8 +1,5 @@
 ::  multipart: multipart/form-data request decoding
 ::
-::NOTE  this parses really narrowly!
-::      it does not support multipart/mixed (aka multi-file upload).
-::
 |%
 +$  part
   $:  file=(unit @t)                   ::  filename
@@ -40,7 +37,7 @@
   ++  cut   (jest 'Content-Type: ')
   ++  dim   (jest (cat 3 '--' del))
   ++  nip   (jest '\0d\0a')
-  ++  nab   (more fas urs:ab)
+  ++  nab   (more fas (cook (cury rap 3) (plus qit)))
   ++  nag   (dine ;~(less ;~(plug nip dim) next))
   ++  nod   (dine ;~(less doq next))
   ++  nom   (dine alp)

@@ -1,0 +1,8 @@
+picture
+
+v1.0.2, ~2021.10.31
+- tiny code & style improvements
+
+v1.0.1, ~2021.10.06
+- fix an issue where the webpage would be downloaded rather than displayed by the browser.
+- lightly improve page rendering on mobile devices.

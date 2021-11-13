@@ -1,0 +1,11 @@
+:~
+  title+''
+  info+'a picture frame for the garden'
+  color+0xdd.dddd
+  image+'/picture/image'
+  version+[1 0 2]
+  website+'https://pal.dev/suite/picture'
+  license+'MIT'
+  base+'picture'
+  site+/picture
+==

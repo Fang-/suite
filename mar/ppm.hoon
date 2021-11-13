@@ -32,6 +32,7 @@
     ~|  [p.q `@ux`q.q]
     =/  fil=(list @)  (rip 3 q.q)
     ::  reclaim trailing zeroes
+    ::TODO  stdlib?
     =.  fil  (weld fil (reap (sub p.q (lent fil)) 0))
     %+  scan  fil
     |^  %+  ifix  [;~(plug (jest 'P6') wit) (punt wit)]
@@ -107,4 +108,6 @@
       (rep 3 b)
     --
   --
+::
+++  grad  %mime
 --

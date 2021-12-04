@@ -7,14 +7,12 @@
 ++  argue
   |=  [headers=header-list:http body=(unit octs)]
   ^-  (unit action)
-  ~&  [%body body]
   ?~  body  ~
   =/  args=(map @t @t)
     %-  ~(gas by *(map @t @t))
     (fall (rush q.u.body yquy:de-purl:html) ~)
   ::
   ?:  (~(has by args) 'uri')
-    =-  ~&  [%uri (~(got by args) 'uri') -]  -
     %+  rush  (~(got by args) 'uri')
     (stag %add puri)
   ::

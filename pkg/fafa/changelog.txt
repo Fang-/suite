@@ -1,0 +1,4 @@
+fafa
+
+v1.0.1, ~2021.12.04
+- fix an issue where the webpage would be downloaded rather than displayed by the browser.

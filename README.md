@@ -7,6 +7,7 @@ these softwares can be installed from ~paldev as landscape tiles
 
 - **pals**: friendlist, for manual peer discovery.
 - **face**: see your pals.
+- **fafa**: 2fa otp authenticator.
 - **cliff**: filesystem explorer & editor.
 - **picture**: a picture frame for the homescreen.
 - **verse**: daily random bible verse for the homescreen.
@@ -32,6 +33,7 @@ these softwares are for manual, local installation & configuration
 - **benc**: b-encoding and -decoding.
 - **torn**: parsing and rendering of torrent files & magnet links.
 - **word**: kjv structured for easy lookup.
+- **otp**: one-time password (rfc4226, rfc6238) utilities.
 - **ppm**: mark and utilities for using `.ppm` image files.
 - **pal**: miscellaneous bits and pieces.
 

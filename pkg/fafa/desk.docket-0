@@ -1,0 +1,10 @@
+:~  title+'fafa'
+    info+'2fa otp authenticator app'
+    color+0x1a.1a2a
+    image+'/fafa/tile.svg'
+    site+/fafa
+    base+'fafa'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/fafa'
+    license+'MIT'
+==

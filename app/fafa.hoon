@@ -123,7 +123,7 @@
   ?+  method.request  !!
       %'GET'
     :_  state
-    :-  [200 ~]
+    :-  [200 ['content-type'^'text/html']~]
     %-  some
     %-  as-octt:mimes:html
     (en-xml:html (build:view args ~))
@@ -170,7 +170,7 @@
       ?:  =(%add page)
         [[303 ['Location' '/fafa']~] ~]
       [[303 ['Location' (cat 3 '/fafa/' page)]~] ~]
-    :-  [400 ~]
+    :-  [400 ['content-type'^'text/html']~]
     %-  some
     %-  as-octt:mimes:html
     (en-xml:html (build:view args `|^u.err))

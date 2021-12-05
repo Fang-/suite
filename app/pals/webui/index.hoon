@@ -61,6 +61,13 @@
     .red { font-weight: bold; color: #dd2222; }
     .green { font-weight: bold; color: #229922; }
 
+    a {
+      display: inline-block;
+      color: inherit;
+      padding: 0;
+      margin-top: 0;
+    }
+
     table#pals tr td:nth-child(2) {
       padding: 0 0.5em;
     }
@@ -112,12 +119,19 @@
         Keep track of your friends! Other applications can use this list to
         find ships to talk to, pull content from, etc.
 
+        Some applications that are better with friends:
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
+          ; ~hastuc^dibtux/zone
+        ==
+        ;br;
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
+          ; ~paldev/face
+        ==
+
+
         Tags are there mostly for your own book-keeping. Applications could
         make use of them for grouping content, but should not change their
         core behavior based on the presence or absence of specific tags.
-
-        (The list of applications that uses this is currently... empty.
-        Watch this space!)
 
         The status icons below indicate whether the ship is a mutual,
         a target (outgoing only), or a leeche (incoming only).

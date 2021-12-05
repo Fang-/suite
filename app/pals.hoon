@@ -1,4 +1,4 @@
-::  pals: manual neighboring
+::  pals: manual peer discovery
 ::
 ::    acts as a "friendlist" of sorts, letting one add arbitrary ships to
 ::    arbitrary lists. upon doing so, the other party is informed of this.

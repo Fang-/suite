@@ -1,5 +1,8 @@
 pals
 
+v1.0.5, ~2021.12.05
+- include list of apps that use pals
+
 v1.0.4, ~2021.10.24
 - fix scry result types
 

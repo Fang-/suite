@@ -50,7 +50,10 @@
       padding: 0 1em;
     }
 
-    .factor, #status {
+    .factor {
+      cursor: pointer;
+    }
+    .factor, #status, #factors a {
       display: block;
       border: 1px solid black;
       border-radius: 2px;
@@ -60,7 +63,7 @@
       color: black;
       text-decoration: none;
     }
-    a.factor {
+    #factors a {
       float: left;
       font-weight: bold;
       padding: 1em 2em;
@@ -154,8 +157,8 @@
           ;div#status.disabled;
           ;div#factors
             ;*  (turn (sort ~(tap by keys) aor) render-factor)
-            ;a.factor(href "/fafa/add"):"+"
-            ;a.factor(href "/fafa/mod"):"•••"
+            ;a(href "/fafa/add"):"+"
+            ;a(href "/fafa/mod"):"•••"
           ==
         ==
       ==

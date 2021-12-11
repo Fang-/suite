@@ -154,7 +154,13 @@
           ;div#head
             ;h1:"fafa authenticator"
           ==
-          ;div#status.disabled;
+          ;+  ?^  msg  ;div#status:"{(trip +.u.msg)}"
+          ;div#status
+            ; remember that neither urbit nor this app have had a full
+            ; security audit yet. avoid adding factors over unencrypted
+            ; http. make sure to save the recovery codes, and/or add
+            ; a copy of these factors into an authenticator on earth.
+          ==
           ;div#factors
             ;*  (turn (sort ~(tap by keys) aor) render-factor)
             ;a(href "/fafa/add"):"+"

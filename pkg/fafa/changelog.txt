@@ -1,4 +1,9 @@
 fafa
 
+v1.1.0, ~2021.12.11
+- add ex- and import functionality. exporting writes a jamfile to .urb/put, which can be imported through the web ui.
+- keep users on their toes by reminding them about security concerns.
+- small ui improvements.
+
 v1.0.1, ~2021.12.04
 - fix an issue where the webpage would be downloaded rather than displayed by the browser.

@@ -182,6 +182,9 @@
   =/  p=(pole @ta)  path
   =,  p
   ?+  p  [~ ~]
+      [%x %dbug %state ~]
+    ``noun+!>((~(run by keys) |=(secret +<(key 0))))
+  ::
       [%x %codes %totp issuer=@ id=@ ~]
     =/  =label
       [(slav %t issuer) (slav %t id)]

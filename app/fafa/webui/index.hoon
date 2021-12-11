@@ -163,8 +163,8 @@
           ==
           ;div#factors
             ;*  (turn (sort ~(tap by keys) aor) render-factor)
-            ;a(href "/fafa/add"):"+"
-            ;a(href "/fafa/mod"):"•••"
+            ;a(href "/fafa/add", title "add"):"+"
+            ;a(href "/fafa/mod", title "manage"):"•••"
           ==
         ==
       ==

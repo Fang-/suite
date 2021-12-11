@@ -60,12 +60,13 @@
   =/  ,request-line:server
     (parse-request-line:server url.request.inbound-request)
   ::
-  =;  [res=simple-payload:http =_state]
+  =;  [res=simple-payload:http caz=(list card) =_state]
     :_  this(state state)
+    %+  weld  caz
     (give-simple-payload:app:server eyre-id res)
   ::
   ?.  &(?=(^ site) =(dap.bowl i.site))
-    [[[500 ['Location' '/fafa']~] `(as-octs 'unexpected route')] state]
+    [[[500 ['location' '/fafa']~] `(as-octs 'unexpected route')] `state]
   ::
   =/  page=@ta
     ?~  t.site  %index
@@ -74,7 +75,7 @@
   ::
   ::TODO  these want specific headers, so we can't use the webpage pattern ):
   ?:  =(%tile page)
-    :_  state
+    :_  `state
     ?.  =(%'GET' method.request.inbound-request)
       [[405 ~] ~]
     ^~  ^-  simple-payload:http
@@ -116,13 +117,13 @@
     --
   ::
   ?.  (~(has by webui) page)
-    [[[400 ~] `(as-octs 'no such page')] state]
+    [[[400 ~] `(as-octs 'no such page')] `state]
   =*  view  ~(. (~(got by webui) page) bowl keys)
   ::
   =*  request  request.inbound-request
   ?+  method.request  !!
       %'GET'
-    :_  state
+    :_  `state
     :-  [200 ['content-type'^'text/html']~]
     %-  some
     %-  as-octt:mimes:html
@@ -131,41 +132,61 @@
       %'POST'
     =/  act=(unit action)
       (argue:view header-list.request body.request)
-    ?~  act  [[[405 ~] `(as-octs 'bad request')] state]
-    =^  err=(unit @t)  state
+    ?~  act  [[[405 ~] `(as-octs 'bad request')] `state]
+    =^  [caz=(list card) err=(unit @t)]  state
+      ^-  [[(list card) (unit @t)] _state]
       ?-  -.u.act
           %add
         ?:  (~(has by keys) label.u.act)
-          [`'cannot overwrite existing account' state]
+          [``'cannot overwrite existing account' state]
         ?:  ?=(%hotp -.wat.secret.u.act)
-          [`'counter-based otp not yet supported in the frontend. file an issue if you need this!' state]
-        `state(keys (~(put by keys) +.u.act))
+          [``'counter-based otp not yet supported in the frontend. file an issue if you need this!' state]
+        [~ ~]^state(keys (~(put by keys) +.u.act))
       ::
           %del
-        `state(keys (~(del by keys) label.u.act))
+        [~ ~]^state(keys (~(del by keys) label.u.act))
       ::
           %mov
-        ?:  =(old new):u.act  `state
+        ?:  =(old new):u.act  [~ ~]^state
         ?.  (~(has by keys) old.u.act)
-          [`'unknown account' state]
+          [``'unknown account' state]
         ?:  (~(has by keys) new.u.act)
-          [`'cannot overwrite existing account' state]
+          [``'cannot overwrite existing account' state]
         =.  keys  (~(put by keys) new.u.act (~(got by keys) old.u.act))
         =.  keys  (~(del by keys) old.u.act)
-        `state
+        [~ ~]^state
       ::
           %set
         ?.  (~(has by keys) label.u.act)
-          [`'unknown account' state]
+          [``'unknown account' state]
         =/  =secret  (~(got by keys) label.u.act)
         ?.  ?=(%hotp -.wat.secret)
-          [`'account not counter-based' state]
+          [``'account not counter-based' state]
         =.  keys
           %+  ~(put by keys)  label.u.act
           secret(counter.wat counter.u.act)
-        `state
+        [~ ~]^state
+      ::
+          %sav
+        =-  [[[-]~ `'saved to .urb/put/fafa/export.jam'] state]
+        =-  [%pass /save %agent [our.bowl %hood] %poke %dill-blit -]
+        !>(`dill-blit:dill`[%sag /[dap.bowl]/export/jam keys])
+      ::
+          %get
+        =/  lap=(set label)
+          ~(key by (~(int by keys) bak.u.act))
+        ?:  =(~ lap)  ::NOTE  tmi
+          :_  state(keys (~(uni by keys) bak.u.act))
+          ``'restored succesfully'
+        =-  [``- state]
+        %+  rap  3
+        :+  'the following accounts already exist. '
+          'rename or delete them before importing. '
+        %+  turn  ~(tap in lap)
+        |=  label
+        (rap 3 issuer ':' id ' ' ~)
       ==
-    :_  state
+    :_  [caz state]
     ?~  err
       ?:  =(%add page)
         [[303 ['Location' '/fafa']~] ~]

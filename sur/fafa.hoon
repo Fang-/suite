@@ -6,5 +6,7 @@
       [%del =label]
       [%mov old=label new=label]
       [%set =label counter=@ud]
+      [%sav ~]
+      [%get bak=(map label secret)]
   ==
 --

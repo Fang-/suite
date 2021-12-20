@@ -172,9 +172,17 @@
     [~ this]
   ==
 ::
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?.  =(/x/dbug/state path)  ~
+  :^  ~  ~  %noun
+  !>  %=  state
+    picture  (bind picture |=(mime [p p.q 1.337]))
+  ==
+::
 ++  on-leave  on-leave:def
 ++  on-agent  on-agent:def
-++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --
 

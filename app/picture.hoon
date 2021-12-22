@@ -47,6 +47,7 @@
       =?  old  ?=(%0 -.old)
         (state-0-to-1 old)
       ?>  ?=(%1 -.old)
+      =.  caching.old  ~
       [~ this(state old)]
   ::
   +$  state-any  $%(state-1 state-0)
@@ -125,6 +126,7 @@
             =y  "0"
             =width  "100"
             =height  "100"
+            =preserveAspectRatio  "xMidYMid slice"
             =href  (trip dat);
           ;image
             =x  "-4"

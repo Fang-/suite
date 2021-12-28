@@ -18,6 +18,7 @@ these softwares are for manual, local installation & configuration
 
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
 - **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
+- **emblemish**: provides an http endpoint for emblemish data
 
 ## for developers
 
@@ -30,6 +31,8 @@ these softwares are for manual, local installation & configuration
 
 - **multipart**: parsing for http multipart form-data.
 - **sigil**: sigil-js but in hoon.
+- **emblemish**: alternative sigils & names, based on emoji, currently in beta.
+- **twemoji**: subset of the twemoji.twitter.com svgs used by emblemish.
 - **benc**: b-encoding and -decoding.
 - **torn**: parsing and rendering of torrent files & magnet links.
 - **word**: kjv structured for easy lookup.

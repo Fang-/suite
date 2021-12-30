@@ -765,23 +765,22 @@
 ++  xtra  ::  ops utilities
   |%
   ++  tes
-    =|  use=(jug @t @t)
-    =|  noz=(jug @t @t)
-    |=  [hav=(set @t) all=(list [p=@t s=(list @t) n=@t])]
+    =|  use=(set @t)
+    =|  noz=(set @t)
+    |=  [hav=(set @t) all=(list [s=@t n=@t])]
     ^-  (list [c=@t t=@t])
     ?~  all  ~
     =+  i.all
     =*  nex  $(all t.all)
-    ?~  s  ~&([%no-emblem p] nex)
-    ?~  n  ~&([%no-flavor p] nex)
-    ?.  (~(has in hav) (fyl i.s))
-      ~&([%missing p `@ux`i.s (fyl i.s)] nex)
-    ~?  (~(has by use) i.s)  [%duplicate i.s p (~(got by use) i.s)]
-    =.  use  (~(put ju use) i.s p)
-    ~?  (~(has by noz) n)  [%duplicate n p (~(got by noz) n)]
-    =.  noz  (~(put ju noz) n p)
-    ~?  ?=(^ t.s)  [%many p]
-    [[i.s n] nex]
+    ?~  s  ~&([%no-emblem n] nex)
+    ?~  n  ~&([%no-flavor n] nex)
+    ?.  (~(has in hav) (fyl s))
+      ~&([%missing n `@ux`s (fyl s)] nex)
+    ~?  (~(has in use) s)  [%duplicate s n]
+    =.  use  (~(put in use) s)
+    ~?  (~(has in noz) n)  [%duplicate n]
+    =.  noz  (~(put in noz) n)
+    [[s n] nex]
   ::
   ++  fyl
     |=  e=@t

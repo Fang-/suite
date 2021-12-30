@@ -319,7 +319,7 @@
       :-  '🤒'  'weakened'                               ::  sic
       :-  '🪳'  'resilient'                              ::  rop
       :-  '🥀'  'expired'                                ::  wit
-      :-  '🎁'  'gifted'                                 ::  nat
+      :-  '🎁'  'gift of'                                ::  nat
       :-  '🐼'  'endangered'                             ::  pan
       :-  '➖'  'absence of'                             ::  min
       :-  '💥'  'destroyer of'                           ::  rit
@@ -454,7 +454,7 @@
       :-  '🔎'  'seeker of'                              ::  hab
       :-  '0️⃣'  'nullifier of'                           ::  nil
       :-  '👃'  'intuitive'                              ::  nos
-      :-  '🌾'  'processor of '                          ::  mil
+      :-  '🌾'  'processor of'                           ::  mil
       :-  '🎰'  'fortuitous'                             ::  fop
       :-  '👨‍👩‍👧‍👦'  'tribal'                                 ::  fam
       :-  '💿'  'digitized'                              ::  dat
@@ -582,7 +582,7 @@
       :-  '🍷'  'vintage'                                ::  wyn
       :-  '🔴'  'recording'                              ::  rec
       :-  '🗄'  'database'                               ::  meg
-      :-  '🥅'  'meshwork'                               ::  net
+      :-  '🌏'  'worlds'  ::TODO  maybe 🌐?              ::  net
       :-  '👮'  'safekeeper'                             ::  sec
       :-  '🤔'  'contemplation'                          ::  mul
       :-  '📛'  'nomenclature'                           ::  nym
@@ -662,7 +662,7 @@
       :-  '🦵'  'support'                                ::  leg
       :-  '🧲'  'attractor'                              ::  nem
       :-  '🌲'  'appeal'                                 ::  fer
-      :-  '🧜'  'amalgam'                                ::  mer
+      :-  '🧜‍♀️'  'amalgam'                               ::  mer
       :-  '🔟'  'decimal'                                ::  ten
       :-  '➕'  'additive'                               ::  lus
       :-  '💭'  'nous'                                   ::  nus

@@ -52,34 +52,51 @@
   ?.  =('GET' method.request.inbound-request)
     [[405 ~] `'illegal method']
   ::
-  |^  ?+  [t.site ext]  [[404 ~] `'not found']
-          [[%full @ ~] [~ %json]]
-        ?~  who=(who (snag 1 t.site))
-          [[404 ~] `(cat 3 (snag 2 t.site) ' not found')]
-        :-  [200 ['content-type'^'application/json']~]
-        %-  some  %-  crip  %-  en-json:html
-        %-  pairs:enjs:format
-        :~  'p'^s+(scot %p u.who)
-            'title'^s+(name:emblemish | u.who)
-          ::
-            :+  'emblem'  %s
-            =+  rend=render:emblemish
-            ?~  syz=(get-header:http 'size' args)
-              (rend u.who)
-            ?~  siz=(rush u.syz dum:ag)
-              (rend u.who)
-            ~&  u.siz
-            (rend(size u.siz) u.who)
-        ==
-      ==
+  ?.  ?=([@ ~] t.site)
+    [[404 ~] `'not found']
   ::
-  ++  who
-    |=  k=knot
-    ^-  (unit @p)
-    ?:  =('random' k)
+  =/  who=(unit @p)
+    ?:  =('random' i.t.site)
       `(end 5 eny.bowl)
-    (rush k ;~(pose fed:ag dum:ag))
-  --
+    (rush i.t.site ;~(pose fed:ag dum:ag))
+  ?~  who
+    [[404 ~] `(cat 3 i.t.site ' not found')]
+  ::
+  =*  fancy  ?=(^ (get-header:http 'fancy' args))
+  =+  rend=render:emblemish
+  ::
+  ?+  ext  [[404 ~] `'not found']
+      [~ %html]
+    :-  [200 ['content-type'^'text/html;charset=utf-8']~]
+    %-  some
+    %+  rap  3
+    :~  '<html><head>'
+        '<title>emblemish: '  (scot %p u.who)  '</title>'
+        '<meta charset="utf-8" />'
+        '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+        '</head><body>'
+        '<h3>'  (name:emblemish fancy u.who)  '</h3>'
+        (rend(size 500) u.who)
+        '</body></html>'
+    ==
+  ::
+      [~ %json]
+    :-  [200 ['content-type'^'application/json;charset=utf-8']~]
+    %-  some  %-  crip  %-  en-json:html
+    %-  pairs:enjs:format
+    :~  'p'^s+(scot %p u.who)
+        'title'^s+(name:emblemish | u.who)
+        'emblem'^s+(rend u.who)
+    ==
+  ::
+      [~ %svg]
+    :-  [200 ['content-type'^'image/svg+xml;charset=utf-8']~]
+    `(rend(size 1.024) u.who)
+  ::
+      [~ %txt]
+    :-  [200 ['content-type'^'text/plain;charset=utf-8']~]
+    `(name:emblemish fancy u.who)
+  ==
 ::
 ++  on-watch
   |=  =path

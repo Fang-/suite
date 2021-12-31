@@ -135,7 +135,7 @@
       ::
       :~  '<g id="'  moj
           '" transform-origin="18 18" transform="scale(0.95)">'
-          (~(got by twemoji) moj)
+          ~|([%oops who moj] (~(got by twemoji) moj))
           '</g>'
       ==
     ::

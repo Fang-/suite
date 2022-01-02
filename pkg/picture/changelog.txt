@@ -1,5 +1,8 @@
 picture
 
+v1.1.2, ~2022.01.02
+- disable the christmas frame.
+
 v1.1.1, ~2021.12.22
 - mimic the natural "scale to cover" behavior of tile images, even when a frame is rendered.
 

@@ -63,41 +63,43 @@
     =/  ,request-line:server
       (parse-request-line:server url.request.inbound-request)
     ::
-    =;  [payload=simple-payload:http caz=(list card) =_state]
+    =;  payload=simple-payload:http
       :_  this(state state)
-      %+  weld  caz
       %+  give-simple-payload:app:server
         eyre-id
       payload
-    ::  405 to all unexpected requests
     ::
-    ?.  =(/verse/verse site)
-      [[[404 ~] `(as-octs 'unexpected route')] ~ state]
-    :_  [~ state]
-    ::
-    =;  svg
-      ?~  picture
-        [[200 ['content-type'^'image/svg+xml']~] `svg]
-      :_  `q.u.picture
-      :-  200
-      :~  :-  'content-type'   (en-mite p.u.picture)
-          :-  'cache-control'  'public, max-age=3600'
-      ==
-    %-  as-octt
-    %-  en-xml:html
-    |^  ^-  manx
-        ;svg
-          =viewport  "0 0 100 100"
-          =height    "100"
-          =width     "100"
-          =version   "1.1"
-          =xmlns     "http://www.w3.org/2000/svg"
-          ;rect
-            =fill    "#eed"
-            =width   "100"
-            =height  "100";
-          ;+  show-verse
-          ;+  show-index
+    |^  ?+  site  [[404 ~] `(as-octs 'unexpected route')]
+            [%verse %study ~]
+          =-  [[302 ['location' -]~] ~]
+          %^  cat  3
+            'https://www.catholiccrossreference.online/fathers/index.php/'
+          (crip (cass index))
+        ::
+            [%verse %verse ~]
+          =;  svg
+            ?~  picture
+              [[200 ['content-type' 'image/svg+xml']~] `svg]
+            :_  `q.u.picture
+            :-  200
+            :~  :-  'content-type'   (en-mite p.u.picture)
+                :-  'cache-control'  'public, max-age=3600'
+            ==
+          %-  as-octt
+          %-  en-xml:html
+          ;svg
+            =viewport  "0 0 100 100"
+            =height    "100"
+            =width     "100"
+            =version   "1.1"
+            =xmlns     "http://www.w3.org/2000/svg"
+            ;rect
+              =fill    "#eed"
+              =width   "100"
+              =height  "100";
+            ;+  show-verse
+            ;+  show-index
+          ==
         ==
     ::
     ++  ci  ~+
@@ -122,6 +124,11 @@
       =+  s=(lent q.i.a)
       ?:  (gth s c)  [p.i.a c (snag c q.i.a)]
       $(c (sub c s), a t.a)
+    ::
+    ++  index  ~+
+      =+  (chapter ci)
+      =.  book  (~(got by titles:word) book)
+      "{(trip book)} {(scow %ud +(local))}:{(scow %ud +(vi))}"
     ::
     ++  weight  ^~  ::  verses per chapter
       =+  a=linear:word
@@ -167,10 +174,6 @@
       ==
     ::
     ++  show-index
-      =+  (chapter ci)
-      =.  book  (~(got by titles:word) book)
-      =/  t
-        "{(trip book)} {(scow %ud +(local))}:{(scow %ud +(vi))}"
       ;foreignObject
         =x  "10"
         =y  "85"
@@ -183,7 +186,7 @@
                   font-size: 6pt;
                   text-align: right;
                   """
-          ; {t}
+          ; {index}
         ==
       ==
     --

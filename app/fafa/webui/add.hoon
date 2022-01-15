@@ -188,6 +188,7 @@
               ;h1:"fafa authenticator"
             ==
           ==
+          ;div#status.disabled;
           ;+  ?~  msg  ;div#status.disabled;
               ;div#status:"{(trip +.u.msg)}"
           ;div#entry
@@ -211,7 +212,7 @@
                 ==
                 ;tr
                   ;td  ;label(for "id"):"account"  ==
-                  ;td  ;input(name "id", type "text", placeholder "SOMEBASE32");  ==
+                  ;td  ;input(name "id", type "text", placeholder "~sampel");  ==
                 ==
                 ;tr
                   ;td;

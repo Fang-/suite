@@ -29,6 +29,7 @@ these softwares are for manual, local installation & configuration
 
 ### libraries
 
+- **rudder**: framework for routing & serving simple web frontends.
 - **multipart**: parsing for http multipart form-data.
 - **sigil**: sigil-js but in hoon.
 - **emblemish**: alternative sigils & names, based on emoji, currently in beta.

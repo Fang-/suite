@@ -1,4 +1,4 @@
-::  fafa/index.hoon: landing page etc
+::  fafa/sav.hoon: im/export
 ::
 /-  *fafa
 /+  *otp, multipart

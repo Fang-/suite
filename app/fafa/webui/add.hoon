@@ -28,8 +28,6 @@
 ::
 ++  build
   |=  [args=(list [k=@t v=@t]) msg=(unit [? @t])]
-  =.  keys  (~(put by keys) ['issuer' 'my acount'] *secret)
-  =.  keys  (~(put by keys) ['issuer2' 'etc acount'] *secret)
   |^  page
   ::
   ++  style

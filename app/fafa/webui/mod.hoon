@@ -1,4 +1,4 @@
-::  fafa/index.hoon: landing page etc
+::  fafa/mod.hoon: rename & delete factors
 ::
 /-  *fafa
 /+  *otp

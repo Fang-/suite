@@ -1,5 +1,7 @@
 ::  webpage: simple webpage core type
 ::
+::TODO  deprecated in favor of /lib/rudder
+::
 |*  [dat=mold cmd=mold]
 $_  ^|
 |_  [bowl:gall dat]

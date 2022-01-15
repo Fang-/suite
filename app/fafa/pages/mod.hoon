@@ -1,26 +1,36 @@
-::  fafa/sav.hoon: im/export
+::  fafa/mod.hoon: rename & delete factors
 ::
 /-  *fafa
-/+  *otp, multipart
+/+  *otp, rudder
 ::
-|_  [bowl:gall keys=(map label secret)]
+^-  (page:rudder (map label secret) action)
+|_  [bowl:gall * keys=(map label secret)]
 ++  argue
   |=  [headers=header-list:http body=(unit octs)]
-  ^-  (unit action)
-  =/  args=(map @t part:multipart)
-    ?~  req=(de-request:multipart headers body)  ~
-    (~(gas by *(map @t part:multipart)) u.req)
-  ?:  (~(has by args) 'save')  `[%sav ~]
-  ?.  (~(has by args) 'load')  ~
-  ?.  (~(has by args) 'file')  ~
-  %+  bind
-    %-  (soft (map label secret))
-    (cue body:(~(got by args) 'file'))
-  (lead %get)
+  ^-  $@(brief:rudder action)
+  ?~  body  ~
+  =/  args=(map @t @t)
+    %-  ~(gas by *(map @t @t))
+    (fall (rush q.u.body yquy:de-purl:html) ~)
+  ?.  (~(has by args) 'cur-issuer')  ~
+  ?.  (~(has by args) 'cur-id')      ~
+  =/  old=label
+    [(~(got by args) 'cur-issuer') (~(got by args) 'cur-id')]
+  ?:  (~(has by args) 'del')
+    [%del old]
+  ?.  (~(has by args) 'save')  ~
+  ?.  (~(has by args) 'issuer')  ~
+  ?.  (~(has by args) 'id')      ~
+  =/  new=label
+    [(~(got by args) 'issuer') (~(got by args) 'id')]
+  [%mov old new]
+::
+++  final  (alert:rudder 'mod' build)
 ::
 ++  build
   |=  [args=(list [k=@t v=@t]) msg=(unit [? @t])]
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  style
     '''
@@ -91,6 +101,26 @@
       margin: 1em;
       border-width: 1px 3px;
     }
+
+    .label, .code {
+      width: 50%;
+      display: inline-block;
+    }
+    .id {
+      font-weight: bold;
+    }
+    .code {
+      text-align: right;
+    }
+    '''
+  ::
+  ++  script
+    '''
+    function cconfirm(this) {
+      console.log('huh', this);
+      this.onclick = () => {};
+      return false;
+    }
     '''
   ::
   ++  page
@@ -99,6 +129,7 @@
       ;head
         ;title:"fafa authenticator"
         ;style:"{(trip style)}"
+        ;script:"{(trip script)}"
         ;meta(charset "utf-8");
         ;meta
           =name     "viewport"
@@ -113,19 +144,10 @@
           ==
           ;+  ?~  msg  ;div#status.disabled;
               ;div#status:"{(trip +.u.msg)}"
-          ;form#factors(method "post", enctype "multipart/form-data")
-            ;div.factor
-              ;input(type "submit", name "save", value "backup");
-              ;
-              ; will export to .urb/put/fafa/export.jam
-            ==
-            ;div.factor
-              ;input(type "submit", name "load", value "restore");
-              ;
-              ; from an export.jam
-              ;input(type "file", name "file", accept "*");
-            ==
-            ;a(href "/fafa/mod", title "manage"):"<"
+          ;div#factors
+            ;*  (turn (sort ~(tap by keys) aor) render-factor)
+            ;a(href "/fafa", title "factors"):"<"
+            ;a(href "/fafa/sav", title "backup & restore"):"⭘"
           ==
         ==
       ==
@@ -136,7 +158,7 @@
     ^-  manx
     =/  tis  (trip issuer)
     =/  tid  (trip id)
-    ;form.factor(method "post", enctype "multipart/form-data")
+    ;form.factor(method "post")
       ;input(type "hidden", name "cur-issuer", value tis);
       ;input(type "hidden", name "cur-id", value tid);
       ;div.label

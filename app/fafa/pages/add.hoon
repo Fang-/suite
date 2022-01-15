@@ -1,34 +1,39 @@
 ::  fafa/add.hoon: factor addition
 ::
 /-  *fafa
-/+  *otp
+/+  *otp, rudder
 ::
-|_  [bowl:gall keys=(map label secret)]
+^-  (page:rudder (map label secret) action)
+|_  [bowl:gall * keys=(map label secret)]
 ++  argue
   |=  [headers=header-list:http body=(unit octs)]
-  ^-  (unit action)
+  ^-  $@(brief:rudder action)
   ?~  body  ~
   =/  args=(map @t @t)
     %-  ~(gas by *(map @t @t))
     (fall (rush q.u.body yquy:de-purl:html) ~)
   ::
   ?:  (~(has by args) 'uri')
-    %+  rush  (~(got by args) 'uri')
-    (stag %add puri)
+    %+  fall
+      %+  rush  (~(got by args) 'uri')
+      (stag %add puri)
+    ~
   ::
   ?.  (~(has by args) 'secret')  ~
   ?.  (~(has by args) 'issuer')  ~
   ?.  (~(has by args) 'id')      ~
   ?~  key=(rush (~(got by args) 'secret') bask)
     ~
-  %-  some
   :+  %add
     [(~(got by args) 'issuer') (~(got by args) 'id')]
   %*(. *secret key u.key)
 ::
+++  final  (alert:rudder '.' build)
+::
 ++  build
   |=  [args=(list [k=@t v=@t]) msg=(unit [? @t])]
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  style
     '''

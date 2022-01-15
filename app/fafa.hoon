@@ -2,10 +2,10 @@
 ::
 ::NOTE  https://github.com/google/google-authenticator/wiki/Conflicting-Accounts
 ::
-/-  *fafa, webpage
-/+  *otp, server, verb, dbug, default-agent
+/-  *fafa
+/+  *otp, rudder, verb, dbug, default-agent
 ::
-/~  webui  (webpage (map label secret) action)  /app/fafa/webui
+/~  pages  (page:rudder (map label secret) action)  /app/fafa/pages
 ::
 |%
 +$  state-0
@@ -43,158 +43,63 @@
   ^-  (quip card _this)
   ?.  =(%handle-http-request mark)
     (on-poke:def mark vase)
-  =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
-  =*  as-octs  as-octs:mimes:html
-  ::  require login for the web interface
   ::
-  ?.  authenticated.inbound-request
-    :_  this
-    %+  give-simple-payload:app:server
-      eyre-id
-    =-  [[307 ['location' -]~] ~]
-    %^  cat  3
-      '/~/login?redirect='
-    url.request.inbound-request
-  ::  parse request url into path and query args
+  =;  out=(quip card _keys)
+    [-.out this(keys +.out)]
+  %.  [bowl !<([@ta inbound-request:eyre] vase) keys]
+  %+  (steer:rudder _keys action)  pages
+  :+  (point:rudder /fafa & ~(key by pages))
+    (fours:rudder keys)
+  |=  act=action
+  ^-  $@(@t [?(~ @t) (list card) _keys])
+  ?-  -.act
+      %add
+    ?:  (~(has by keys) label.act)
+      'cannot overwrite existing account'
+    ?:  ?=(%hotp -.wat.secret.act)
+      'counter-based otp not yet supported in the frontend. file an issue if you need this!'
+    ``(~(put by keys) +.act)
   ::
-  =/  ,request-line:server
-    (parse-request-line:server url.request.inbound-request)
+      %del
+    ``(~(del by keys) label.act)
   ::
-  =;  [res=simple-payload:http caz=(list card) =_state]
-    :_  this(state state)
-    %+  weld  caz
-    (give-simple-payload:app:server eyre-id res)
+      %mov
+    ?:  =(old new):act  ``keys
+    ?.  (~(has by keys) old.act)
+      'unknown account'
+    ?:  (~(has by keys) new.act)
+      'cannot overwrite existing account'
+    =.  keys  (~(put by keys) new.act (~(got by keys) old.act))
+    =.  keys  (~(del by keys) old.act)
+    ``keys
   ::
-  ?.  &(?=(^ site) =(dap.bowl i.site))
-    [[[500 ['location' '/fafa']~] `(as-octs 'unexpected route')] `state]
+      %set
+    ?.  (~(has by keys) label.act)
+      'unknown account'
+    =/  =secret  (~(got by keys) label.act)
+    ?.  ?=(%hotp -.wat.secret)
+      'account not counter-based'
+    :+  ~  ~
+    %+  ~(put by keys)  label.act
+    secret(counter.wat counter.act)
   ::
-  =/  page=@ta
-    ?~  t.site  %index
-    ?~  i.t.site  %index
-    i.t.site
+      %sav
+    :+  'saved to .urb/put/fafa/export.jam'
+      =+  !>(`dill-blit:dill`[%sag /[dap.bowl]/export/jam keys])
+      [%pass /save %agent [our.bowl %hood] %poke %dill-blit -]~
+    keys
   ::
-  ::TODO  these want specific headers, so we can't use the webpage pattern ):
-  ?:  =(%tile page)
-    :_  `state
-    ?.  =(%'GET' method.request.inbound-request)
-      [[405 ~] ~]
-    ^~  ^-  simple-payload:http
-    :-  :-  200
-        :~  ['content-type' 'image/svg+xml']
-            ['cache-control' 'public, max-age=604800, immutable']
-        ==
-    %-  some
-    %-  as-octt:mimes:html
-    %-  en-xml:html
-    |^  svg
-    ++  svg
-      ;svg
-        =xmlns     "http://www.w3.org/2000/svg"
-        =version   "1.1"
-        =width     "100"
-        =height    "100"
-        =viewport  "0 0 100 100"
-        ;rect(width "100%", height "100%", fill "#1a1a2a");
-        ;g(style "stroke-width: 6;", transform "rotate(40 50 50)")
-          :: ;g(style "stroke: goldenrod;", transform "rotate(25 50 60)")
-          ::   ;*  (key |)
-          :: ==
-          ;g(style "stroke: gold;")
-            ;*  (key &)
-          ==
-        ==
-      ==
-    ++  key
-      |=  ring=?
-      ^-  (list manx)
-      :*  ;line(x1 "50", y1 "25", x2 "50", y2 "55");
-          ;line(style "stroke-width: 4;", x1 "50", y1 "27", x2 "60", y2 "27");
-          ;line(style "stroke-width: 4;", x1 "50", y1 "35", x2 "60", y2 "35");
-        ::
-          ?.  ring  ~
-          [;circle(style "fill: none;", cx "50", cy "60", r "8");]~
-      ==
-    --
-  ::
-  ?.  (~(has by webui) page)
-    [[[400 ~] `(as-octs 'no such page')] `state]
-  =*  view  ~(. (~(got by webui) page) bowl keys)
-  ::
-  =*  request  request.inbound-request
-  ?+  method.request  !!
-      %'GET'
-    :_  `state
-    :-  [200 ['content-type'^'text/html']~]
-    %-  some
-    %-  as-octt:mimes:html
-    (en-xml:html (build:view args ~))
-  ::
-      %'POST'
-    =/  act=(unit action)
-      (argue:view header-list.request body.request)
-    ?~  act  [[[405 ~] `(as-octs 'bad request')] `state]
-    =^  [caz=(list card) err=(unit @t)]  state
-      ^-  [[(list card) (unit @t)] _state]
-      ?-  -.u.act
-          %add
-        ?:  (~(has by keys) label.u.act)
-          [``'cannot overwrite existing account' state]
-        ?:  ?=(%hotp -.wat.secret.u.act)
-          [``'counter-based otp not yet supported in the frontend. file an issue if you need this!' state]
-        [~ ~]^state(keys (~(put by keys) +.u.act))
-      ::
-          %del
-        [~ ~]^state(keys (~(del by keys) label.u.act))
-      ::
-          %mov
-        ?:  =(old new):u.act  [~ ~]^state
-        ?.  (~(has by keys) old.u.act)
-          [``'unknown account' state]
-        ?:  (~(has by keys) new.u.act)
-          [``'cannot overwrite existing account' state]
-        =.  keys  (~(put by keys) new.u.act (~(got by keys) old.u.act))
-        =.  keys  (~(del by keys) old.u.act)
-        [~ ~]^state
-      ::
-          %set
-        ?.  (~(has by keys) label.u.act)
-          [``'unknown account' state]
-        =/  =secret  (~(got by keys) label.u.act)
-        ?.  ?=(%hotp -.wat.secret)
-          [``'account not counter-based' state]
-        =.  keys
-          %+  ~(put by keys)  label.u.act
-          secret(counter.wat counter.u.act)
-        [~ ~]^state
-      ::
-          %sav
-        =-  [[[-]~ `'saved to .urb/put/fafa/export.jam'] state]
-        =-  [%pass /save %agent [our.bowl %hood] %poke %dill-blit -]
-        !>(`dill-blit:dill`[%sag /[dap.bowl]/export/jam keys])
-      ::
-          %get
-        =/  lap=(set label)
-          ~(key by (~(int by keys) bak.u.act))
-        ?:  =(~ lap)  ::NOTE  tmi
-          :_  state(keys (~(uni by keys) bak.u.act))
-          ``'restored succesfully'
-        =-  [``- state]
-        %+  rap  3
-        :+  'the following accounts already exist. '
-          'rename or delete them before importing. '
-        %+  turn  ~(tap in lap)
-        |=  label
-        (rap 3 issuer ':' id ' ' ~)
-      ==
-    :_  [caz state]
-    ?~  err
-      ?:  =(%add page)
-        [[303 ['Location' '/fafa']~] ~]
-      [[303 ['Location' (cat 3 '/fafa/' page)]~] ~]
-    :-  [400 ['content-type'^'text/html']~]
-    %-  some
-    %-  as-octt:mimes:html
-    (en-xml:html (build:view args `|^u.err))
+      %get
+    =/  lap=(set label)
+      ~(key by (~(int by keys) bak.act))
+    ?:  =(~ lap)  ::NOTE  tmi
+      ['restored succesfully' ~ (~(uni by keys) bak.act)]
+    %+  rap  3
+    :+  'the following accounts already exist. '
+      'rename or delete them before importing. '
+    %+  turn  ~(tap in lap)
+    |=  label
+    (rap 3 issuer ':' id ' ' ~)
   ==
 ::
 ++  on-peek

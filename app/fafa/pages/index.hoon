@@ -1,14 +1,16 @@
 ::  fafa/index.hoon: landing page etc
 ::
 /-  *fafa
-/+  *otp
+/+  *otp, rudder
 ::
-|_  [bowl:gall keys=(map label secret)]
-++  argue  !!
+|_  [bowl:gall * keys=(map label secret)]
+++  argue  |=(* 'not postable')
+++  final  (alert:rudder 'index' build)
 ::
 ++  build
   |=  [args=(list [k=@t v=@t]) msg=(unit [? @t])]
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  style
     '''

@@ -1,6 +1,6 @@
 ::  rudder: framework for routing & serving simple web frontends
 ::
-::      v0.1.0: newborn sailor
+::      v0.1.1: restless sailor
 ::
 ::    the primary usage pattern involves your app calling steer:rudder
 ::
@@ -51,14 +51,14 @@
       args=(list [key=@t value=@t])
   ==
 ::
-+$  order  inbound-request:eyre
++$  order  [id=@ta inbound-request:eyre]
 +$  route  $-(query (unit place))
 +$  brief  ?(~ @t)
 ::
 ++  page
   |*  [dat=mold cmd=mold]
   $_  ^|
-  |_  [bowl:gall [eyre-id=@ta order] dat]
+  |_  [bowl:gall order dat]
   ++  build  |~([(list [k=@t v=@t]) (unit [? @t])] *reply)
   ++  argue  |~([header-list:http (unit octs)] *$@(brief cmd))
   ++  final  |~([success=? msg=brief] *reply)
@@ -73,14 +73,15 @@
   |*  [dat=mold cmd=mold]
   |^  serve
   +$  page   (^page dat cmd)
-  +$  adlib  $-([@ta order] [[(unit reply) (list card)] dat])
+  +$  adlib  $-(order [[(unit reply) (list card)] dat])
   +$  solve  $-(cmd $@(@t [brief (list card) dat]))
   ::
   ++  serve  ::  main helper
     =*  card  card:agent:gall
     |=  [pages=(map @ta page) =route =adlib =solve]
-    |=  [=bowl:gall [id=@ta =order] =dat]
+    |=  [=bowl:gall =order =dat]
     ^-  (quip card _dat)
+    =*  id  id.order
     =+  (purse url.request.order)
     =/  target=(unit place)
       (route -)
@@ -88,7 +89,7 @@
     ::
     ?~  target
       =^  [res=(unit reply) caz=(list card)]  dat
-        (adlib id order)
+        (adlib order)
       :_  dat
       ?~  res  caz
       (weld (spout id (paint u.res)) caz)
@@ -109,7 +110,7 @@
     =/  =page
       %~  .
         (~(got by pages) nom.u.target)
-      [bowl [id order] dat]
+      [bowl order dat]
     ?+  method.request.order
       [(spout id (issue 405 ~)) dat]
     ::

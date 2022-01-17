@@ -10,8 +10,7 @@
   ^-  $@(brief:rudder action)
   ?~  body  ~
   =/  args=(map @t @t)
-    %-  ~(gas by *(map @t @t))
-    (fall (rush q.u.body yquy:de-purl:html) ~)
+    ?~(body ~ (frisk:rudder q.u.body))
   ?.  (~(has by args) 'cur-issuer')  ~
   ?.  (~(has by args) 'cur-id')      ~
   =/  old=label

@@ -211,6 +211,11 @@
   ?.  =(i.base i.site)  ~
   $(base t.base, site t.site)
 ::
+++  frisk  ::  parse url-encoded form args
+  |=  body=@t
+  %-  ~(gas by *(map @t @t))
+  (fall (rush body yquy:de-purl:html) ~)
+::
 ::NOTE  the below (and $query) are also available in /lib/server.hoon,
 ::      but we reimplement them here for independence's sake.
 ::

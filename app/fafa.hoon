@@ -46,12 +46,12 @@
   ::
   =;  out=(quip card _keys)
     [-.out this(keys +.out)]
-  %.  [bowl !<([@ta inbound-request:eyre] vase) keys]
+  %.  [bowl !<(order:rudder vase) keys]
   %+  (steer:rudder _keys action)  pages
   :+  (point:rudder /fafa & ~(key by pages))
     (fours:rudder keys)
   |=  act=action
-  ^-  $@(@t [?(~ @t) (list card) _keys])
+  ^-  $@(@t [brief:rudder (list card) _keys])
   ?-  -.act
       %add
     ?:  (~(has by keys) label.act)

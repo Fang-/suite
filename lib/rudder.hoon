@@ -15,11 +15,31 @@
 ::    adlib  gets called with the full request when no route is found.
 ::    solve  is a function that executes a cmd resulting from a post request.
 ::
+::    the library provides some default implementations for route and adlib,
+::    which you can construct using +point and +fours respectively.
+::
+::    for examples and a more detailed description of handling http requests,
+::    see /lib/rudder/poke-example.hoon
+::
+::    pages implement a bundle of view logic, each implementing a door
+::    with three arms.
+::
+::    +build  gets called for GET requests, producing a reply to render.
+::    +argue  gets called for POST requests, turning it into a cmd.
+::    +final  gets called after POST requests, producing a reply to render.
+::
+::    for examples and a more detailed description of implementing a page,
+::    see /lib/rudder/page-example.hoon
+::
 ::TODO
-::  - moar docs. describe page structure, give examples, templates
-::    - ignores file extentions
-::    - +final with failure always has a msg
-::    - purpose of the full request in the page door (delayed response, etc)
+::  - %next always uses ?rmsg=, but might need &rmsg= if the location
+::    already contains other query parameters.
+::  - should rudder be in the business of falling back to generic error
+::    messages when calling +final after failure?
+::  - should we expose a separate arm for the "using a page" part of +serve?
+::    might be useful for fallback implementations.
+::  - should +place allow a %func case, for providing bespoke fallbacks?
+::  - weird that routing function also gets access to :args.
 ::  - in the full-default setup, the behavior of +alert is a little bit
 ::    awkward. because +point forces routes to omit trailing slashes,
 ::    you cannot refer to "the current page" in a consistent way.
@@ -27,6 +47,12 @@
 ::    from the inbound-request.
 ::    a router that forces inclusion of trailing slashes would
 ::    let you use '.', but doesn't have the prettiest url semantics...
+::  - why can +solve not produce a brief in the failure case?
+::  - some inconsistency between the expected output of +adlib and +solve.
+::    "briefless" +solve results may be common, so it's nice that they're
+::    easy to write. for +adlib that probably doesn't matter as much, and
+::    the current factoring makes for a nice =^ in the lib code, but...
+::  - maybe unsupported methods should go to the fallback too?
 ::
 |%
 +|  %types  ::  outputs, inputs, function signatures
@@ -199,11 +225,11 @@
     %405  'method not allowed'
     %500  'internal server error'
   ==
-::  utils:  fidgeting
+::  utils: fidgeting
 ::
 +|  %utils
 ::
-++  decap
+++  decap  ::  strip leading base from full site path
   |=  [base=(list @t) site=(list @t)]
   ^-  (unit (list @t))
   ?~  base  `site
@@ -219,7 +245,7 @@
 ::NOTE  the below (and $query) are also available in /lib/server.hoon,
 ::      but we reimplement them here for independence's sake.
 ::
-++  purse
+++  purse  ::  url cord to query
   |=  url=@t
   ^-  query
   (fall (rush url ;~(plug apat:de-purl:html yque:de-purl:html)) [[~ ~] ~])
@@ -227,7 +253,7 @@
 ++  press  ::  manx to octs
   (cork en-xml:html as-octt:mimes:html)
 ::
-++  spout
+++  spout  ::  build full response cards
   |=  [eyre-id=@ta simple-payload:http]
   ^-  (list card)
   =/  =path  /http-response/[eyre-id]

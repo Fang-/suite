@@ -37,7 +37,7 @@
       [%next loc=@t msg=brief]                          ::  303, succeeded
       [%move loc=@t]                                    ::  308, use other
       [%auth loc=@t]                                    ::  307, please log in
-      [%code cod=@ud msg=@t]                            ::  http status code
+      [%code cod=@ud msg=brief]                         ::  error code page
       [%full ful=simple-payload:http]                   ::  full payload
   ==
 ::
@@ -159,7 +159,7 @@
   |*  dat=*
   ::  ^-  adlib:(rest * _dat)
   |=  *
-  [[`full+(issue 404 'no route found') ~] dat]
+  [[`[%code 404 'no route found'] ~] dat]
 ::
 ++  alert  ::  simple redirecting +final handler
   |=  [next=@t build=$-([(list [@t @t]) (unit [? @t])] reply)]

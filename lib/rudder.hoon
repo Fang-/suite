@@ -1,6 +1,6 @@
 ::  rudder: framework for routing & serving simple web frontends
 ::
-::      v0.1.1: restless sailor
+::      v1.0.0: newborn helmsman
 ::
 ::    the primary usage pattern involves your app calling steer:rudder
 ::    with a configuration, then calling the resulting gate with an

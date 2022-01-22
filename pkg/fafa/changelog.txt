@@ -1,5 +1,9 @@
 fafa
 
+v1.1.1, ~2022.01.22
+- fix visual issues on the factor adding page.
+- use /lib/rudder for serving the web ui.
+
 v1.1.0, ~2021.12.11
 - add ex- and import functionality. exporting writes a jamfile to .urb/put, which can be imported through the web ui.
 - keep users on their toes by reminding them about security concerns.

@@ -3,6 +3,8 @@
 ::      v0.1.1: restless sailor
 ::
 ::    the primary usage pattern involves your app calling steer:rudder
+::    with a configuration, then calling the resulting gate with an
+::    incoming request and relevant context.
 ::
 ::      %.  [bowl [eyre-id inbound-request] dat]
 ::      %-  (steer:rudder _dat cmd)
@@ -11,9 +13,9 @@
 ::    dat    is app state passed into and transformed by the frontend code.
 ::    cmd    is the type of app actions that the frontend may produce.
 ::    pages  is a (map term (page _dat cmd)), contains per-view frontend logic.
-::    route  is a routing function, turning a url query into a place.
+::    route  is a routing function, turning a url query into a $place.
 ::    adlib  gets called with the full request when no route is found.
-::    solve  is a function that executes a cmd resulting from a post request.
+::    solve  is a function that applies a cmd resulting from a POST request.
 ::
 ::    the library provides some default implementations for route and adlib,
 ::    which you can construct using +point and +fours respectively.
@@ -24,29 +26,36 @@
 ::    pages implement a bundle of view logic, each implementing a door
 ::    with three arms.
 ::
-::    +build  gets called for GET requests, producing a reply to render.
+::    +build  gets called for GET requests, producing a $reply to render.
 ::    +argue  gets called for POST requests, turning it into a cmd.
-::    +final  gets called after POST requests, producing a reply to render.
+::    +final  gets called after POST requests, producing a $reply to render.
 ::
 ::    for examples and a more detailed description of implementing a page,
 ::    see /lib/rudder/page-example.hoon
 ::
 ::TODO
-::  - should rudder be in the business of falling back to generic error
-::    messages when calling +final after failure?
-::  - should +place allow a %func case, for providing bespoke fallbacks?
+::  - should rudder really be falling back to generic error messages when
+::    calling +final after failure? what if apps/pages want to provide
+::    their own generic error message?
 ::  - in the full-default setup, the behavior of +alert is a little bit
 ::    awkward. because +point forces routes to omit trailing slashes,
 ::    you cannot refer to "the current page" in a consistent way.
 ::    you have to either hardcode the page name, or pass the full url
 ::    from the inbound-request.
-::    a router that forces inclusion of trailing slashes would
-::    let you use '.', but doesn't have the prettiest url semantics...
+::    a router that forces inclusion of trailing slashes would let you
+::    use '.', but has unconventional url semantics, and doesn't mesh
+::    nicely with single-level routing.
 ::  - some inconsistency between the expected output of +adlib and +solve.
 ::    "briefless" +solve results may be common, so it's nice that they're
-::    easy to write. for +adlib that probably doesn't matter as much, and
+::    easy to write. for +adlib that probably isn't as relevant, and
 ::    the current factoring makes for a nice =^ in the lib code, but...
+::    on the other hand, they're still different output types semantically,
+::    so inconsistency isn't the end of the world. would have to see how
+::    this ends up looking in practice.
 ::  - maybe unsupported methods should go to the fallback too?
+::  - currently ambiguous: do you catch would-fail actions during +argue,
+::    or in +solve? might be best to catch earlier, but this splits
+::    or duplicates business logic between app and pages...
 ::
 |%
 +|  %types  ::  outputs, inputs, function signatures
@@ -100,7 +109,6 @@
   +$  solve  $-(cmd $@(brief [brief (list card) dat]))
   ::
   ++  serve  ::  main helper
-    =*  card  card:agent:gall
     |=  [pages=(map @ta page) =route =adlib =solve]
     |=  [=bowl:gall =order =dat]
     ^-  (quip card _dat)

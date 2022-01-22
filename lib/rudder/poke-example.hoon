@@ -52,16 +52,29 @@
 ++  on-poke-simple
   |=  [=mark =vase]
   ^-  (quip card:agent:gall _this)
-  ::  we do not deal with anything other than http requsets
+  ::  we do not deal with anything other than http requests in this example
   ::
-  ?.  =(%handle-http-request mark)  !!
+  ?>  =(%handle-http-request mark)
   ::  the code further down is going to produce effects and
   ::  a possibly-updated list of enemies. here we simply integrate the
   ::  new enemies into our context and produce the desired output.
   ::
   =;  out=(quip card:agent:gall _enemies)
     [-.out this(enemies +.out)]
-  ::  to handle an http request, we have to provide rudder with a few things:
+  ::  what follows is a chain of function calls, the inner ones using
+  ::  passed-in configuration parameters, resulting in an outer function
+  ::  that handles individual http requests. for a quick overview, the
+  ::  below code will do the following:
+  ::
+  ::    %-  %-  (steer:rudder _enemies action)
+  ::        [pages route adlib solve]
+  ::    [bowl [eyre-id inbound-request] enemies]
+  ::
+  ::  in practice, as below, this is often structured with a %. for the
+  ::  outer call instead, because the inner arguments (which we will
+  ::  elaborate on soon) may be comparatively large.
+  ::
+  ::  to handle this http request, we provide rudder with a few things:
   ::
   %.  ::  the bowl, for general context information.
       ::
@@ -90,14 +103,15 @@
     ::
     pages
   ::
-    ::  secondly, a routing function. rudder uses this to map request urls
-    ::  to the pages (or redirects) they should serve.
+    ::  secondly, a routing function, called "+route" by rudder internally.
+    ::  rudder uses this to map request urls to the pages (or redirects)
+    ::  that should be served in response.
     ::  calling +point provides a default routing implementation.
     ::  it routes only for urls up to one level under the base path. any
     ::  requests with trailing slashes get redirected. file extensions are
     ::  ignored.
     ::  for example: /base/hello routes to a page named %hello,
-    ::  /base/hello/ redirects to the previous url, and /base/he/llo fails
+    ::  /base/hello/ redirects to the previous url, and /base/hey/yo fails
     ::  to route at all. additionally, /base resolves to a page named %index.
     ::  +point takes three arguments for configuration.
     ::
@@ -116,12 +130,14 @@
       ~(key by pages)
     ==
   ::
-    ::  thirdly, a fallback function. if routing fails (that is, if the
-    ::  routing function does not produce a route), then this function
-    ::  is called upon to handle the request instead.
-    ::  +fours simple serves a 404 'no route found' page. we are required
-    ::  to pass in our app's data, so that the resulting fallback function
-    ::  may re-emit it, unchanged, to abide by rudder's interface.
+    ::  thirdly, a fallback function, called "+adlib" by rudder internally.
+    ::  if routing fails (that is, if the routing function does not produce
+    ::  a route), then this function is called upon to handle the request
+    ::  instead.
+    ::  the fallback function produced by +fours simple serves a 404
+    ::  'no route found' page. we are required to pass in our app's data,
+    ::  so that the resulting fallback function may re-emit it, unchanged,
+    ::  to abide by the interface rudder expects.
     ::
     (fours:rudder enemies)
   ::
@@ -155,7 +171,7 @@
   ::
   |=  [=mark =vase]
   ^-  (quip card:agent:gall _this)
-  ?.  =(%handle-http-request mark)  !!
+  ?>  =(%handle-http-request mark)
   =;  out=(quip card:agent:gall _enemies)
     [-.out this(enemies +.out)]
   %.  [bowl !<(order:rudder vase) enemies]
@@ -176,14 +192,14 @@
     ::
     ^-  (unit place:rudder)
     ::  because we are bound to /enemies, all requests coming into this app
-    ::  are going to have that prefix in the trail. we use the +decap helper
+    ::  are going to have that prefix in the :trail. we use the +decap helper
     ::  to get rid of that. if it fails, something's wrong, and we give up.
     ::
     ?~  site=(decap:rudder /enemies site.trail)  ~
     ::  we provide routes for a few pages:
-    ::  /         ->  the example page, requires login
-    ::  /index    ->  redirects to /
-    ::  /hitlist  ->  some imaginary bounty listing, publicly viewable
+    ::  /enemies          ->  the example page, requires login
+    ::  /enemies/index    ->  redirects to /enemies
+    ::  /enemies/hitlist  ->  some imaginary bounty listing, publicly viewable
     ::
     ?+  u.site  ~
       ~             `[%page & %page-example]

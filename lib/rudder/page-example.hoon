@@ -51,14 +51,14 @@
         ::
         =enemies
     ==
-::  +build gets called for every GET request for which routing resolves
-::  to this page. it must produce a $reply containing the response.
-::
 ::  (in practice, it tends to be more stylistically sensible to put the
 ::   +argue and +final arms above the +build one, simply because rendering
 ::   logic, possibly with css and js code, can get rather large. for the
 ::   sake of pedagogy though, we write them in the order in which they get
 ::   called during normal use.)
+::
+::  +build gets called for every GET request for which routing resolves
+::  to this page. it must produce a $reply containing the response.
 ::
 ++  build
   |=  $:  ::  these are the url query parameters from the request,
@@ -101,7 +101,7 @@
       ;body
         ::  we take care to render the status message, if there is any
         ::
-        ;+  ?~  msg  :/""  ::div#status.disabled;
+        ;+  ?~  msg  :/""
             ?:  gud.u.msg
               ;div#status.green:"{(trip txt.u.msg)}"
             ;div#status.red:"{(trip txt.u.msg)}"
@@ -175,7 +175,9 @@
 ::  it must produce a $reply containing the response.
 ::
 ::  (note that the below implementation of +final is equivalent to:
-::   ++  final  (alert:rudder 'page-example' build)
+::
+::     ++  final  (alert:rudder 'page-example' build)
+::
 ::   if you want the same behavior, you are encouraged to use that helper
 ::   function. the expanded implementation is provided purely for
 ::   pedagogical reasons.)

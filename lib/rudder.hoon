@@ -44,7 +44,6 @@
 ::    from the inbound-request.
 ::    a router that forces inclusion of trailing slashes would
 ::    let you use '.', but doesn't have the prettiest url semantics...
-::  - why can +solve not produce a brief in the failure case?
 ::  - some inconsistency between the expected output of +adlib and +solve.
 ::    "briefless" +solve results may be common, so it's nice that they're
 ::    easy to write. for +adlib that probably doesn't matter as much, and
@@ -100,7 +99,7 @@
   |^  serve
   +$  page   (^page dat cmd)
   +$  adlib  $-(order [[(unit reply) (list card)] dat])
-  +$  solve  $-(cmd $@(@t [brief (list card) dat]))
+  +$  solve  $-(cmd $@(brief [brief (list card) dat]))
   ::
   ++  serve  ::  main helper
     =*  card  card:agent:gall

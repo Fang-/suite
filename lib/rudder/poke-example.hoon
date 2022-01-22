@@ -134,10 +134,11 @@
     |=  act=action
     ::  using the given action (of the type we have specified), it must
     ::  either produce a failure message, or produce the triple of
-    ::  an optional success message, effects, and updated data. note that
-    ::  $brief is simply a ?(~ @t), containing an optional success message.
+    ::  a success message, effects, and updated data. note that
+    ::  $brief is simply a ?(~ @t), containing an optional message.
     ::
-    ^-  $@(@t [brief:rudder (list card:agent:gall) _enemies])
+    ^-  $@  brief:rudder
+        [brief:rudder (list card:agent:gall) _enemies]
     ?-  -.act
       %add  ``(snoc enemies enemy.act)
       %del  ``(oust [index.act 1] enemies)

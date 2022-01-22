@@ -37,7 +37,6 @@
 ::  - should rudder be in the business of falling back to generic error
 ::    messages when calling +final after failure?
 ::  - should +place allow a %func case, for providing bespoke fallbacks?
-::  - weird that routing function also gets access to :args.
 ::  - in the full-default setup, the behavior of +alert is a little bit
 ::    awkward. because +point forces routes to omit trailing slashes,
 ::    you cannot refer to "the current page" in a consistent way.
@@ -71,12 +70,15 @@
   ==
 ::
 +$  query
-  $:  [ext=(unit @ta) site=(list @t)]
+  $:  trail
       args=(list [key=@t value=@t])
   ==
 ::
++$  trail
+  [ext=(unit @ta) site=(list @t)]
+::
 +$  order  [id=@ta inbound-request:eyre]
-+$  route  $-(query (unit place))
++$  route  $-(trail (unit place))
 +$  brief  ?(~ @t)
 ::
 ++  page
@@ -108,7 +110,7 @@
     =*  id  id.order
     =+  (purse url.request.order)
     =/  target=(unit place)
-      (route -)
+      (route -<)
     ::  if there is no route, fall back to adlib
     ::
     ?~  target
@@ -173,7 +175,7 @@
 ++  point  ::  simple single-level routing, +route
   |=  [base=(lest @t) auth=? have=(set term)]
   ^-  route
-  |=  query
+  |=  trail
   ^-  (unit place)
   ?~  site=(decap base site)  ~
   ?-  u.site

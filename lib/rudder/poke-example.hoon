@@ -164,23 +164,21 @@
   %:  (steer:rudder _enemies action)
     pages
   ::
-    ::  the routing function takes a $query as its only argument. this is
-    ::  a destructured url, containing a :site path, an optional file :ext,
-    ::  and any http query :args that may have been in the url.
-    ::  (it is probably poor form to route differently based on the args.)
+    ::  the routing function takes a $trail as its only argument. this is
+    ::  a destructured url, containing a :site path and optional file :ext.
     ::
-    |=  =query:rudder
-    ::  a $place must be deduced from the :query. this may fail, in which
+    |=  =trail:rudder
+    ::  a $place must be deduced from the :trail. this may fail, in which
     ::  case the fallback function gets called instead.
     ::  a $place is either a %page, with an authentication requirement flag
     ::  and a page name, or an %away, redirecting to a different path.
     ::
     ^-  (unit place:rudder)
     ::  because we are bound to /enemies, all requests coming into this app
-    ::  are going to have that prefix in the query. we use the +decap helper
+    ::  are going to have that prefix in the trail. we use the +decap helper
     ::  to get rid of that. if it fails, something's wrong, and we give up.
     ::
-    ?~  site=(decap:rudder /enemies site.query)  ~
+    ?~  site=(decap:rudder /enemies site.trail)  ~
     ::  we provide routes for a few pages:
     ::  /         ->  the example page, requires login
     ::  /index    ->  redirects to /
@@ -188,7 +186,7 @@
     ::
     ?+  u.site  ~
       ~             `[%page & %page-example]
-      [%index ~]    `[%away (snip site.query)]
+      [%index ~]    `[%away (snip site.trail)]
       [%hitlist ~]  `[%page | %hitlist]
     ==
   ::

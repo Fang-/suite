@@ -36,8 +36,6 @@
 ::    already contains other query parameters.
 ::  - should rudder be in the business of falling back to generic error
 ::    messages when calling +final after failure?
-::  - should we expose a separate arm for the "using a page" part of +serve?
-::    might be useful for fallback implementations.
 ::  - should +place allow a %func case, for providing bespoke fallbacks?
 ::  - weird that routing function also gets access to :args.
 ::  - in the full-default setup, the behavior of +alert is a little bit
@@ -133,15 +131,21 @@
     ?.  (~(has by pages) nom.u.target)
       [(spout id (issue 404 (cat 3 'no such page: ' nom.u.target))) dat]
     ::
-    =/  =page
-      %~  .
-        (~(got by pages) nom.u.target)
-      [bowl order dat]
+    %.  [bowl order dat]
+    (apply (~(got by pages) nom.u.target) solve)
+  ::
+  ++  apply  ::  page usage helper
+    |=  [=page =solve]
+    |=  [=bowl:gall =order =dat]
+    ^-  (quip card _dat)
+    =.  page  ~(. page bowl order dat)
+    =*  id    id.order
     ?+  method.request.order
       [(spout id (issue 405 ~)) dat]
     ::
         %'GET'
       :_  dat
+      =+  (purse url.request.order)
       =^  msg  args
         ::NOTE  as set by %next replies
         ?~  msg=(get-header:http 'rmsg' args)  [~ args]

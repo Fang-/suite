@@ -5,7 +5,7 @@
 /-  *fafa
 /+  *otp, rudder, verb, dbug, default-agent
 ::
-/~  pages  (page:rudder (map label secret) action)  /app/fafa/pages
+/~  pages  (page:rudder (map label secret) action)  /app/fafa/webui
 ::
 |%
 +$  state-0

@@ -10,14 +10,14 @@
   ^-  $@(brief:rudder action)
   ?~  body  ~
   =/  args=(map @t @t)
-    ?~(body ~ (frisk:rudder q.u.body))
+    (frisk:rudder q.u.body)
   ?.  (~(has by args) 'cur-issuer')  ~
   ?.  (~(has by args) 'cur-id')      ~
   =/  old=label
     [(~(got by args) 'cur-issuer') (~(got by args) 'cur-id')]
   ?:  (~(has by args) 'del')
     [%del old]
-  ?.  (~(has by args) 'save')  ~
+  ?.  (~(has by args) 'save')    ~
   ?.  (~(has by args) 'issuer')  ~
   ?.  (~(has by args) 'id')      ~
   =/  new=label

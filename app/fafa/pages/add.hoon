@@ -10,7 +10,7 @@
   ^-  $@(brief:rudder action)
   ?~  body  ~
   =/  args=(map @t @t)
-    ?~(body ~ (frisk:rudder q.u.body))
+    (frisk:rudder q.u.body)
   ::
   ?:  (~(has by args) 'uri')
     %+  fall

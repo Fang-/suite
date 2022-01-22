@@ -54,10 +54,9 @@
 ::
 ::
 /-  *pals
-/+  dbug, verb, default-agent,
-    server
+/+  rudder, dbug, verb, default-agent
 ::
-/~  webui  webpage  /app/pals/webui
+/~  pages  (page:rudder records command)  /app/pals/webui
 ::
 |%
 +$  state-0  [%0 records]
@@ -87,7 +86,7 @@
   =^  cards  this
     (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
   =-  [[- cards] this]
-  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]
+  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
 ::
 ++  on-save  !>(state)
 ::
@@ -173,71 +172,19 @@
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
-    =+  !<([=eyre-id =inbound-request:eyre] vase)
-    ?.  authenticated.inbound-request
-      :_  this
-      ::TODO  probably put a function for this into /lib/server
-      ::      we can't use +require-authorization because we also update state
-      %+  give-simple-payload:app:server
-        eyre-id
-      =-  [[307 ['location' -]~] ~]
-      %^  cat  3
-        '/~/login?redirect='
-      url.request.inbound-request
-    ::  parse request url into path and query args
-    ::
-    =/  ,request-line:server
-      (parse-request-line:server url.request.inbound-request)
-    ::
-    =;  [[status=@ud out=(unit manx)] caz=(list card) =_state]
-      :_  this(state state)
-      %+  weld  caz
-      :: ;;  (list card)  ::NOTE  this is hilariously slow
-      %+  give-simple-payload:app:server
-        eyre-id
-      :-  :-  status
-          ?~  out  ~
-          ['content-type'^'text/html']~
-      ?~  out  ~
-      `(as-octt:mimes:html (en-xml:html u.out))
-    ::  405 to all unexpected requests
-    ::
-    ?.  &(?=(^ site) =('pals' i.site))
-      [[500 `:/"unexpected route"] ~ state]
-    ::
-    =/  page=@ta
-      ?~  t.site  %index
-      i.t.site
-    ?.  (~(has by webui) page)
-      [[404 `:/"no such page: {(trip page)}"] ~ state]
-    =*  view  ~(. (~(got by webui) page) bowl +.state)
-    ::
-    ::TODO  switch higher up: get never changes state!
-    ?+  method.request.inbound-request  [[405 ~] ~ state]
-        %'GET'
-      :_  [~ state]
-      [200 `(build:view args ~)]
-    ::
-        %'POST'
-      ?~  body.request.inbound-request  [[400 `:/"no body!"] ~ state]
-      =/  args=(list [k=@t v=@t])
-        (rash q.u.body.request.inbound-request yquy:de-purl:html)
-      =/  cmd=(unit command)
-        (argue:view args)
-      ?~  cmd
-        :_  [~ state]
-        :-  400
-        %-  some
-        ::TODO  should pass on previous inputs to re-fill fields?
-        %+  build:view  ^args
-        `|^'Something went wrong! Did you provide sane inputs?'
-      =^  caz  this
-        (on-poke %pals-command !>(u.cmd))
-      :_  [caz state]
-      :-  200
-      %-  some
-      (build:view ^args `&^'Processed succesfully.')  ::NOTE  silent?
-    ==
+    =;  out=(quip card _+.state)
+      [-.out this(+.state +.out)]
+    %.  [bowl !<(order:rudder vase) +.state]
+    %-  (steer:rudder _+.state command)
+    :^    pages
+        (point:rudder /[dap.bowl] & ~(key by pages))
+      (fours:rudder +.state)
+    |=  cmd=command
+    ^-  $@  brief:rudder
+        [brief:rudder (list card) _+.state]
+    =^  caz  this
+      (on-poke %pals-command !>(cmd))
+    ['Processed succesfully.' caz +.state]
   ==
 ::
 ++  on-watch

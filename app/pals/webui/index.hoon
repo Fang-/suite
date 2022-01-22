@@ -1,24 +1,21 @@
 ::  pals index
 ::
 /-  *pals, contact=contact-store
-/+  sigil-svg=sigil
+/+  rudder, sigil-svg=sigil
 ::
-^-  webpage
-|_  [=bowl:gall records]
+^-  (page:rudder records command)
+|_  [=bowl:gall * records]
 ++  argue
-  |=  arg=(list [k=@t v=@t])
-  ^-  (unit command)  ::TODO  maybe (each command @t) for error messages?
-  =+  args=(~(gas by *(map @t @t)) arg)
-  ::TODO  alternatively we should just crash on invalid args,
-  ::      since ui shouldn't allow it without user meddling?
-  ::      poorly constructed commands here might crash anyway.
+  |=  [headers=header-list:http body=(unit octs)]
+  ^-  $@(brief:rudder command)
+  =/  args=(map @t @t)
+    ?~(body ~ (frisk:rudder q.u.body))
   ?~  what=(~(get by args) 'what')
     ~
   ?~  who=(slaw %p (~(gut by args) 'who' ''))
     ~
   |^  ?+  u.what  ~
           ?(%meet %part)
-        %-  some
         ?:  ?=(%part u.what)
           [%part u.who ~]
         [%meet u.who get-lists]
@@ -26,7 +23,6 @@
           ?(%enlist %unlist)
         =/  tags=(set @ta)  get-lists
         ?:  =(~ tags)  ~
-        %-  some
         ?:  ?=(%enlist u.what)
           [%meet u.who tags]
         [%part u.who tags]
@@ -41,12 +37,14 @@
     (more (ifix [. .]:(star ace) com) urs:ab)
   --
 ::
+++  final  (alert:rudder (cat 3 '/' dap.bowl) build)
+::
 ++  build
   |=  $:  arg=(list [k=@t v=@t])
           msg=(unit [o=? =@t])
       ==
-  ^-  manx
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  icon-color  "black"
   ::

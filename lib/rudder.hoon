@@ -32,8 +32,6 @@
 ::    see /lib/rudder/page-example.hoon
 ::
 ::TODO
-::  - %next always uses ?rmsg=, but might need &rmsg= if the location
-::    already contains other query parameters.
 ::  - should rudder be in the business of falling back to generic error
 ::    messages when calling +final after failure?
 ::  - should +place allow a %func case, for providing bespoke fallbacks?
@@ -210,8 +208,11 @@
     %xtra  =?  hed.reply  ?=(~ (get-header:http 'content-type' hed.reply))
              ['content-type'^'text/html' hed.reply]
            [[200 hed.reply] `(press bod.reply)]
-    %next  =+  loc=?~(msg.reply loc.reply (rap 3 [loc '?rmsg=' msg ~]:reply))
-           [[303 ['location' loc]~] ~]
+    %next  =;  loc  [[303 ['location' loc]~] ~]
+           ?~  msg.reply  loc.reply
+           ?:  ?=(^ (find "?" (trip loc.reply)))
+             (rap 3 [loc '&rmsg=' msg ~]:reply)
+           (rap 3 [loc '?rmsg=' msg ~]:reply)
     %move  [[308 ['location' loc.reply]~] ~]
     %auth  [[307 ['location' (cat 3 '/~/login?redirect=' loc.reply)]~] ~]
     %code  (issue +.reply)

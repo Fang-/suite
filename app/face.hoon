@@ -5,9 +5,11 @@
 ::    intended to be used with self-portraits.
 ::
 /-  webpage, pals
-/+  server, dbug, verb, default-agent
+/+  gossip, server, dbug, verb, default-agent
 ::
 /~  webui  (webpage (map ship cord) (unit cord))  /app/face/webui
+::
+/$  grab-face  %noun  %face
 ::
 |%
 +$  state-0
@@ -23,6 +25,12 @@
 =|  state-0
 =*  state  -
 ::
+%-  %+  agent:gossip
+      [1 %mutuals %mutuals]
+    %+  ~(put by *(map mark tube:clay))
+      %face
+    |=  =vase
+    !>((grab-face !<(* vase)))
 %-  agent:dbug
 %+  verb  |
 ^-  agent:gall
@@ -35,9 +43,7 @@
 ++  on-init
   ^-  (quip card _this)
   :_  this
-  :~  [%pass /pals/targets %agent [our.bowl %pals] %watch /targets]
-      [%pass /pals/leeches %agent [our.bowl %pals] %watch /leeches]
-      [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+  :~  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
   ==
 ::
 ++  on-save  !>(state)
@@ -154,17 +160,7 @@
   ?+  path  (on-watch:def path)
     [%http-response *]  [~ this]
   ::
-      [%face @ ~]
-    ?>  =(our.bowl (slav %p i.t.path))
-    ?.  .^(? %gu pax)
-      ::  pals isn't running, so they cannot be a mutual.
-      ::  the web interface will inform the user about this.
-      ::
-      ~|  %no-pals
-      !!
-    ?.  .^(? %gx (weld pax /mutuals//(scot %p src.bowl)/noun))
-      ~|  %not-mutual
-      !!
+      [%~.~ %gossip %source ~]
     :_  this
     [%give %fact ~ %face !>(`(unit cord)`(~(get by faces) our.bowl))]~
   ==
@@ -173,62 +169,8 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+  wire  (on-agent:def wire sign)
-    ::  handle pals, toggle subscriptions for mutuals
-    ::
-      [%pals ?(%targets %leeches) ~]
-    ?-  -.sign
-      %poke-ack  (on-agent:def wire sign)
-    ::
-        %watch-ack
-      ?~  p.sign  [~ this]
-      %-  (slog 'unexpected watch nack from pals' u.p.sign)
-      [~ this]
-    ::
-        %kick
-      :_  this
-      [%pass wire %agent [our.bowl %pals] %watch t.wire]~
-    ::
-        %fact
-      =*  mark  p.cage.sign
-      =*  vase  q.cage.sign
-      ?.  =(%pals-effect mark)
-        ~&  [dap.bowl %unexpected-mark-fact mark wire=wire]
-        [~ this]
-      =+  !<(pef=effect:pals vase)
-      :_  this
-      ::NOTE  used as both wire and target path, take care!
-      =/  =path  /face/(scot %p ship.pef)
-      ?-  -.pef
-          ?(%meet %near)
-        ?:  (~(has by wex.bowl) [path ship.pef dap.bowl])
-          ~
-        ?.  .^(? %gx (weld pax /mutuals//(scot %p ship.pef)/noun))
-          ~
-        [%pass path %agent [ship.pef dap.bowl] %watch path]~
-      ::
-          ?(%part %away)
-        :~  [%pass path %agent [ship.pef dap.bowl] %leave ~]
-            [%give %kick [/face/(scot %p our.bowl)]~ `ship.pef]
-        ==
-      ==
-    ==
-  ::  handle faces, putting them into state
-  ::
-      [%face @ ~]
-    ?>  =(src.bowl (slav %p i.t.wire))
-    ?-  -.sign
-      %poke-ack  (on-agent:def wire sign)
-    ::
-        %watch-ack
-      ?~  p.sign  [~ this]
-      %-  (slog 'unexpected watch nack from face' u.p.sign)
-      [~ this]
-    ::
-        %kick
-      :_  this
-      ::NOTE  take care here when changing wire format
-      [%pass wire %agent [src.bowl dap.bowl] %watch wire]~
-    ::
+      [%~.~ %gossip %gossip ~]
+    ?+  -.sign  ~|([%unexpected-gossip-sign -.sign] !!)
         %fact
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
@@ -254,20 +196,7 @@
   ==
 ::
 ++  on-leave  on-leave:def
-++  on-peek   ::on-peek:def
-  |=  =path
-  |^  ?+  path  [~ ~]
-        [%x %test ~]  (flag |)
-      ==
-  ::
-  ++  flag
-    |=  f=?
-    (make f)
-  ::
-  ++  make
-    |*  n=*
-    ``noun+!>(n)
-  --
+++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --
 

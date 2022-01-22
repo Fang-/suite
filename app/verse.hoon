@@ -2,8 +2,6 @@
 ::
 ::    displays a bible verse on the homescreen, refreshing every 24 hours.
 ::
-::TODO  maybe the app site should link to biblehub or catena or someplace?
-::
 /+  word, pal, server, default-agent
 ::
 |%

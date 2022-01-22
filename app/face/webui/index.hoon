@@ -1,25 +1,30 @@
 ::  facepage
 ::
-|_  [bowl:gall faces=(map ship cord)]
+/+  rudder
+::
+^-  (page:rudder (map ship cord) [%set (unit cord)])
+|_  [bowl:gall * faces=(map ship cord)]
 ++  argue
   |=  [head=header-list:http body=(unit octs)]
-  ^-  (unit (unit cord))
+  ^-  $@(brief:rudder [%set (unit cord)])
   ?~  body  ~
   =/  args=(map @t @t)
     %-  ~(gas by *(map @t @t))
     (fall (rush q.u.body yquy:de-purl:html) ~)
-  ?:  (~(has by args) 'remove')  [~ ~]
+  ?:  (~(has by args) 'remove')  [%set ~]
   ?~  face=(~(get by args) 'face')
     ~
-  %-  some
+  :-  %set
   ?:(=('' u.face) ~ `u.face)
+::
+++  final  (alert:rudder (cat 3 '/' dap) build)
 ::
 ++  build
   |=  $:  arg=(list [k=@t v=@t])
           msg=(unit [o=? =@t])
       ==
-  ^-  manx
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  style
     '''

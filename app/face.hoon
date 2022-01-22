@@ -4,10 +4,10 @@
 ::    and see the images shared by your mutuals.
 ::    intended to be used with self-portraits.
 ::
-/-  webpage, pals
-/+  server, dbug, verb, default-agent
+/-  pals
+/+  rudder, dbug, verb, default-agent
 ::
-/~  webui  (webpage (map ship cord) (unit cord))  /app/face/webui
+/~  pages  (page:rudder (map ship cord) [%set (unit cord)])  /app/face/webui
 ::
 |%
 +$  state-0
@@ -75,77 +75,21 @@
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
-    =,  mimes:html
-    =+  !<([=eyre-id =inbound-request:eyre] vase)
-    ?.  authenticated.inbound-request
-      :_  this
-      ::TODO  probably put a function for this into /lib/server
-      ::      we can't use +require-authorization because we also update state
-      %+  give-simple-payload:app:server
-        eyre-id
-      =-  [[307 ['location' -]~] ~]
-      %^  cat  3
-        '/~/login?redirect='
-      url.request.inbound-request
-    ::  parse request url into path and query args
-    ::
-    =/  ,request-line:server
-      (parse-request-line:server url.request.inbound-request)
-    ::
-    =;  [payload=simple-payload:http caz=(list card) =_state]
-      :_  this(state state)
-      %+  weld  caz
-      %+  give-simple-payload:app:server
-        eyre-id
-      payload
-    ::  405 to all unexpected requests
-    ::
-    ?.  &(?=(^ site) =(dap.bowl i.site))
-      [[[500 ~] `(as-octs 'unexpected route')] ~ state]
-    ::
-    =/  page=@ta
-      ?~  t.site  %index
-      i.t.site
-    =;  [[status=@ud out=(unit manx)] caz=(list card) =_state]
-      :_  [caz state]
-      ^-  simple-payload:http
-      :-  :-  status
-          ?~  out  ~
-          ['content-type'^'text/html']~
-      ?~  out  ~
-      `(as-octt (en-xml:html u.out))
-    ::TODO  pattern copied from pals etc, dedupe!
-    ::
-    ?.  (~(has by webui) page)
-      [[404 `:/"no such page: {(trip page)}"] ~ state]
-    =*  view  ~(. (~(got by webui) page) bowl faces)
-    ::
-    ::TODO  switch higher up: get should never change state!
-    ?+  method.request.inbound-request  [[405 ~] ~ state]
-        %'GET'
-      :_  [~ state]
-      [200 `(build:view args ~)]
-    ::
-        %'POST'
-      ?~  body.request.inbound-request  [[400 `:/"no body!"] ~ state]
-      =/  new=(unit (unit cord))
-        (argue:view [header-list body]:request.inbound-request)
-      ?~  new
-        :_  [~ state]
-        :-  400
-        %-  some
-        %+  build:view  args
-        `|^'Something went wrong! Did you provide sane inputs?'
-      =*  success
-        ::NOTE  deferred expression of this is important,
-        ::      it needs to render with updated state.
-        [200 (some (build:view args `&^'Processed succesfully.'))]
-      ?:  =(u.new (~(get by faces) our.bowl))
-        [success ~ state]
-      =^  cards  this
-        (on-poke %noun !>([%set-face u.new]))
-      [success cards state]
-    ==
+    =;  out=(quip card _faces)
+      [-.out this(faces +.out)]
+    %.  [bowl !<(order:rudder vase) faces]
+    %-  (steer:rudder _faces ,[%set (unit cord)])
+    :^    pages
+        (point:rudder /[dap.bowl] & ~(key by pages))
+      (fours:rudder faces)
+    |=  [%set new=(unit cord)]
+    ^-  $@(brief:rudder [brief:rudder (list card) _faces])
+    =*  success  'Processed succesfully.'
+    ?:  =(new (~(get by faces) our.bowl))
+      [success ~ faces]
+    =^  cards  this
+      (on-poke %noun !>([%set-face new]))
+    [success cards faces]
   ==
 ::
 ++  on-watch

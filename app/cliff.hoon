@@ -52,11 +52,11 @@
       ::  %handle-http-request: incoming from eyre
       ::
         %handle-http-request
+      :_  this
       =,  mimes:html
       =+  !<([=eyre-id =inbound-request:eyre] vase)
       ?.  authenticated.inbound-request
         ::TODO  depend on publicness of requested file?
-        :_  this
         ::TODO  probably put a function for this into /lib/server
         ::      we can't use +require-authorization because we also emit cards
         %+  give-simple-payload:app:server
@@ -73,7 +73,6 @@
       ::  out: page or edit
       ::
       =;  out=(each simple-payload:http [l=@t c=(list card)])
-        :_  this
         ?-  -.out
           %&  (give-simple-payload:app:server eyre-id p.out)
           %|  %+  weld  c.p.out
@@ -253,10 +252,9 @@
       %+  bind
         (de-request:multipart header-list body)
       ~(gas by *(map @t part:multipart))
-    :+  &  [mode beam]
-    !!
+    !!  ::TODO  implement
   ::
-  ++  deny  [[405 ~] `(as-octs:mimes:html 'method now allow')]
+  ++  deny  [[405 ~] `(as-octs:mimes:html 'method not allowed')]
   ++  miss  [[404 ~] `(as-octs:mimes:html 'file not found')]
   ++  wack  [[400 ~] `(as-octs:mimes:html 'invalid request')]
   ::

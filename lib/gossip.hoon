@@ -28,10 +28,12 @@
 ::    handle this for you, based on the current configuration.
 ::
 ::    to change the configuration after the agent has been started, emit
-::    a %fact with the %gossip-xx mark on the /~/gossip/config path.
+::    a %fact with the %gossip-config mark on the /~/gossip/config path.
+::    the current configuration can be scries out using the +read-config
+::    helper.
 ::
-::    (we introduce the /~/x path prefix convention to indicate paths that
-::     are for library-specific use only.
+::    (we introduce the /~/etc path prefix convention to indicate paths
+::     that are for library-specific use only.
 ::     the advantage this has over the "mutated agent" pattern (for example,
 ::     /lib/shoe) is that the library consumes a normal $agent:gall, making
 ::     it theoretically easier to compose with other agent libraries.
@@ -46,28 +48,6 @@
 ::    we may want to use pokes exclusively, instead of watches/facts,
 ::    making it easier to exclude the src.bowl, include metadata, etc.
 ::
-::    most important: compare against stuff we already have!
-::    lib can do this: attach id, check on that
-::    agent shoudl not re-emit at all! only emit sources and react
-::    TODO  video walkthrough of this
-::
-::      configuration
-::    TODO  custom cards for changing this at run-time
-::    TODO  and then just only rsepect the args in first +on-init/+on-load
-::
-::      mode
-::    %source  data originating from direct friends only
-::    %gossip  (TODO) full p2p gossip
-::
-::      perm
-::    ::TODO  rename/rewrite for consistency/usefulness
-::    %leeches  let anyone listen
-::    %mutuals  only targets may listen
-::
-::      warn
-::    if true, shows debug printfs on misuse.
-::    turn on for dev, not production.
-::
 ::      internal logic
 ::
 ::    - on-init or during first on-load, watch pals for targets & leeches.
@@ -75,7 +55,6 @@
 ::    - if pals ever watch-nacks, we (TODO) try rewatching on a backoff timer.
 ::
 ::    - for facts produced on /~/gossip/source, we
-::      - send them out as-is(?), and
 ::      - wrap them as %gossip-rumor to send them out on /~/gossip/gossip
 ::    - for new pals matching the hear mode, we watch their /~/gossip/gossip
 ::    - for gone pals, we leave that watch

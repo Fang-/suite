@@ -6,10 +6,16 @@
 ::      usage
 ::
 ::    to use this library, call its +agent arm with an initial
-::    configuration, then call the resulting gate with the agent's door.
+::    configuration and a map of noun->mark convertors,
+::    then call the resulting gate with the agent's door.
 ::
 ::    data from peers will come in through +on-agent, as %facts with
 ::    a /~/gossip wire.
+::    the mark convertors ensure that this library can reconstitute the
+::    appropriate vases from the (cask *)s it sends around internally.
+::    if a mark conversion for a received datum isn't available, then
+::    the library will inject a %fact with a %gossip-unknown mark instead,
+::    containing a (cask *).
 ::
 ::    for new incoming subscriptions, the underlying agent's +on-watch is
 ::    called, with /~/gossip/source, so that it may give initial results.
@@ -133,10 +139,11 @@
         pals   ~(. lp bowl)
     ++  en-cage
       |=  =(cask *)
-      ^-  (unit cage)
-      ::TODO  what if we defaulted to [%noun *] instead?
-      ?~  to=(~(get by grab) p.cask)  ~
-      `[p.cask (u.to -:!>(**) q.cask)]
+      ^-  cage
+      ?^  to=(~(get by grab) p.cask)
+        [p.cask (u.to -:!>(**) q.cask)]
+      ~&  [%gossip %no-mark p.cask]
+      [%gossip-unknown !>(cask)]
     ::
     ++  de-cage
       |=(cage `(cask *)`[p q.q])
@@ -368,12 +375,8 @@
           ?:  (~(has in memory) hash)
             ~&  %hav
             [~ this]
-          =/  mage=(unit cage)
-            (en-cage:up what.rumor)
-          ?~  mage
-            ~&  [%gossip dap.bowl %ignoring-unexpected-rumor mark=p.what.rumor hash=hash]
-            [~ this]
-          =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage u.mage))
+          =/  mage=cage     (en-cage:up what.rumor)
+          =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage mage))
           =^  cards  state  (play-cards:up cards)
           ~&  %put
           :_  this(memory (~(put in memory) hash))

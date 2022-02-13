@@ -94,10 +94,15 @@
   ^-  card:agent:gall
   [%give %fact [/~/gossip/source]~ cage]
 ::
-++  configure  ::TODO  support
+++  configure
   |=  =config
   ^-  card:agent:gall
   [%give %fact [/~/gossip/config]~ %gossip-config !>(config)]
+::
+++  read-config
+  |=  bowl:gall
+  ^-  config
+  .^(config %gx /(scot %p our)/[dap]/(scot %da now)/~/gossip/config/noun)
 ::
 +$  whos
   $?  %anybody
@@ -156,7 +161,7 @@
       :_  [now.bowl (de-cage cage)]
       [%0 `meta-0`(dec hops.manner)]
     ::
-    ++  play-card  ::  en-rumor relevant facts
+    ++  play-card  ::  en-rumor relevant facts, handle config changes
       |=  =card
       ^-  (quip ^card _state)
       ?.  ?=([%give %fact *] card)  [[card]~ state]
@@ -168,16 +173,31 @@
       =/  caz=(list ^card)
         ?:  =(~ ext)  ~
         [card(paths.p ext)]~
-      ?:  =(~ int)  [caz state]
+      ?:  ?=(~ int)  [caz state]
+      =*  path  i.int
+      ::  there may only be one gossip-internal path per card
       ::
-      ::TODO  handle configuration cards
-      ?>  (levy int (cury test /~/gossip/source))
+      ?.  =(~ t.int)
+        ~|([%too-many-internal-targets int] !!)
+      ?:  =(/~/gossip/config path)
+        ~|  [%weird-fact-on-config p.cage.p.card]
+        ?>  =(%gossip-config p.cage.p.card)
+        =/  old=config  manner
+        =.  manner  !<(config q.cage.p.card)
+        :_  state
+        ;:  weld
+          (hear-changed hear.old)
+          (tell-changed tell.old)
+          caz
+        ==
+      ~|  [%strange-internal-target path]
+      ?>  =(/~/gossip/source path)
       ::
       ~&  %gossipping
       =/  =rumor  (en-rumor cage.p.card)
       =.  memory  (~(put in memory) (hash-rumor rumor))
-      =+  card(paths.p [/~/gossip/gossip]~, cage.p [%gossip-rumor !>(rumor)])
-      [[- caz] state]
+      =-  [[- caz] state]
+      card(paths.p [/~/gossip/gossip]~, cage.p [%gossip-rumor !>(rumor)])
     ::
     ++  play-cards
       |=  cards=(list card)
@@ -256,6 +276,7 @@
       |=  old=whos
       ^-  (list card)
       =*  new  hear.manner
+      ?:  =(old new)  ~
       =/  listen=(set ship)
         ?-  new
           %anybody  (~(uni in leeches:pals) (targets:pals ~.))
@@ -277,6 +298,7 @@
       |=  old=whos
       ^-  (list card)
       =*  new  tell.manner
+      ?:  =(old new)  ~
       ?-  [old new]
           $?  [* %anybody]
               [%mutuals *]
@@ -483,9 +505,12 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
-      ?.  ?=([%~.~ %gossip *] path)
+      ?.  ?=([@ %~.~ %gossip *] path)
         (on-peek:og path)
-      ~  ::TODO
+      ?.  ?=(%x i.path)  [~ ~]
+      ?+  t.t.t.path  [~ ~]
+        [%config ~]  ``noun+!>(manner)
+      ==
     ::
     ++  on-leave
       |=  path

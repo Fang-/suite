@@ -93,17 +93,10 @@
   ^-  card:agent:gall
   [%give %fact [/~/gossip/config]~ %gossip-config !>(config)]
 ::
-::TODO  this is a bit un-ergonomic maybe. certainly there's hear-tell
-::      combinations that just don't make sense.
-::      maybe we only want a limited set:
-::      - %gossip: hear targets, tell anyone
-::      - %gozzip: hear & tell anyone
-::      - %xxxxxx: hear & tell mutuals
-::
-+$  whos  ::TODO  this is a bit awkward maybe
-  $?  %leeches  ::  hear: anyone we know, tell: anyone who asks
-      %targets  ::  hear: anyone we want, tell: anyone we allow
-      %mutuals  ::  hear & tell: true friends only
++$  whos
+  $?  %anybody
+      %targets
+      %mutuals
   ==
 ::
 +$  config
@@ -252,7 +245,7 @@
       =*  new  hear.manner
       =/  listen=(set ship)
         ?-  new
-          %leeches  (~(uni in leeches:pals) (targets:pals ~.))
+          %anybody  (~(uni in leeches:pals) (targets:pals ~.))
           %targets  (targets:pals ~.)
           %mutuals  (mutuals:pals ~.)
         ==
@@ -272,7 +265,7 @@
       ^-  (list card)
       =*  new  tell.manner
       ?-  [old new]
-          $?  [* %leeches]
+          $?  [* %anybody]
               [%mutuals *]
           ==
         ::  perms got broader, we can just no-op
@@ -284,7 +277,7 @@
         ::
         =/  allowed=(set ship)
           ?-  new
-            %leeches  !!
+            %anybody  !!
             %targets  (targets:pals ~.)
             %mutuals  (mutuals:pals ~.)
           ==
@@ -433,7 +426,7 @@
           ?-  -.effect
               %meet
             ?-  hear.manner
-              %leeches  ?:((watching-target:up ship) ~ view)
+              %anybody  ?:((watching-target:up ship) ~ view)
               %targets  view
               %mutuals  ?:((mutual:pals ~. ship) view ~)
             ==
@@ -441,19 +434,19 @@
               %part
             %+  weld
               ?-  tell.manner
-                %leeches  ~
+                %anybody  ~
                 %targets  kick
                 %mutuals  kick
               ==
             ?-  hear.manner
-              %leeches  ?:((leeche:pals ship) ~ flee)
+              %anybody  ?:((leeche:pals ship) ~ flee)
               %targets  flee
               %mutuals  flee
             ==
           ::
               %near
             ?-  hear.manner
-              %leeches  ?:((watching-target:up ship) ~ view)
+              %anybody  ?:((watching-target:up ship) ~ view)
               %targets  ~
               %mutuals  ?:((mutual:pals ~. ship) view ~)
             ==
@@ -461,12 +454,12 @@
               %away
             %+  weld
               ?-  tell.manner
-                %leeches  ~
+                %anybody  ~
                 %targets  ~
                 %mutuals  kick
               ==
             ?-  hear.manner
-              %leeches  ?:((target:pals ~. ship) ~ flee)
+              %anybody  ?:((target:pals ~. ship) ~ flee)
               %targets  ~
               %mutuals  flee
             ==

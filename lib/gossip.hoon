@@ -112,11 +112,12 @@
   ==
 ::
 +$  rumor
-  $:  hops=_0
+  $:  [kind=@ meta=*]
       when=@da
-      ::TODO  from=(unit [ship life sig]) ?
-      what=(cask *)
+      data=(cask *)
   ==
++$  meta-0  hops=_0
+::TODO  support signing & verifying rumors
 ::
 ++  agent
   |=  $:  init=config
@@ -129,6 +130,7 @@
     $:  %0
         manner=config           ::  latest config
         memory=(set [@da @uv])  ::  cages seen
+        future=(list rumor)     ::  rumors of unknown kinds
     ==
   ::
   +$  card  card:agent:gall
@@ -151,7 +153,8 @@
     ++  en-rumor
       |=  =cage
       ^-  rumor
-      [(dec hops.manner) now.bowl (de-cage cage)]
+      :_  [now.bowl (de-cage cage)]
+      [%0 `meta-0`(dec hops.manner)]
     ::
     ++  play-card  ::  en-rumor relevant facts
       |=  =card
@@ -202,12 +205,15 @@
     ++  resend-rumor
       |=  =rumor
       ^-  (unit card)
-      ?:  =(0 hops.rumor)  ~
-      =.  hops.rumor  (dec hops.rumor)
+      ?>  =(%0 kind.rumor)  ::NOTE  should have been checked for already
+      ?~  meta=((soft ,hops=@ud) meta.rumor)  ~
+      =*  hops  hops.u.meta
+      ?:  =(0 hops)  ~
+      =.  meta.rumor  (dec hops)
       `[%give %fact [/~/gossip/gossip]~ %gossip-rumor !>(rumor)]
     ::
     ++  hash-rumor
-      |=(rumor [when (sham what)])
+      |=(rumor [when (sham data)])
     ::
     ::
     ++  watch-pals
@@ -337,6 +343,7 @@
       =.  state  old
       =^  cards  inner  (on-load:og ile)
       =^  cards  state  (play-cards:up cards)
+      ::TODO  for later versions, add :future retry logic
       [cards this]
     ::
     ++  on-watch
@@ -375,7 +382,10 @@
           ?:  (~(has in memory) hash)
             ~&  %hav
             [~ this]
-          =/  mage=cage     (en-cage:up what.rumor)
+          ?.  =(%0 kind.rumor)
+            ~&  [%gossip dap.bowl %delaying-unknown-rumor-kind kind.rumor]
+            [~ this(future [rumor future])]
+          =/  mage=cage     (en-cage:up data.rumor)
           =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage mage))
           =^  cards  state  (play-cards:up cards)
           ~&  %put

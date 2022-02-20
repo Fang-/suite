@@ -260,17 +260,17 @@
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)
   ::
+  ++  contacts  ~+
+    =/  base=path
+      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
+    ?.  .^(? %gu base)  *rolodex:contact
+    .^(rolodex:contact %gx (weld base /all/noun))
+  ::
   ++  sigil
     |=  =ship
     ^-  manx
-    =/  base=path
-      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
     =/  bg=@ux
-      ?.  .^(? %gu base)  0xff.ffff
-      ::TODO  contact-store should have a %u scry for existence checks,
-      ::      so that we can safely do a /x/contact/~ship scry
-      =+  .^(=rolodex:contact %gx (weld base /all/noun))
-      ?~(p=(~(get by rolodex) ship) 0xff.ffff color.u.p)
+      ?~(p=(~(get by contacts) ship) 0xff.ffff color.u.p)
     =/  fg=tape
       ::TODO  move into sigil.hoon or elsewhere?
       =+  avg=(div (roll (rip 3 bg) add) 3)

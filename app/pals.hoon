@@ -11,20 +11,21 @@
 ::    for example, a game wanting to stay abreast of high scores,
 ::    or filesharing service giving selective access.
 ::
-::    webui at /pals courtesy of overengineering incorporated.
-::    (it really is too elaborate for what's essentially a spa,
-::    but experimenting here helps find good patterns. the current
-::    implementation might almost be factored out into a generic library.)
+::    "leeches" are ships who added us.
+::    "targets" are ships we have added.
+::    "mutuals" is the intersection of "leeches" and "targets".
 ::
 ::      reading
 ::    external applications likely want to read from this via scries or
 ::    watches, both of which are outlined below.
 ::    finding interaction targets or mutuals to poke or subscribe to, using
 ::    mutual status as permission check, etc.
-::    libraries for handling generalizable behavior are in the works.
+::    to scry data out of this app, please use /lib/pals.
 ::    one might be tempted to use list names for namespacing (ie %yourapp
 ::    would only retrieve targets from the ~.yourapp list), but beware that
-::    this overlaps with user-facing organizational purposes.
+::    this overlaps with user-facing organizational purposes. if lists feel
+::    opaque or inaccessible, it's to discourage this. but the right balance
+::    might not have been found yet...
 ::
 ::      writing
 ::    poke this app with a $command.
@@ -35,8 +36,6 @@
 ::    is bad manners. managing pals without informing the user is evil.
 ::
 ::      scry endpoints (all %noun marks)
-::TODO  consider removing /mutuals, only meaningful to ui ...right?
-::      or do apps want it to avoid permission-based poke/watch nacks?
 ::    y  /                       arch        [%leeches %targets %mutuals ~]
 ::    y  /[status]               arch        non-empty lists listing
 ::
@@ -51,7 +50,6 @@
 ::      subscription endpoints (local ship only, all %pals-effect marks)
 ::    /targets   target-effect   effect for every addition/removal
 ::    /leeches   leeche-effect   effect for every addition/removal
-::
 ::
 /-  *pals
 /+  rudder, dbug, verb, default-agent
@@ -118,7 +116,7 @@
       ?.  yow  ~
       :~  =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])
           =/  =cage     [%pals-gesture !>(gesture)]
-          [%pass /[-.gesture] %agent [ship.cmd %pals] %poke cage]
+          [%pass /[-.gesture] %agent [ship.cmd dap.bowl] %poke cage]
         ::
           =/  =effect   ?-(-.cmd %meet [- ship]:cmd, %part [- ship]:cmd)
           =/  =cage     [%pals-effect !>(effect)]
@@ -211,7 +209,6 @@
   ?.  ?=([%hey ~] wire)  [~ this]
   ::  for %pals-gesture pokes, record the result
   ::TODO  should we slowly retry for nacks?
-  ::TODO  verify src.bowl behaves correctly here. idk why it wouldn't, but...
   ::
   =-  [~ this(receipts -)]
   ?+  -.sign  ~|([%unexpected-agent-sign wire -.sign] !!)
@@ -224,6 +221,7 @@
   ?>  =(our src):bowl
   |^  ?+  path  [~ ~]
         [%y ~]                 (arc %leeches %targets %mutuals ~)
+        [%y %leeches ~]        (arc ~)
         [%y %targets ~]        (arc (las targets))
         [%y %mutuals ~]        (arc (las mutuals))
         [%x %leeches ~]        (alp leeches)

@@ -236,6 +236,26 @@
         [%x %mutuals ~ ~]      [~ ~]
         [%x %mutuals @ta ~]    (alp (lap mutuals i.t.t.path))
         [%x %mutuals @ta @ ~]  (ask (bind (wat t.t.path) (hal mutuals)))
+      ::
+          [%x %json ~]  ::NOTE  dumb hack, subject to change
+        =;  =json  ``json+!>(json)
+        =,  enjs:format
+        %-  pairs
+        :~  :-  'outgoing'
+            %-  pairs
+            %+  turn  ~(tap by outgoing)
+            |=  [=^ship lists=(set @ta)]
+            :-  (rsh 3 (scot %p ship))
+            %-  pairs
+            :~  'lists'^a+(turn ~(tap in lists) (lead %s))
+                'ack'^(fall (bind (~(get by receipts) ship) (lead %b)) ~)
+            ==
+          ::
+            :-  'incoming'
+            %-  pairs
+            %+  turn  ~(tap in incoming)
+            |=(=^^ship [(rsh 3 (scot %p ship)) b+&])
+        ==
       ==
   ::  scry results
   ++  arc  |=  l=(list @ta)  ``noun+!>(`arch`~^(malt (turn l (late ~))))

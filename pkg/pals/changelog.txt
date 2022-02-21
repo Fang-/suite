@@ -1,5 +1,9 @@
 pals
 
+v1.0.7, ~2022.02.21
+- add json (con)versions to part of the interface.
+- avoid scrying into contact-store repeatedly during a single render.
+
 v1.0.6, ~2022.01.22
 - use /lib/rudder for serving the web ui.
 

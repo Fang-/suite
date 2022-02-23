@@ -117,9 +117,13 @@
         Keep track of your friends! Other applications can use this list to
         find ships to talk to, pull content from, etc.
 
-        Some applications that are better with friends:
+        Some applications that are better with pals:
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
           ; ~hastuc^dibtux/zone
+        ==
+        ;br;
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~dister-fabnev-hinmur/escape/"
+          ; ~fabnev^hinmur/escape
         ==
         ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"

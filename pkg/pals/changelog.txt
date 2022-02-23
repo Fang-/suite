@@ -1,5 +1,9 @@
 pals
 
+v1.0.8, ~2022.02.22
+- fix issue with pals-command json conversion.
+- add escape to app listing.
+
 v1.0.7, ~2022.02.21
 - add json (con)versions to part of the interface.
 - avoid scrying into contact-store repeatedly during a single render.

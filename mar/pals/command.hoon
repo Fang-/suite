@@ -12,10 +12,11 @@
   |%
   ++  noun  command
   ++  json
+    ^-  $-(^json command)
     =,  dejs:format
-    |^  (of 'meet'^arg 'part'^arg ~)
+    |^  (of meet+arg part+arg ~)
     ++  arg
-      (ot 'ship'^(su ;~(pfix sig fed:ag)) 'in'^(as so) ~)
+      (ot 'ship'^(su fed:ag) 'in'^(as so) ~)
     --
   --
 --

@@ -110,7 +110,8 @@
           ?@  p  (stag ~ items)
           (stag `+.p items)
       ++  items   (star item)
-      ++  item    ;~(pfix gaw bullet (star ace) many)
+      ++  item    ;~(pfix gack bullet (star ace) many)
+      ++  gack    (star (mask ' ' '\0a' '\0d' ~))
       ++  bullet  (jest '[*]')
       --
     ==

@@ -19,6 +19,12 @@
   ?:  =(0 a)  (some i.b)
   $(b t.b, a (dec a))
 ::
+::  unit operations
+::
+++  sink                                                ::  any of units
+  |*  [a=(unit) b=(unit)]
+  ?^(a a b)
+::
 ::  data structures
 ::
 ++  mip                                                 ::  map of maps

@@ -1,6 +1,6 @@
 ::  rudder: framework for routing & serving simple web frontends
 ::
-::      v1.0.0: newborn helmsman
+::      v1.0.1: newborn helmsman
 ::
 ::    the primary usage pattern involves your app calling steer:rudder
 ::    with a configuration, then calling the resulting gate with an
@@ -218,11 +218,15 @@
            [[200 hed.reply] `(press bod.reply)]
     %next  =;  loc  [[303 ['location' loc]~] ~]
            ?~  msg.reply  loc.reply
-           ?:  ?=(^ (find "?" (trip loc.reply)))
-             (rap 3 [loc '&rmsg=' msg ~]:reply)
-           (rap 3 [loc '?rmsg=' msg ~]:reply)
+           %+  rap  3
+           :~  loc.reply
+               ?:(?=(^ (find "?" (trip loc.reply))) '&' '?')
+               'rmsg='
+               (crip (en-urlt:html (trip msg.reply)))
+           ==
     %move  [[308 ['location' loc.reply]~] ~]
-    %auth  [[307 ['location' (cat 3 '/~/login?redirect=' loc.reply)]~] ~]
+    %auth  =/  loc  (crip (en-urlt:html (trip loc.reply)))
+           [[307 ['location' (cat 3 '/~/login?redirect=' loc)]~] ~]
     %code  (issue +.reply)
     %full  ful.reply
   ==

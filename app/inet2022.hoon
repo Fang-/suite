@@ -69,13 +69,14 @@
     ?+  mark  (on-poke:def mark vase)
         %inet-action
       =+  !<(act=action vase)
+      =*  upd  `update`[%stories [src.bowl act]~]
       ?-  -.act
         %pre  [~ this]
       ::
           %add
         ?:  =(host our.bowl)
           :_  this(state (put-story src.bowl & +.act))
-          [%give %fact [/all]~ %inet-update !>([%stories [src.bowl action]~])]~
+          [%give %fact [/all]~ %inet-update !>(upd)]~
         ?>  =(src our):bowl
         :_  this(state (put-story our.bowl | +.act))
         :_  ~
@@ -85,7 +86,7 @@
           %del
         ?:  =(host our.bowl)
           :_  this(state (del-story src.bowl +.act))
-          [%give %fact [/all]~ %inet-update !>([%stories [src.bowl act]~])]~
+          [%give %fact [/all]~ %inet-update !>(upd)]~
         ?>  =(src our):bowl
         :_  this(library (~(del by library) our.bowl id.act))
         [%pass /delete %agent [host dap.bowl] %poke %inet-action !>(act)]~
@@ -94,7 +95,7 @@
         ?:  =(host our.bowl)
           ?.  (~(has by library) index.act)  [~ this]
           :_  this(state (luv-story index.act src.bowl))
-          [%give %fact [/all]~ %inet-update !>([%stories [src.bowl act]~])]~
+          [%give %fact [/all]~ %inet-update !>(upd)]~
         ?>  =(src our):bowl
         :_  this(state (luv-story index.act our.bowl))
         [%pass /like %agent [host dap.bowl] %poke %inet-action !>(act)]~
@@ -195,8 +196,8 @@
         [%all ~]
       =;  stories=(list [@p action])
         :_  this
-        :~  :: [%give %fact ~ %inet-update !>([%sprouts sprouts])]
-            [%give %fact ~ %inet-update !>([%stories stories])]
+        :~  :: [%give %fact ~ %inet-update !>(`update`[%sprouts sprouts])]
+            [%give %fact ~ %inet-update !>(`update`[%stories stories])]
         ==
       %+  turn  ~(tap by library)
       |=  [index =story]

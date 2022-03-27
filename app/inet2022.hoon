@@ -88,7 +88,7 @@
           :_  this(state (del-story src.bowl +.act))
           [%give %fact [/all]~ %inet-update !>(upd)]~
         ?>  =(src our):bowl
-        :_  this(library (~(del by library) our.bowl id.act))
+        :_  this(state (del-story our.bowl id.act))
         [%pass /delete %agent [host dap.bowl] %poke %inet-action !>(act)]~
       ::
           %luv

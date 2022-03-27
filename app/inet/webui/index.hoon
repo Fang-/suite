@@ -810,9 +810,7 @@
       =/  stories  (~(get ja volumes) sprout)
       ?:  =(~ stories)
         ;*  :~
-          ;div.empty
-            ; This folder is empty.
-          ==
+          ;div.empty:"This folder is empty."
           ;div.tips
             ;+  :/"You can help by "
             ;a/"{(link-to-pencil sprout)}":"expanding this section"
@@ -826,10 +824,10 @@
     ::
     ++  render-author  ^-  marl
       =/  author=@p  (need author)
-      :-  ;h1:"{+:(cite:title author)}'s documents"
+      :-  ;h1:"{+:(cite:title author)}'s Documents"
       =/  stories  (~(get ja authors) author)
       ?:  =(~ stories)
-        ;+  :/"no files found"
+        ;+  ;div.empty:"This folder is empty."
       %+  turn  stories
       |=  =^index
       (article index (~(got by library) index))

@@ -34,6 +34,7 @@ these softwares are for manual, local installation & configuration
 - **sigil**: sigil-js but in hoon.
 - **emblemish**: alternative sigils & names, based on emoji, currently in beta.
 - **twemoji**: subset of the twemoji.twitter.com svgs used by emblemish.
+- **bbcode**: bbcode parsing and rendering.
 - **benc**: b-encoding and -decoding.
 - **torn**: parsing and rendering of torrent files & magnet links.
 - **word**: kjv structured for easy lookup.

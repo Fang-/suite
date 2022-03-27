@@ -1,0 +1,10 @@
+:~  title+'Invisible Networks 2022'
+    info+'Invent a weird/magical/terrifying social network every day.'
+    color+0xff.dbb1
+    image+'https://pal.dev/props/inet2022/gradient.svg'
+    site+/invisible-networks
+    base+'inet2022'
+    version+[1 0 0]
+    website+'https://invisible.social/'
+    license+'MIT'
+==

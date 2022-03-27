@@ -214,7 +214,7 @@
       opacity: .6;
     }
 
-    .header summary {
+    .header summary, .header details {
       display: inline-block;
     }
 

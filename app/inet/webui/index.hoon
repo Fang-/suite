@@ -113,6 +113,7 @@
       height: 100%;
       background-image: url('https://pal.dev/props/inet2022/blissed.jpg');
       background-size: cover;
+      background-attachment: fixed;
     }
     body {
       padding: 0 1em;
@@ -341,6 +342,7 @@
       color: grey;
       text-align: center;
       margin-top: 2em;
+      margin-bottom: 6em;
     }
     main > .tips {
       position: absolute;

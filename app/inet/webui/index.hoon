@@ -150,9 +150,6 @@
       margin: 1em auto;
       padding: 3px;
       max-width: 1500px;
-      /* box-shadow: inset -1px -1px #00138c,inset 1px 1px #0831d9,inset -2px -2px #001ea0,inset 2px 2px #166aee,inset -3px -3px #003bda,inset 3px 3px #0855dd; */
-      /* box-shadow: inset -1px -1px #00aacc,inset 1px 1px #02aaee,inset -2px -2px #0099dd,inset 2px 2px #02dcdf,inset -3px -3px #0099ee,inset 3px 3px #02bbff; */
-      /* box-shadow: inset -1px -1px #0053af,inset 1px 1px #0871eb,inset -2px -2px #0065b5,inset 2px 2px #16bafe,inset -3px -3px #0082ed,inset 3px 3px #08a5ef; */
       box-shadow: inset -1px -1px #c29562,inset 1px 1px #e8af6a,inset -2px -2px #e8af6a,inset 2px 2px #e8af6a,inset -3px -3px #e8af6a,inset 3px 3px #e8af6a;
       border-radius: 0.5em 0.5em 0 0;
     }
@@ -163,30 +160,11 @@
       padding: 0.5em;
       width: 100%;
       font-size: 1.2em;
-      /* background: linear-gradient(180deg,#00aacc,#02aaee 8%,#0099dd 40%,#02dcdf 88%,#02dcdf 93%,#0099ee 95%,#02bbff 96%,#02bbff); */
-      /* background: linear-gradient(180deg,#09d7ff,#0083ee 8%,#0090ee 40%,#0af 88%,#0af 93%,#009bff 95%,#006dd7 96%,#006dd7); */
       background: linear-gradient(180deg,#e89f6a,#db9368 8%,#eaa16c 40%,#f59f6f 88%,#f59f6f 93%,#f4a76e 95%,#eaa86b 96%,#eaa86b);
       border-radius: 0.5em 0.2em 0 0;
       color: white;
       text-shadow: 1px 1px #0f1089;
     }
-    /*
-    <div style="height: 10px; width: 10px; background-color: #0053af;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0871eb;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0065b5;"></div>
-    <div style="height: 10px; width: 10px; background-color: #16bafe;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0082ed;"></div>
-    <div style="height: 10px; width: 10px; background-color: #08a5ef;"></div>
-    --
-    <div style="height: 10px; width: 10px; background-color: #09d7ff;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0083ee;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0090ee;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0af;"></div>
-    <div style="height: 10px; width: 10px; background-color: #0af;"></div>
-    <div style="height: 10px; width: 10px; background-color: #009bff;"></div>
-    <div style="height: 10px; width: 10px; background-color: #006dd7;"></div>
-    <div style="height: 10px; width: 10px; background-color: #006dd7;"></div>
-    */
 
     .header {
       display: flex;
@@ -195,7 +173,8 @@
       background-color: rgb(235,235,220);
       border-top: 2px solid rgba(255,255,255,0.5);
       border-bottom: 2px solid rgba(0,0,0,0.3);
-      overflow: scroll;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
 
     .header > div, .header > a {
@@ -221,6 +200,10 @@
 
     .header summary > .icon:hover {
       transform: rotate(80deg);
+    }
+
+    .header ::-webkit-details-marker, .header ::marker {
+      display: none;
     }
 
     .header .icon {
@@ -249,6 +232,7 @@
       background: linear-gradient(-40deg, #ffcba1 -5%, #02ccdf 60%, #02fcff);
       background-color: #02ccdf; /* rgb(85,100,205); */
       color: rgb(55,75,95);
+      overflow: hidden;
     }
 
     .sidebar > h3 {
@@ -303,6 +287,7 @@
       overflow: scroll;
       background-color: white;
       z-index: 0;
+      overflow: hidden;
     }
 
     main > h1 {

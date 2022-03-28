@@ -1,9 +1,9 @@
 various apps, tools, and crazy experiments.  
-usage encouraged! issues welcome! provided "as is"!
+usage encouraged! issues welcome! provided "as is"! we do not accept prs at this time.
 
 ## for users
 
-these softwares can be installed from ~paldev as landscape tiles
+these softwares can be installed from ~paldev as landscape tiles:
 
 - **pals**: friendlist, for manual peer discovery.
 - **face**: see your pals.
@@ -14,7 +14,7 @@ these softwares can be installed from ~paldev as landscape tiles
 
 ## for powerusers
 
-these softwares are for manual, local installation & configuration
+these softwares are for manual, local installation & configuration:
 
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
 - **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
@@ -44,7 +44,7 @@ these softwares are for manual, local installation & configuration
 
 ## for later
 
-these softwares have not yet been updated for the new world
+these softwares have not yet been updated for the new world:
 
 - **serval**: a torrent tracker: implements the bittorrent http tracker protocol.
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`.

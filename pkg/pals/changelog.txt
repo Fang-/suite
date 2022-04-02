@@ -1,5 +1,8 @@
 pals
 
+v1.0.9, ~2022.04.02
+- add notifications when others add/remove us as pals.
+
 v1.0.8, ~2022.02.22
 - fix issue with pals-command json conversion.
 - add escape to app listing.

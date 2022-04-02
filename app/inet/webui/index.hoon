@@ -152,6 +152,7 @@
       max-width: 1500px;
       box-shadow: inset -1px -1px #c29562,inset 1px 1px #e8af6a,inset -2px -2px #e8af6a,inset 2px 2px #e8af6a,inset -3px -3px #e8af6a,inset 3px 3px #e8af6a;
       border-radius: 0.5em 0.5em 0 0;
+      background-color: white;
     }
 
     #wrapper > h1 {
@@ -283,11 +284,11 @@
       flex-basis: 10em;
       flex-grow: 3;
       min-height: 100%;
-      padding-bottom: 5em;
-      overflow: scroll;
+      max-height: calc(100vh - 9.2em - 6px);
+      overflow-x: hidden;
+      overflow-y: auto;
       background-color: white;
       z-index: 0;
-      overflow: hidden;
     }
 
     main > h1 {
@@ -354,6 +355,10 @@
 
     article > section {
       margin: 0 1em 2em;
+    }
+
+    section img {
+      max-width: 100%;
     }
 
     form {

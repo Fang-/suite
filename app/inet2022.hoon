@@ -231,7 +231,7 @@
   =*  index  `^index`[author id]
   ?:  (~(has by library) index)
     =-  state(library -)
-    =-  (~(put by library) index [author echoed ~ sprout date body])
+    =-  (~(put by library) index [author echoed - sprout date body])
     likes:(~(got by library) index)
   %_  state
     library  (~(put by library) index [author echoed ~ sprout date body])

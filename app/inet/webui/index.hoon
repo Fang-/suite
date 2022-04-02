@@ -674,7 +674,18 @@
             :/"{(prompt-title sprout)}"
             ;br;
             ;br;
-            :/"Date Modified: {(date-format date.story)}"
+          ::
+            =/  [n=@ud w=tape]
+              =/  d=@dr  (sub (max date.story now) date.story)
+              =/  n=@ud  (div d ~d1)
+              ?.  =(0 n)  [n "day"]
+              =.  n      (div d ~h1)
+              ?.  =(0 n)  [n "hour"]
+              [(div d ~m1) "minute"]
+            ;span(title "{(a-co:co n)} {w}(s) ago.")
+              ;+  :/"Date Modified: {(date-format date.story)}"
+            ==
+          ::
             ;br;
             ?.  &(=(our author.story) !=(~ likes.story))
               :_  ~

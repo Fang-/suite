@@ -51,7 +51,7 @@
 ::    /targets   target-effect   effect for every addition/removal
 ::    /leeches   leeche-effect   effect for every addition/removal
 ::
-/-  *pals
+/-  *pals, hark=hark-store
 /+  rudder, dbug, verb, default-agent
 ::
 /~  pages  (page:rudder records command)  /app/pals/webui
@@ -162,10 +162,24 @@
         %bye  :-   has  (~(del in incoming) ship)
       ==
     :_  this(incoming.state incoming)
+    ^-  (list card)
     ?.  yow  ~
-    =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
-    =/  =cage    [%pals-effect !>(effect)]
-    [%give %fact [/leeches]~ cage]~
+    :*  =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
+        =/  =cage    [%pals-effect !>(effect)]
+        [%give %fact [/leeches]~ cage]
+      ::
+        ?.  .^(? %gu /(scot %p our.bowl)/hark-store/(scot %da now.bowl))  ~
+        =/  title=(list content:hark)
+          =-  [ship+ship - ~]
+          ?-  -.gesture
+            %hey  text+' added you as a pal.'
+            %bye  text+' no longer considers you a pal.'
+          ==
+        =/  =bin:hark     [/[dap.bowl] q.byk.bowl /(scot %p ship)/[-.gesture]]
+        =/  =action:hark  [%add-note bin title ~ now.bowl / /pals]
+        =/  =cage         [%hark-action !>(action)]
+        [%pass /hark %agent [our.bowl %hark-store] %poke cage]~
+    ==
   ::
     ::  %handle-http-request: incoming from eyre
     ::
@@ -201,18 +215,29 @@
     :_  this
     %+  turn  ~(tap in incoming)
     |=(=@p [%give %fact ~ %pals-effect !>(`effect`[%near p])])
+  ::
+    ::TODO  consider adding a subscription endpoint that includes tags?
+    ::      shouldn't become too legible to applications though...
   ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ?.  ?=([%hey ~] wire)  [~ this]
-  ::  for %pals-gesture pokes, record the result
-  ::TODO  should we slowly retry for nacks?
+  ?+  wire  ~&([dap.bowl %strange-wire wire] [~ this])
+      [%hark ~]
+    ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
+    ?~  p.sign  [~ this]
+    ((slog 'pals: failed to notify' u.p.sign) [~ this])
   ::
-  =-  [~ this(receipts -)]
-  ?+  -.sign  ~|([%unexpected-agent-sign wire -.sign] !!)
-    %poke-ack  (~(put by receipts) src.bowl ?=(~ p.sign))
+      [%bye ~]  [~ this]  ::TODO  also retry if nack?
+      [%hey ~]
+    ::  for %pals-gesture pokes, record the result
+    ::TODO  should we slowly retry for nacks?
+    ::
+    =-  [~ this(receipts -)]
+    ?+  -.sign  ~|([%unexpected-agent-sign wire -.sign] !!)
+      %poke-ack  (~(put by receipts) src.bowl ?=(~ p.sign))
+    ==
   ==
 ::
 ++  on-peek

@@ -4,7 +4,7 @@
     image+'https://pal.dev/props/inet2022/gradient.svg'
     site+/invisible-networks
     base+'inet2022'
-    version+[1 0 1]
+    version+[1 0 2]
     website+'https://invisible.social/'
     license+'MIT'
 ==

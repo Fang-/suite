@@ -318,7 +318,7 @@
       right: 0.2em; bottom: 0.2em;
       /* filter: grayscale(100%);
       opacity: .3; */
-      z-index: -1;
+      z-index: -2;
     }
     main > img.fg {
       filter: none;
@@ -339,6 +339,7 @@
       background-color: rgb(245,245,105);
       border-radius: 3px;
       border: 1px solid black;
+      z-index: -1;
     }
 
     article h1, article h2, article h3 {
@@ -366,6 +367,9 @@
       padding-top: 0;
     }
 
+    main.pencil {
+      padding-bottom: 8em;
+    }
     .pencil section {
       background-color: rgba(0,0,0,0.05);
       border: 2px dashed #00effe;

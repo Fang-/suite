@@ -290,8 +290,13 @@
       background-color: white;
       z-index: 0;
     }
+    main > div {
+      position: relative;
+      padding-bottom: 8em;
+      min-height: calc(100% - 10em);
+    }
 
-    main > h1 {
+    main h1 {
       margin: 0.5em 1em;
       padding: 0;
       text-align: center;
@@ -313,24 +318,24 @@
       color: blue;
     }
 
-    main > img {
+    main img {
       position: absolute;
       right: 0.2em; bottom: 0.2em;
       /* filter: grayscale(100%);
       opacity: .3; */
       z-index: -2;
     }
-    main > img.fg {
+    main img.fg {
       filter: none;
       opacity: 1;
     }
-    main > .empty {
+    main .empty {
       color: grey;
       text-align: center;
       margin-top: 2em;
       margin-bottom: 6em;
     }
-    main > .tips {
+    main .tips {
       position: absolute;
       bottom: 1em; right: min(30%, 12em);
       padding: 1em;
@@ -367,9 +372,6 @@
       padding-top: 0;
     }
 
-    main.pencil {
-      padding-bottom: 8em;
-    }
     .pencil section {
       background-color: rgba(0,0,0,0.05);
       border: 2px dashed #00effe;
@@ -743,14 +745,14 @@
   ::
   ::
   ++  render-content  ^-  manx
-    |^  ;main(class "{(trip format)}")
+    |^  ;main(class "{(trip format)}")  ;div
           ;*  ?-  format
                 %pencil  render-pencil
                 %single  render-single
                 %sprout  render-sprout
                 %author  render-author
                 %biding  render-biding
-        ==    ==
+        ==  ==  ==
     ::
     ++  render-pencil  ^-  marl
       =/  content  (~(get by args) 'content')

@@ -318,7 +318,7 @@
       color: blue;
     }
 
-    main img {
+    main > div > img {
       position: absolute;
       right: 0.2em; bottom: 0.2em;
       /* filter: grayscale(100%);

@@ -52,11 +52,11 @@
       ::  %handle-http-request: incoming from eyre
       ::
         %handle-http-request
+      :_  this
       =,  mimes:html
       =+  !<([=eyre-id =inbound-request:eyre] vase)
       ?.  authenticated.inbound-request
         ::TODO  depend on publicness of requested file?
-        :_  this
         ::TODO  probably put a function for this into /lib/server
         ::      we can't use +require-authorization because we also emit cards
         %+  give-simple-payload:app:server
@@ -72,11 +72,12 @@
       ::
       ::  out: page or edit
       ::
-      =;  out=(each simple-payload:http [r=[mode beam] c=(list card)])
+      =;  out=(each simple-payload:http [l=@t c=(list card)])
         ?-  -.out
-          %&  [(give-simple-payload:app:server eyre-id p.out) this]
-          %|  :_  this(pend (~(put by pend) eyre-id r.p.out))
-              [[%pass /resp/[eyre-id] %arvo %b %wait now.bowl] c.p.out]
+          %&  (give-simple-payload:app:server eyre-id p.out)
+          %|  %+  weld  c.p.out
+              %+  give-simple-payload:app:server  eyre-id
+              [[303 ['location' l.p.out]~] ~]
         ==
       ::  500 to all unexpected requests
       ::
@@ -130,18 +131,6 @@
       ~?  !accepted.sign-arvo
         [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
       [~ this]
-    ::
-        [%resp @ ~]
-      =*  eyre-id  i.t.wire
-      :_  this(pend (~(del by pend) eyre-id))
-      %+  give-simple-payload:app:server  eyre-id
-      =/  orig  (~(got by pend) eyre-id)
-      =.  r.beam.orig  da+now.bowl
-      =+  go=~(. work bowl orig)
-      ?+  mode.orig  !!
-        %edit  (page:go `'done')
-        %load  [[307 ['location' (crip sput:go(mode %view))]~] ~]
-      ==
     ==
   ::
   ++  on-leave  on-leave:def
@@ -211,7 +200,7 @@
   ::
   ++  edit
     |=  request:http
-    ^-  (each simple-payload:http [[^mode ^beam] (list card)])
+    ^-  (each simple-payload:http [loc=@t (list card)])
     ~|  [%edit-must-be-now r.beam]
     ?>  =(da+now r.beam)
     ?+  method  [%& deny]
@@ -226,13 +215,13 @@
       ?~  are  [%& wack]
       =*  arm  u.are
       ?:  (~(has by arm) 'cancel')
-        [%& [307 ['location' (crip sput(mode %view))]~] ~]
+        [%| (crip sput(mode %view)) ~]
       ?:  (~(has by arm) 'delete')
-        :+  %|  [mode beam]
+        :+  %|  (crip sput)
         [%pass /edit/delete %arvo %c %info (fray:space:userlib rend)]~
       ?.  (~(has by arm) 'save')  [%& wack]
       ?.  (~(has by arm) 'file')  [%& wack]
-      :+  %|  [mode beam]
+      :+  %|  (crip sput)
       :_  ~
       :+  %pass  /edit/save
       :+  %arvo  %c
@@ -255,7 +244,7 @@
   ::
   ++  load
     |=  request:http
-    ^-  (each simple-payload:http [[^mode ^beam] (list card)])
+    ^-  (each simple-payload:http [loc=@t (list card)])
     ?.  ?=(%'POST' method)  [%& `simple-payload:http`deny]
     ~|  [%edit-must-be-now r.beam]
     ?>  =(da+now r.beam)
@@ -263,10 +252,9 @@
       %+  bind
         (de-request:multipart header-list body)
       ~(gas by *(map @t part:multipart))
-    :+  &  [mode beam]
-    !!
+    !!  ::TODO  implement
   ::
-  ++  deny  [[405 ~] `(as-octs:mimes:html 'method now allow')]
+  ++  deny  [[405 ~] `(as-octs:mimes:html 'method not allowed')]
   ++  miss  [[404 ~] `(as-octs:mimes:html 'file not found')]
   ++  wack  [[400 ~] `(as-octs:mimes:html 'invalid request')]
   ::

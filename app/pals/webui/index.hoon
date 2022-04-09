@@ -1,24 +1,21 @@
 ::  pals index
 ::
 /-  *pals, contact=contact-store
-/+  sigil-svg=sigil
+/+  rudder, sigil-svg=sigil
 ::
-^-  webpage
-|_  [=bowl:gall records]
+^-  (page:rudder records command)
+|_  [=bowl:gall * records]
 ++  argue
-  |=  arg=(list [k=@t v=@t])
-  ^-  (unit command)  ::TODO  maybe (each command @t) for error messages?
-  =+  args=(~(gas by *(map @t @t)) arg)
-  ::TODO  alternatively we should just crash on invalid args,
-  ::      since ui shouldn't allow it without user meddling?
-  ::      poorly constructed commands here might crash anyway.
+  |=  [headers=header-list:http body=(unit octs)]
+  ^-  $@(brief:rudder command)
+  =/  args=(map @t @t)
+    ?~(body ~ (frisk:rudder q.u.body))
   ?~  what=(~(get by args) 'what')
     ~
   ?~  who=(slaw %p (~(gut by args) 'who' ''))
     ~
   |^  ?+  u.what  ~
           ?(%meet %part)
-        %-  some
         ?:  ?=(%part u.what)
           [%part u.who ~]
         [%meet u.who get-lists]
@@ -26,7 +23,6 @@
           ?(%enlist %unlist)
         =/  tags=(set @ta)  get-lists
         ?:  =(~ tags)  ~
-        %-  some
         ?:  ?=(%enlist u.what)
           [%meet u.who tags]
         [%part u.who tags]
@@ -41,12 +37,14 @@
     (more (ifix [. .]:(star ace) com) urs:ab)
   --
 ::
+++  final  (alert:rudder (cat 3 '/' dap.bowl) build)
+::
 ++  build
   |=  $:  arg=(list [k=@t v=@t])
           msg=(unit [o=? =@t])
       ==
-  ^-  manx
-  |^  page
+  ^-  reply:rudder
+  |^  [%page page]
   ::
   ++  icon-color  "black"
   ::
@@ -60,6 +58,13 @@
 
     .red { font-weight: bold; color: #dd2222; }
     .green { font-weight: bold; color: #229922; }
+
+    a {
+      display: inline-block;
+      color: inherit;
+      padding: 0;
+      margin-top: 0;
+    }
 
     table#pals tr td:nth-child(2) {
       padding: 0 0.5em;
@@ -112,12 +117,23 @@
         Keep track of your friends! Other applications can use this list to
         find ships to talk to, pull content from, etc.
 
+        Some applications that are better with pals:
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
+          ; ~hastuc^dibtux/zone
+        ==
+        ;br;
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~dister-fabnev-hinmur/escape/"
+          ; ~fabnev^hinmur/escape
+        ==
+        ;br;
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
+          ; ~paldev/face
+        ==
+
+
         Tags are there mostly for your own book-keeping. Applications could
         make use of them for grouping content, but should not change their
         core behavior based on the presence or absence of specific tags.
-
-        (The list of applications that uses this is currently... empty.
-        Watch this space!)
 
         The status icons below indicate whether the ship is a mutual,
         a target (outgoing only), or a leeche (incoming only).
@@ -248,17 +264,17 @@
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)
   ::
+  ++  contacts  ~+
+    =/  base=path
+      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
+    ?.  .^(? %gu base)  *rolodex:contact
+    .^(rolodex:contact %gx (weld base /all/noun))
+  ::
   ++  sigil
     |=  =ship
     ^-  manx
-    =/  base=path
-      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
     =/  bg=@ux
-      ?.  .^(? %gu base)  0xff.ffff
-      ::TODO  contact-store should have a %u scry for existence checks,
-      ::      so that we can safely do a /x/contact/~ship scry
-      =+  .^(=rolodex:contact %gx (weld base /all/noun))
-      ?~(p=(~(get by rolodex) ship) 0xff.ffff color.u.p)
+      ?~(p=(~(get by contacts) ship) 0xff.ffff color.u.p)
     =/  fg=tape
       ::TODO  move into sigil.hoon or elsewhere?
       =+  avg=(div (roll (rip 3 bg) add) 3)

@@ -38,11 +38,4 @@
   $%  [%near =ship]  ::  hey from leeche
       [%away =ship]  ::  bye from leeche
   ==
-::
-+$  webpage
-  $_  ^|
-  |_  [bowl:gall records]
-  ++  build  |~([(list [k=@t v=@t]) (unit [? @t])] *manx)  ::  get to page
-  ++  argue  |~((list [k=@t v=@t]) *(unit command))        ::  post to cmd
-  --
 --

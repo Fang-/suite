@@ -1,7 +1,17 @@
 picture
 
+v1.1.2, ~2022.01.02
+- disable the christmas frame.
+
+v1.1.1, ~2021.12.22
+- mimic the natural "scale to cover" behavior of tile images, even when a frame is rendered.
+
+v1.1.0, ~2021.12.20
+- christmas update!
+- stub out image data in the dbug state output.
+
 v1.0.2, ~2021.10.31
-- tiny code & style improvements
+- tiny code & style improvements.
 
 v1.0.1, ~2021.10.06
 - fix an issue where the webpage would be downloaded rather than displayed by the browser.

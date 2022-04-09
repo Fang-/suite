@@ -2,9 +2,9 @@
     info+'a random Bible verse, every day'
     color+0xee.eedd
     image+'/verse/verse'
-    site+/
+    site+/verse/study
     base+'verse'
-    version+[1 0 0]
+    version+[1 1 0]
     website+'https://pal.dev/suite/verse'
     license+'MIT'
 ==

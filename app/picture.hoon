@@ -3,15 +3,18 @@
 ::    lets you upload an arbitrary image, then serves that as the icon
 ::    for the app's tile on the homescreen.
 ::
+::    to disable seasonal framing, :picture |
+::
 /-  webpage
 /+  server, dbug, verb, default-agent
 ::
 /~  webui  (webpage ~ (unit mime))  /app/picture/webui
 ::
 |%
-+$  state-0
-  $:  %0
++$  state-1
+  $:  %1
       picture=(unit mime)
+      [framing=? caching=(unit octs)]  ::  for seasonal surprises
   ==
 ::
 +$  card  card:agent:gall
@@ -19,7 +22,7 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -38,15 +41,37 @@
 ++  on-save  !>(state)
 ::
 ++  on-load
-  |=  ole=vase
-  ^-  (quip card _this)
-  =/  old=state-0  !<(state-0 ole)
-  [~ this(state old)]
+  |^  |=  ole=vase
+      ^-  (quip card _this)
+      =/  old=state-any  !<(state-any ole)
+      =?  old  ?=(%0 -.old)
+        (state-0-to-1 old)
+      ?>  ?=(%1 -.old)
+      =.  caching.old  ~
+      [~ this(state old)]
+  ::
+  +$  state-any  $%(state-1 state-0)
+  ::
+  ++  state-0-to-1
+    |=  state-0
+    ^-  state-1
+    [%1 picture [& ~]]
+  ::
+  +$  state-0
+    $:  %0
+        picture=(unit mime)
+    ==
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?+  mark  (on-poke:def mark vase)
+      %noun
+    =+  f=(? q.vase)
+    =?  caching  !f  ~
+    [~ this(framing f)]
+  ::
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
@@ -86,10 +111,11 @@
       =;  placeholder
         ?~  picture
           [[200 ['content-type'^'image/svg+xml']~] `placeholder]
-        :_  `q.u.picture
+        :_  `(fall caching q.u.picture)
         :-  200
-        :~  :-  'content-type'   (en-mite p.u.picture)
-            :-  'cache-control'  'public, max-age=604800, immutable'
+        :~
+          :-  'content-type'   ?^(caching 'image/svg+xml' (en-mite p.u.picture))
+          :-  'cache-control'  'public, max-age=604800, immutable'
         ==
       ^~
       %-  as-octt
@@ -147,7 +173,7 @@
         %-  some
         %+  build:view  args
         `|^'Something went wrong! Did you provide sane inputs?'
-      :_  [~ state(picture u.new)]
+      :_  [~ state(picture u.new, caching ~)]
       :-  200
       %-  some
       (build:view args `&^'Processed succesfully.')  ::NOTE  silent?
@@ -172,9 +198,18 @@
     [~ this]
   ==
 ::
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?.  =(/x/dbug/state path)  ~
+  :^  ~  ~  %noun
+  !>  %=  state
+    picture  (bind picture |=(mime [p p.q 1.337]))
+    caching  (bind caching |=(octs [p 1.337]))
+  ==
+::
 ++  on-leave  on-leave:def
 ++  on-agent  on-agent:def
-++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --
 

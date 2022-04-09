@@ -1,4 +1,4 @@
-::  pals: manual neighboring
+::  pals: manual peer discovery
 ::
 ::    acts as a "friendlist" of sorts, letting one add arbitrary ships to
 ::    arbitrary lists. upon doing so, the other party is informed of this.
@@ -11,20 +11,21 @@
 ::    for example, a game wanting to stay abreast of high scores,
 ::    or filesharing service giving selective access.
 ::
-::    webui at /pals courtesy of overengineering incorporated.
-::    (it really is too elaborate for what's essentially a spa,
-::    but experimenting here helps find good patterns. the current
-::    implementation might almost be factored out into a generic library.)
+::    "leeches" are ships who added us.
+::    "targets" are ships we have added.
+::    "mutuals" is the intersection of "leeches" and "targets".
 ::
 ::      reading
 ::    external applications likely want to read from this via scries or
 ::    watches, both of which are outlined below.
 ::    finding interaction targets or mutuals to poke or subscribe to, using
 ::    mutual status as permission check, etc.
-::    libraries for handling generalizable behavior are in the works.
+::    to scry data out of this app, please use /lib/pals.
 ::    one might be tempted to use list names for namespacing (ie %yourapp
 ::    would only retrieve targets from the ~.yourapp list), but beware that
-::    this overlaps with user-facing organizational purposes.
+::    this overlaps with user-facing organizational purposes. if lists feel
+::    opaque or inaccessible, it's to discourage this. but the right balance
+::    might not have been found yet...
 ::
 ::      writing
 ::    poke this app with a $command.
@@ -35,8 +36,6 @@
 ::    is bad manners. managing pals without informing the user is evil.
 ::
 ::      scry endpoints (all %noun marks)
-::TODO  consider removing /mutuals, only meaningful to ui ...right?
-::      or do apps want it to avoid permission-based poke/watch nacks?
 ::    y  /                       arch        [%leeches %targets %mutuals ~]
 ::    y  /[status]               arch        non-empty lists listing
 ::
@@ -52,12 +51,10 @@
 ::    /targets   target-effect   effect for every addition/removal
 ::    /leeches   leeche-effect   effect for every addition/removal
 ::
+/-  *pals, hark=hark-store
+/+  rudder, dbug, verb, default-agent
 ::
-/-  *pals
-/+  dbug, verb, default-agent,
-    server
-::
-/~  webui  webpage  /app/pals/webui
+/~  pages  (page:rudder records command)  /app/pals/webui
 ::
 |%
 +$  state-0  [%0 records]
@@ -87,7 +84,7 @@
   =^  cards  this
     (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
   =-  [[- cards] this]
-  [%pass /eyre/connect %arvo %e %connect [~ %pals ~] dap.bowl]
+  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
 ::
 ++  on-save  !>(state)
 ::
@@ -119,7 +116,7 @@
       ?.  yow  ~
       :~  =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])
           =/  =cage     [%pals-gesture !>(gesture)]
-          [%pass /[-.gesture] %agent [ship.cmd %pals] %poke cage]
+          [%pass /[-.gesture] %agent [ship.cmd dap.bowl] %poke cage]
         ::
           =/  =effect   ?-(-.cmd %meet [- ship]:cmd, %part [- ship]:cmd)
           =/  =cage     [%pals-effect !>(effect)]
@@ -165,79 +162,41 @@
         %bye  :-   has  (~(del in incoming) ship)
       ==
     :_  this(incoming.state incoming)
+    ^-  (list card)
     ?.  yow  ~
-    =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
-    =/  =cage    [%pals-effect !>(effect)]
-    [%give %fact [/leeches]~ cage]~
+    :*  =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
+        =/  =cage    [%pals-effect !>(effect)]
+        [%give %fact [/leeches]~ cage]
+      ::
+        ?.  .^(? %gu /(scot %p our.bowl)/hark-store/(scot %da now.bowl))  ~
+        =/  title=(list content:hark)
+          =-  [ship+ship - ~]
+          ?-  -.gesture
+            %hey  text+' added you as a pal.'
+            %bye  text+' no longer considers you a pal.'
+          ==
+        =/  =bin:hark     [/[dap.bowl] q.byk.bowl /(scot %p ship)/[-.gesture]]
+        =/  =action:hark  [%add-note bin title ~ now.bowl / /pals]
+        =/  =cage         [%hark-action !>(action)]
+        [%pass /hark %agent [our.bowl %hark-store] %poke cage]~
+    ==
   ::
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
-    =+  !<([=eyre-id =inbound-request:eyre] vase)
-    ?.  authenticated.inbound-request
-      :_  this
-      ::TODO  probably put a function for this into /lib/server
-      ::      we can't use +require-authorization because we also update state
-      %+  give-simple-payload:app:server
-        eyre-id
-      =-  [[307 ['location' -]~] ~]
-      %^  cat  3
-        '/~/login?redirect='
-      url.request.inbound-request
-    ::  parse request url into path and query args
-    ::
-    =/  ,request-line:server
-      (parse-request-line:server url.request.inbound-request)
-    ::
-    =;  [[status=@ud out=(unit manx)] caz=(list card) =_state]
-      :_  this(state state)
-      %+  weld  caz
-      :: ;;  (list card)  ::NOTE  this is hilariously slow
-      %+  give-simple-payload:app:server
-        eyre-id
-      :-  :-  status
-          ?~  out  ~
-          ['content-type'^'text/html']~
-      ?~  out  ~
-      `(as-octt:mimes:html (en-xml:html u.out))
-    ::  405 to all unexpected requests
-    ::
-    ?.  &(?=(^ site) =('pals' i.site))
-      [[500 `:/"unexpected route"] ~ state]
-    ::
-    =/  page=@ta
-      ?~  t.site  %index
-      i.t.site
-    ?.  (~(has by webui) page)
-      [[404 `:/"no such page: {(trip page)}"] ~ state]
-    =*  view  ~(. (~(got by webui) page) bowl +.state)
-    ::
-    ::TODO  switch higher up: get never changes state!
-    ?+  method.request.inbound-request  [[405 ~] ~ state]
-        %'GET'
-      :_  [~ state]
-      [200 `(build:view args ~)]
-    ::
-        %'POST'
-      ?~  body.request.inbound-request  [[400 `:/"no body!"] ~ state]
-      =/  args=(list [k=@t v=@t])
-        (rash q.u.body.request.inbound-request yquy:de-purl:html)
-      =/  cmd=(unit command)
-        (argue:view args)
-      ?~  cmd
-        :_  [~ state]
-        :-  400
-        %-  some
-        ::TODO  should pass on previous inputs to re-fill fields?
-        %+  build:view  ^args
-        `|^'Something went wrong! Did you provide sane inputs?'
-      =^  caz  this
-        (on-poke %pals-command !>(u.cmd))
-      :_  [caz state]
-      :-  200
-      %-  some
-      (build:view ^args `&^'Processed succesfully.')  ::NOTE  silent?
-    ==
+    =;  out=(quip card _+.state)
+      [-.out this(+.state +.out)]
+    %.  [bowl !<(order:rudder vase) +.state]
+    %-  (steer:rudder _+.state command)
+    :^    pages
+        (point:rudder /[dap.bowl] & ~(key by pages))
+      (fours:rudder +.state)
+    |=  cmd=command
+    ^-  $@  brief:rudder
+        [brief:rudder (list card) _+.state]
+    =^  caz  this
+      (on-poke %pals-command !>(cmd))
+    ['Processed succesfully.' caz +.state]
   ==
 ::
 ++  on-watch
@@ -256,19 +215,29 @@
     :_  this
     %+  turn  ~(tap in incoming)
     |=(=@p [%give %fact ~ %pals-effect !>(`effect`[%near p])])
+  ::
+    ::TODO  consider adding a subscription endpoint that includes tags?
+    ::      shouldn't become too legible to applications though...
   ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ?.  ?=([%hey ~] wire)  [~ this]
-  ::  for %pals-gesture pokes, record the result
-  ::TODO  should we slowly retry for nacks?
-  ::TODO  verify src.bowl behaves correctly here. idk why it wouldn't, but...
+  ?+  wire  ~&([dap.bowl %strange-wire wire] [~ this])
+      [%hark ~]
+    ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
+    ?~  p.sign  [~ this]
+    ((slog 'pals: failed to notify' u.p.sign) [~ this])
   ::
-  =-  [~ this(receipts -)]
-  ?+  -.sign  ~|([%unexpected-agent-sign wire -.sign] !!)
-    %poke-ack  (~(put by receipts) src.bowl ?=(~ p.sign))
+      [%bye ~]  [~ this]  ::TODO  also retry if nack?
+      [%hey ~]
+    ::  for %pals-gesture pokes, record the result
+    ::TODO  should we slowly retry for nacks?
+    ::
+    =-  [~ this(receipts -)]
+    ?+  -.sign  ~|([%unexpected-agent-sign wire -.sign] !!)
+      %poke-ack  (~(put by receipts) src.bowl ?=(~ p.sign))
+    ==
   ==
 ::
 ++  on-peek
@@ -277,6 +246,7 @@
   ?>  =(our src):bowl
   |^  ?+  path  [~ ~]
         [%y ~]                 (arc %leeches %targets %mutuals ~)
+        [%y %leeches ~]        (arc ~)
         [%y %targets ~]        (arc (las targets))
         [%y %mutuals ~]        (arc (las mutuals))
         [%x %leeches ~]        (alp leeches)
@@ -289,6 +259,26 @@
         [%x %mutuals ~ ~]      [~ ~]
         [%x %mutuals @ta ~]    (alp (lap mutuals i.t.t.path))
         [%x %mutuals @ta @ ~]  (ask (bind (wat t.t.path) (hal mutuals)))
+      ::
+          [%x %json ~]  ::NOTE  dumb hack, subject to change
+        =;  =json  ``json+!>(json)
+        =,  enjs:format
+        %-  pairs
+        :~  :-  'outgoing'
+            %-  pairs
+            %+  turn  ~(tap by outgoing)
+            |=  [=^ship lists=(set @ta)]
+            :-  (rsh 3 (scot %p ship))
+            %-  pairs
+            :~  'lists'^a+(turn ~(tap in lists) (lead %s))
+                'ack'^(fall (bind (~(get by receipts) ship) (lead %b)) ~)
+            ==
+          ::
+            :-  'incoming'
+            %-  pairs
+            %+  turn  ~(tap in incoming)
+            |=(=^^ship [(rsh 3 (scot %p ship)) b+&])
+        ==
       ==
   ::  scry results
   ++  arc  |=  l=(list @ta)  ``noun+!>(`arch`~^(malt (turn l (late ~))))

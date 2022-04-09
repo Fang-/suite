@@ -14,10 +14,16 @@
 ::
 ++  snug                                                ::  unitized snag
   |*  [a=@ b=(list)]
-  |-  ^+  (some ?>(?=(^ b) i.b))
+  |-  ^-  (unit _?>(?=(^ b) i.b))
   ?~  b  ~
   ?:  =(0 a)  (some i.b)
   $(b t.b, a (dec a))
+::
+::  unit operations
+::
+++  sink                                                ::  any of units
+  |*  [a=(unit) b=(unit)]
+  ?^(a a b)
 ::
 ::  data structures
 ::

@@ -96,6 +96,24 @@
 /+  lp=pals, dbug, verb
 ::
 |%
++$  rumor
+  $:  [kind=@ meta=*]
+      data=(cask *)
+  ==
++$  meta-0  hops=_0
+::
++$  whos
+  $?  %anybody  ::  any ship discoverable through pals
+      %targets  ::  any ship we've added as a pal
+      %mutuals  ::  any mutual pal
+  ==
+::
++$  config
+  $:  hops=_1    ::  how far away gossip may travel
+                 ::  (1 hop is pals only, 0 stops exposing data at all)
+      hear=whos  ::  who to subscribe to
+      tell=whos  ::  who to allow subscriptions from
+  ==
 ++  invent
   |=  =cage
   ^-  card:agent:gall
@@ -110,25 +128,6 @@
   |=  bowl:gall
   ^-  config
   .^(config %gx /(scot %p our)/[dap]/(scot %da now)/~/gossip/config/noun)
-::
-+$  whos
-  $?  %anybody
-      %targets
-      %mutuals
-  ==
-::
-+$  config
-  $:  hops=_1    ::  how far away gossip may travel
-                 ::  (1 hop is pals only, 0 stops exposing data at all)
-      hear=whos  ::  who to subscribe to
-      tell=whos  ::  who to allow subscriptions from
-  ==
-::
-+$  rumor
-  $:  [kind=@ meta=*]
-      data=(cask *)
-  ==
-+$  meta-0  hops=_0
 ::
 ++  agent
   |=  $:  init=config

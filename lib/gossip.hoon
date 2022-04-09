@@ -6,7 +6,7 @@
 ::      usage
 ::
 ::    to use this library, call its +agent arm with an initial
-::    configuration and a map of noun->mark convertors,
+::    configuration and a map of, per mark, noun->vase convertors,
 ::    then call the resulting gate with the agent's door.
 ::
 ::    data from peers will come in through +on-agent, as %facts with
@@ -15,22 +15,25 @@
 ::    appropriate vases from the (cask *)s it sends around internally.
 ::    if a mark conversion for a received datum isn't available, then
 ::    the library will inject a %fact with a %gossip-unknown mark instead,
-::    containing a (cask *).
+::    containing a (cask *). the agent may either store it for later use,
+::    or handle it directly.
 ::
 ::    for new incoming subscriptions, the underlying agent's +on-watch is
 ::    called, with /~/gossip/source, so that it may give initial results.
 ::
-::    ::TODO  should the below all have shorthand functions?
-::
 ::    when data originates locally and needs to be given to our peers,
-::    simply produce a %fact on the /~/gossip/source path.
+::    simply produce a normal %fact on the /~/gossip/source path.
+::    the +invent helper can be used to do this.
 ::    refrain from re-emitting received %facts manually. the library will
 ::    handle this for you, based on the current configuration.
 ::
 ::    to change the configuration after the agent has been started, emit
 ::    a %fact with the %gossip-config mark on the /~/gossip/config path.
-::    the current configuration can be scries out using the +read-config
-::    helper.
+::    the +configure helper can be used to do this.
+::    the +read-config helper scries out the current configuration.
+::    setting hops to 1 distributes the data to direct pals only.
+::    setting hops to 0 prevents emission of any gossip data at all,
+::    even during initial subscription setup.
 ::
 ::    (we introduce the /~/etc path prefix convention to indicate paths
 ::     that are for library-specific use only.
@@ -39,20 +42,45 @@
 ::     it theoretically easier to compose with other agent libraries.
 ::     the disavantage, of course, is that internal interaction with the
 ::     wrapper library isn't type-checked anymore. helper functions make
-::     that less of a problem, but the developer must stay vigilant.)
+::     that less of a problem, but the developer must stay vigilant about
+::     casting all the relevant outputs.)
 ::
-::      wip, thoughts
+::    when considering the types of data to be sent through gossip, keep
+::    in mind that the library keeps track of (hashes of) all the individual
+::    datums it has heard. as such, if your data is of the shape @t, and we
+::    hear a 'hello' once, we will completely ignore any 'hello' that come
+::    afterward, even if they originate from distinct events.
+::    if this is a problem for your use case, consider including a timestamp
+::    or other source of uniqueness with each distinct datum.
+::
+::    note that this library and its protocol are currently not in the
+::    business of providing anonymized gossip. any slightly motivated actor
+::    will have no problem modifying this library to detect and record
+::    sources of data with good accuracy.
+::
+::      wip, libdev thoughts
 ::
 ::    we may want to include additional metadata alongside gossip facts,
 ::    such as a hop counter, set of informed peers, origin timestamp, etc.
 ::    we may want to use pokes exclusively, instead of watches/facts,
 ::    making it easier to exclude the src.bowl, include metadata, etc.
 ::
+::    what if this was a userspace-infrastructure app instead of a wrapper?
+::    how would ensuring installation of this app-dependency work?
+::    it gains us... a higher chance of peers having this installed.
+::    what if it was just part of pals?
+::    would let us more-reliably poke mutuals and leeches, if we wanted to do
+::    a proxy-broadcast thing.
+::
+::    when considering adding features like rumor signing, keep in mind that
+::    this library is mostly in the business of ferrying casks. perhaps
+::    features like signing should be left up to applications themselves.
+::
 ::      internal logic
 ::
 ::    - on-init or during first on-load, watch pals for targets & leeches.
 ::    - if pals is not running, the watch will simply pend until it starts.
-::    - if pals ever watch-nacks, we (TODO) try rewatching on a backoff timer.
+::    - if pals ever watch-nacks (it shouldn't), we try rewatching after ~m1.
 ::
 ::    - for facts produced on /~/gossip/source, we
 ::      - wrap them as %gossip-rumor to send them out on /~/gossip/gossip
@@ -62,10 +90,10 @@
 ::      - ensure they're %gossip-rumors, ignoring otherwise
 ::      - unwrap them and +on-agent /~/gossip/gossip into the inner agent, and
 ::      - re-emit them as facts on /~/gossip/gossip if there are hops left
-::    - for nacks on those watches, we (TODO) retry later/on-leeche
+::    - for nacks on those watches, we retry after ~m30
 ::
 /-  pals
-/+  lp=pals, default-agent
+/+  lp=pals, dbug, verb
 ::
 |%
 ++  invent
@@ -90,7 +118,8 @@
   ==
 ::
 +$  config
-  $:  hops=_1    ::  how far away gossip may travel (1 hop is pals only)
+  $:  hops=_1    ::  how far away gossip may travel
+                 ::  (1 hop is pals only, 0 stops exposing data at all)
       hear=whos  ::  who to subscribe to
       tell=whos  ::  who to allow subscriptions from
   ==
@@ -100,7 +129,6 @@
       data=(cask *)
   ==
 +$  meta-0  hops=_0
-::TODO  support signing & verifying rumors
 ::
 ++  agent
   |=  $:  init=config
@@ -127,7 +155,7 @@
       ^-  cage
       ?^  to=(~(get by grab) p.cask)
         [p.cask (u.to q.cask)]
-      ~&  [%gossip %no-mark p.cask]
+      ~&  [gossip+dap.bowl %no-mark p.cask]
       [%gossip-unknown !>(cask)]
     ::
     ++  de-cage
@@ -157,7 +185,7 @@
       ::  there may only be one gossip-internal path per card
       ::
       ?.  =(~ t.int)
-        ~&  [%gossip %too-many-internal-targets int]
+        ~&  [gossip+dap.bowl %too-many-internal-targets int]
         ~|([%too-many-internal-targets int] !!)
       ?:  =(/~/gossip/config path)
         ~|  [%weird-fact-on-config p.cage.p.card]
@@ -174,7 +202,6 @@
       ?>  =(/~/gossip/source path)
       ::  if hops is configured at 0, we don't broadcast at all.
       ::
-      ~&  %gossipping
       =.  memory  (~(put in memory) (sham (de-cage cage.p.card)))
       ?:  =(0 hops.manner)  [caz state]
       =-  [[- caz] state]
@@ -199,7 +226,6 @@
       ?.  ?=([%give %fact ~ *] i.cards)
         =^  caz  state  (play-card i.cards)
         $(out (weld out caz), cards t.cards)
-      ~&  %first-card-detected
       ::  if hops is set to 0, we block even the initial response
       ::
       ?:  =(0 hops.manner)  $(cards t.cards)
@@ -249,14 +275,12 @@
     ++  retry-timer
       |=  [t=@dr p=path]
       ^-  card
-      ~&  [%gossip-await-retry p t]
       :+  %pass  [%~.~ %gossip %retry p]
       [%arvo %b %wait (add now.bowl t)]
     ::
     ++  watch-target
       |=  s=ship
       ^-  (list card)
-      ~&  [%gossip-watch-target s]
       ?:  (watching-target s)  ~
       :_  ~
       :+  %pass  /~/gossip/gossip/(scot %p s)
@@ -265,14 +289,12 @@
     ++  leave-target
       |=  s=ship
       ^-  card
-      ~&  [%gossip-leave-target s]
       :+  %pass  /~/gossip/gossip/(scot %p s)
       [%agent [s dap.bowl] %leave ~]
     ::
     ++  kick-target
       |=  s=ship
       ^-  card
-      ~&  [%gossip-kick-target s]
       [%give %kick [/~/gossip/gossip]~ `s]
     ::
     ++  hear-changed
@@ -335,9 +357,9 @@
     |=  inner=agent:gall
     =|  state-0
     =*  state  -
+    %+  verb  |
+    %-  agent:dbug
     ^-  agent:gall
-    ::TODO  if warn then we want to sanity-check /~/gossip facts?
-    ::
     |_  =bowl:gall
     +*  this    .
         pals  ~(. lp bowl)
@@ -351,17 +373,13 @@
       =^  cards   state  (play-cards:up cards)
       [(weld watch-pals:up cards) this]
     ::
-    ::TODO  why does this on-save not get called?
-    ++  on-save  ~&  %on-save-gossip  !>([[%gossip state] on-save:og])
+    ++  on-save  !>([[%gossip state] on-save:og])
     ++  on-load
       |=  ole=vase
       ^-  (quip card _this)
       ?.  ?=([[%gossip *] *] q.ole)
-        ~&  [%huh -.q.ole]
-        ::TODO  deduplicate with +on-init
         =.  manner  init
         =^  cards   inner   (on-load:og ole)
-        ::TODO  fires too often?
         =^  cards   state  (play-cards:up cards)
         [(weld watch-pals:up cards) this]
       ::
@@ -369,7 +387,7 @@
       =.  state  old
       =^  cards  inner  (on-load:og ile)
       =^  cards  state  (play-cards:up cards)
-      ::TODO  for later versions, add :future retry logic
+      ::TODO  for later versions, add :future retry logic as needed
       [cards this]
     ::
     ++  on-watch
@@ -390,7 +408,6 @@
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
-      ~&  [%gossip-on-agent wire -.sign]
       ?.  ?=([%~.~ %gossip *] wire)
         =^  cards  inner  (on-agent:og wire sign)
         =^  cards  state  (play-cards:up cards)
@@ -398,26 +415,25 @@
       ::
       ?+  t.t.wire  ~|([%gossip %unexpected-wire wire] !!)
           [%gossip @ ~]
+        ~|  t.t.wire
+        ?>  =(src.bowl (slav %p i.t.t.t.wire))
         ?-  -.sign
             %fact
           =*  mark  p.cage.sign
           =*  vase  q.cage.sign
           ?.  =(%gossip-rumor mark)
-            ~&  [%gossip dap.bowl %ignoring-unexpected-fact mark=mark]
+            ~&  [gossip+dap.bowl %ignoring-unexpected-fact mark=mark]
             [~ this]
           =+  !<(=rumor vase)
           =/  hash  (sham data.rumor)
-          ~&  [%got-rume hash]
           ?:  (~(has in memory) hash)
-            ~&  %hav
             [~ this]
           ?.  =(%0 kind.rumor)
-            ~&  [%gossip dap.bowl %delaying-unknown-rumor-kind kind.rumor]
+            ~&  [gossip+dap.bowl %delaying-unknown-rumor-kind kind.rumor]
             [~ this(future [rumor future])]
           =/  mage=cage     (en-cage:up data.rumor)
           =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage mage))
           =^  cards  state  (play-cards:up cards)
-          ~&  %put
           :_  this(memory (~(put in memory) hash))
           (weld (drop (resend-rumor:up rumor)) cards)
         ::
@@ -429,8 +445,7 @@
           ::  ourselves and others from a lot of needless retries.
           ::  (notably, "do we still care" check also lives in %wake logic.)
           ::
-          ~&  %gossip-watch-nack
-          [(retry-timer:up ~m1 /watch/(scot %p src.bowl))]~  ::TODO  m30
+          [(retry-timer:up ~m30 /watch/(scot %p src.bowl))]~
         ::
             %kick
           :_  this
@@ -441,17 +456,16 @@
           ::  so we cannot take more accurate/appropriate action here.
           ::  (notably, "do we still care" check also lives in %wake logic.)
           ::
-          ~&  %gossip-kick
           [(retry-timer:up ~s15 /watch/(scot %p src.bowl))]~
         ::
             %poke-ack
-          ~&  [%gossip %unexpected-poke-ack wire]
+          ~&  [gossip+dap.bowl %unexpected-poke-ack wire]
           [~ this]
         ==
       ::
           [%pals @ ~]
         ?-  -.sign
-          %poke-ack  (on-agent:def wire sign)
+          %poke-ack  ~&([gossip+dap.bowl %unexpected-poke-ack wire] [~ this])
           %kick      [watch-pals:up this]
         ::
             %watch-ack
@@ -464,16 +478,14 @@
           =*  mark  p.cage.sign
           =*  vase  q.cage.sign
           ?.  =(%pals-effect mark)
-            ~&  [%gossip %unexpected-fact-mark mark wire]
+            ~&  [gossip+dap.bowl %unexpected-fact-mark mark wire]
             [~ this]
           =+  !<(=effect:^pals vase)
           :_  this
           =*  ship  ship.effect
-          ~&  [%hear-pals effect]
-          =*  kick  ~&  %kick  [(kick-target:up ship)]~
-          =*  view  ~&  %view   (watch-target:up ship)
-          =*  flee  ~&  %flee  [(leave-target:up ship)]~
-          ~&  [-.effect hear.manner (watching-target:up ship)]
+          =*  kick  [(kick-target:up ship)]~
+          =*  view   (watch-target:up ship)
+          =*  flee  [(leave-target:up ship)]~
           ?-  -.effect
               %meet
             ?-  hear.manner
@@ -521,6 +533,8 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
+      ?:  =(/x/dbug/state path)
+        ``noun+(slop on-save:og !>(gossip=state))
       ?.  ?=([@ %~.~ %gossip *] path)
         (on-peek:og path)
       ?.  ?=(%x i.path)  [~ ~]
@@ -529,15 +543,18 @@
       ==
     ::
     ++  on-leave
-      |=  path
+      |=  =path
       ^-  (quip card _this)
-      =^  cards  inner  (on-leave:og +<)
+      ?:  ?=([%~.~ %gossip *] path)
+        [~ this]
+      =^  cards  inner  (on-leave:og path)
       =^  cards  state  (play-cards:up cards)
       [cards this]
     ::
     ++  on-poke
       |=  cage
       ^-  (quip card _this)
+      ::TODO  gossip config pokes?
       =^  cards  inner  (on-poke:og +<)
       =^  cards  state  (play-cards:up cards)
       [cards this]

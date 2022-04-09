@@ -232,12 +232,23 @@
     ::
     ++  watching-target
       |=  s=ship
-      ~&  wt=wex.bowl
-      %+  lien  ~(tap by wex.bowl)
-      |=  [[=wire =ship =term] [acked=? =path]]
-      ?&  =(s ship)
-          =(/~/gossip/gossip/(scot %p s) wire)
+      %-  ~(has by wex.bowl)
+      [/~/gossip/gossip/(scot %p s) s dap.bowl]
+    ::
+    ++  want-target
+      %~  has  in
+      ?-  hear.manner
+        %anybody  (~(uni in leeches:pals) (targets:pals ~.))
+        %targets  (targets:pals ~.)
+        %mutuals  (mutuals:pals ~.)
       ==
+    ::
+    ++  retry-timer
+      |=  [t=@dr p=path]
+      ^-  card
+      ~&  [%gossip-await-retry p t]
+      :+  %pass  [%~.~ %gossip %retry p]
+      [%arvo %b %wait (add now.bowl t)]
     ::
     ++  watch-target
       |=  s=ship
@@ -405,17 +416,27 @@
           (weld (drop (resend-rumor:up rumor)) cards)
         ::
             %watch-ack
-          ?~  p.sign  [~ this]
-          ::TODO  should retry on timer, and/or on-leeche?
-          ~&  [%gossip %no-retry-logic-yet wire]
-          =/  =tank
-            leaf+"gossip failed subscribe on {<dap.bowl>}{<`^wire`wire>}"
-          ((slog tank u.p.sign) [~ this])
+          :_  this
+          ?~  p.sign  ~
+          ::  30 minutes might cost us some responsiveness when the other
+          ::  party changes their local config, but in return we save both
+          ::  ourselves and others from a lot of needless retries.
+          ::  (notably, "do we still care" check also lives in %wake logic.)
+          ::
+          ~&  %gossip-watch-nack
+          [(retry-timer:up ~m1 /watch/(scot %p src.bowl))]~  ::TODO  m30
         ::
             %kick
-          ::TODO  should only rewatch if still a target?
-          ::      but if the rest of our logic is good, not necessary...
-          [[(watch-target:up src.bowl)]~ this]
+          :_  this
+          ::  to prevent pathological kicks from exploding, we always
+          ::  wait a couple seconds before resubscribing.
+          ::  perhaps this is overly careful, but we cannot tell the
+          ::  difference between "clog" kicks and "missing mark" kicks,
+          ::  so we cannot take more accurate/appropriate action here.
+          ::  (notably, "do we still care" check also lives in %wake logic.)
+          ::
+          ~&  %gossip-kick
+          [(retry-timer:up ~s15 /watch/(scot %p src.bowl))]~
         ::
             %poke-ack
           ~&  [%gossip %unexpected-poke-ack wire]
@@ -428,11 +449,10 @@
           %kick      [watch-pals:up this]
         ::
             %watch-ack
-          ?~  p.sign  [~ this]
-          ::TODO  should retry on timer? shouldn't fail though...
-          ~&  [%gossip %no-retry-logic-yet wire]
-          =/  =tank  leaf+"gossip failed subscribe on %pals{<wire>}"
-          ((slog tank u.p.sign) [~ this])
+          :_  this
+          ?~  p.sign  ~
+          %-  (slog 'gossip: failed to subscribe on %pals!!' u.p.sign)
+          [(retry-timer:up ~m1 t.t.wire)]~
         ::
             %fact
           =*  mark  p.cage.sign
@@ -517,11 +537,31 @@
       [cards this]
     ::
     ++  on-arvo
-      |=  [wire sign-arvo:agent:gall]
+      |=  [=wire sign=sign-arvo:agent:gall]
       ^-  (quip card _this)
-      =^  cards  inner  (on-arvo:og +<)
-      =^  cards  state  (play-cards:up cards)
-      [cards this]
+      ?.  ?=([%~.~ %gossip *] wire)
+        =^  cards  inner  (on-arvo:og wire sign)
+        =^  cards  state  (play-cards:up cards)
+        [cards this]
+      ?>  ?=([%retry *] t.t.wire)
+      ?>  ?=(%wake +<.sign)
+      ?+  t.t.t.wire  ~|(wire !!)
+          [%pals *]
+        ::NOTE  this might result in subscription wire re-use,
+        ::      but if we hit this path we should be loud anyway.
+        [watch-pals:up this]
+      ::
+          [%watch @ ~]
+        :_  this
+        =/  target=ship  (slav %p i.t.t.t.t.wire)
+        ?.  ?&  !(watching-target:up target)
+                (want-target:up target)
+            ==
+          ~&  %skip
+          ~
+        ~&  %actual-retry
+        [(watch-target:up target)]~
+      ==
     ::
     ++  on-fail
       |=  [term tang]

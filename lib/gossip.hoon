@@ -104,7 +104,7 @@
 ::
 ++  agent
   |=  $:  init=config
-          grab=(map mark tube:clay)
+          grab=(map mark $-(* vase))
       ==
   ^-  $-(agent:gall agent:gall)
   |^  agent
@@ -126,7 +126,7 @@
       |=  =(cask *)
       ^-  cage
       ?^  to=(~(get by grab) p.cask)
-        [p.cask (u.to -:!>(**) q.cask)]
+        [p.cask (u.to q.cask)]
       ~&  [%gossip %no-mark p.cask]
       [%gossip-unknown !>(cask)]
     ::

@@ -5,34 +5,32 @@
 ::    intended to be used with self-portraits.
 ::
 /-  pals
-/+  gossip, rudder, dbug, verb, default-agent
+/+  gossip, rudder, default-agent
 ::
-/~  pages  (page:rudder (map ship cord) [%set (unit cord)])  /app/face/webui
+/~    pages
+    (page:rudder (map ship [@da (unit cord)]) [%set (unit cord)])
+  /app/face/webui
 ::
 /$  grab-face  %noun  %face
 ::
 |%
-+$  state-0
-  $:  %0
-      faces=(map ship cord)
++$  state-1
+  $:  %1
+      faces=(map ship face)
   ==
 ::
++$  face  [@da (unit cord)]
 +$  card  card:agent:gall
-::
-+$  eyre-id  @ta
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  %+  agent:gossip
       [1 %mutuals %mutuals]
-    %+  ~(put by *(map mark tube:clay))
+    %+  ~(put by *(map mark $-(* vase)))
       %face
-    |=  =vase
-    !>((grab-face !<(* vase)))
-%-  agent:dbug
-%+  verb  |
+    |=(n=* !>((grab-face n)))
 ^-  agent:gall
 ::
 |_  =bowl:gall
@@ -42,17 +40,36 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :_  this
-  :~  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
-  ==
+  :_  this(faces (~(put by faces) our.bowl [now.bowl ~]))
+  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
 ::
 ++  on-save  !>(state)
 ::
 ++  on-load
   |=  ole=vase
-  ^-  (quip card _this)
-  =/  old=state-0  !<(state-0 ole)
-  [~ this(state old)]
+  |^  ^-  (quip card _this)
+      =/  old=state-any  !<(state-any ole)
+      =^  caz  old
+        ?.  ?=(%0 -.old)  [~ old]
+        (state-0-to-1 old)
+      ?>  ?=(%1 -.old)
+      [caz this(state old)]
+  ::
+  +$  state-any  $%(state-1 state-0)
+  +$  state-0  [%0 faces=(map ship cord)]
+  ++  state-0-to-1
+    |=  old=state-0
+    ^-  (quip card state-1)
+    :-  ::  we nuke all outgoing subs, gossip will take over
+        %+  turn  ~(tap in ~(key by wex.bowl))
+        |=  [w=wire t=[@p @tas]]
+        [%pass w %agent t %leave ~]
+    =/  new=(map ship face)
+      (~(run by faces.old) |=(f=cord `face`[now.bowl `f]))
+    =?  new  !(~(has by new) our.bowl)
+      (~(put by new) our.bowl [now.bowl ~])
+    [%1 new]
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -62,20 +79,12 @@
     ::
       %noun
     ?+  q.vase  (on-poke:def mark vase)
-        [%set-face (unit @t)]
+        [%set-face (unit cord)]
       =*  new  +.q.vase
-      ?:  =(new (~(get by faces) our.bowl))
+      ?:  =(new +:(~(got by faces) our.bowl))
         [~ this]
-      :-  [%give %fact [/face/(scot %p our.bowl)]~ %face !>(`(unit cord)`new)]~
-      =-  this(faces -)
-      ?~  new  (~(del by faces) our.bowl)
-      (~(put by faces) our.bowl u.new)
-    ::
-        [%watch-face @p]
-      =*  who  +.q.vase
-      :_  this
-      =/  =path  /face/(scot %p who)
-      [%pass path %agent [who dap.bowl] %watch path]~
+      :-  [(invent:gossip %face !>(`face`[now.bowl new]))]~
+      this(faces (~(put by faces) our.bowl [now.bowl new]))
     ==
   ::
     ::  %handle-http-request: incoming from eyre
@@ -106,7 +115,7 @@
   ::
       [%~.~ %gossip %source ~]
     :_  this
-    [%give %fact ~ %face !>(`(unit cord)`(~(get by faces) our.bowl))]~
+    [%give %fact ~ %face !>((~(got by faces) our.bowl))]~
   ==
 ::
 ++  on-agent
@@ -121,11 +130,8 @@
       ?.  =(%face mark)
         ~&  [dap.bowl %unexpected-mark-fact mark wire=wire]
         [~ this]
-      =+  !<(face=(unit cord) vase)
-      =.  faces
-        ?~  face  (~(del by faces) src.bowl)
-        (~(put by faces) src.bowl u.face)
-      [~ this]
+      =+  !<(=face vase)
+      [~ this(faces (~(put by faces) src.bowl face))]
     ==
   ==
 ::

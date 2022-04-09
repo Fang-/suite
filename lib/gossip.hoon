@@ -214,6 +214,14 @@
     ++  hash-rumor
       |=(rumor [when (sham data)])
     ::
+    ++  may-watch
+      |=  who=ship
+      ?-  tell.manner
+        %anybody  &
+        %targets  (~(has in (targets:pals ~.)) who)
+        %mutuals  (~(has in (mutuals:pals ~.)) who)
+      ==
+    ::
     ::
     ++  watch-pals
       ^-  (list card)
@@ -354,7 +362,10 @@
         =^  cards  inner  (on-watch:og path)
         =^  cards  state  (play-cards:up cards)
       [cards this]
+      ::  /~/gossip/gossip
       ?>  =(/gossip t.t.path)
+      ?.  (may-watch:up src.bowl)
+        ~|(%gossip-forbidden !!)
       =^  cards  inner  (on-watch:og /~/gossip/source)
       =^  cards  state  (first-cards:up cards)
       [cards this]

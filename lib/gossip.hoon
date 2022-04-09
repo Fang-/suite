@@ -97,7 +97,6 @@
 ::
 +$  rumor
   $:  [kind=@ meta=*]
-      when=@da
       data=(cask *)
   ==
 +$  meta-0  hops=_0
@@ -112,9 +111,9 @@
   ::
   +$  state-0
     $:  %0
-        manner=config           ::  latest config
-        memory=(set [@da @uv])  ::  cages seen
-        future=(list rumor)     ::  rumors of unknown kinds
+        manner=config        ::  latest config
+        memory=(set @uv)     ::  datums seen
+        future=(list rumor)  ::  rumors of unknown kinds
     ==
   ::
   +$  card  card:agent:gall
@@ -137,7 +136,7 @@
     ++  en-rumor  ::NOTE  assumes !=(0 hops.manner)
       |=  =cage
       ^-  rumor
-      :_  [now.bowl (de-cage cage)]
+      :_  (de-cage cage)
       ~|  [%en-rumor initial-hops=hops.manner]
       [%0 `meta-0`(dec hops.manner)]
     ::
@@ -176,7 +175,7 @@
       ::  if hops is configured at 0, we don't broadcast at all.
       ::
       ~&  %gossipping
-      =.  memory  (~(put in memory) [now.bowl (sham (de-cage cage.p.card))])
+      =.  memory  (~(put in memory) (sham (de-cage cage.p.card)))
       ?:  =(0 hops.manner)  [caz state]
       =-  [[- caz] state]
       =/  =rumor  (en-rumor cage.p.card)
@@ -217,9 +216,6 @@
       ?:  =(0 hops)  ~
       =.  meta.rumor  (dec hops)
       `[%give %fact [/~/gossip/gossip]~ %gossip-rumor !>(rumor)]
-    ::
-    ++  hash-rumor
-      |=(rumor [when (sham data)])
     ::
     ++  may-watch
       |=  who=ship
@@ -407,7 +403,7 @@
             ~&  [%gossip dap.bowl %ignoring-unexpected-fact mark=mark]
             [~ this]
           =+  !<(=rumor vase)
-          =+  hash=(hash-rumor:up rumor)
+          =/  hash  (sham data.rumor)
           ~&  [%got-rume hash]
           ?:  (~(has in memory) hash)
             ~&  %hav

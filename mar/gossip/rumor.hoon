@@ -1,4 +1,4 @@
-|_  rum=[@ud @da (cask *)]
+|_  rum=[[@ *] (cask *)]
 ++  grad  %noun
 ++  grow
   |%
@@ -6,6 +6,6 @@
   --
 ++  grab
   |%
-  ++  noun  ,[@ud @da (cask *)]
+  ++  noun  ,[[@ *] (cask *)]
   --
 --

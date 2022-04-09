@@ -134,19 +134,20 @@
     ++  de-cage
       |=(cage `(cask *)`[p q.q])
     ::
-    ++  en-rumor
+    ++  en-rumor  ::NOTE  assumes !=(0 hops.manner)
       |=  =cage
       ^-  rumor
       :_  [now.bowl (de-cage cage)]
+      ~|  [%en-rumor initial-hops=hops.manner]
       [%0 `meta-0`(dec hops.manner)]
     ::
     ++  play-card  ::  en-rumor relevant facts, handle config changes
       |=  =card
       ^-  (quip ^card _state)
       ?.  ?=([%give %fact *] card)  [[card]~ state]
+      ?:  =(~ paths.p.card)  [[card]~ state]
       =/  [int=(list path) ext=(list path)]
         %+  skid  paths.p.card
-        ::TODO  what about the ~ case after +on-watch?
         |=  =path
         ?=([%~.~ %gossip *] path)
       =/  caz=(list ^card)
@@ -157,6 +158,7 @@
       ::  there may only be one gossip-internal path per card
       ::
       ?.  =(~ t.int)
+        ~&  [%gossip %too-many-internal-targets int]
         ~|([%too-many-internal-targets int] !!)
       ?:  =(/~/gossip/config path)
         ~|  [%weird-fact-on-config p.cage.p.card]
@@ -171,11 +173,13 @@
         ==
       ~|  [%strange-internal-target path]
       ?>  =(/~/gossip/source path)
+      ::  if hops is configured at 0, we don't broadcast at all.
       ::
       ~&  %gossipping
-      =/  =rumor  (en-rumor cage.p.card)
-      =.  memory  (~(put in memory) (hash-rumor rumor))
+      =.  memory  (~(put in memory) [now.bowl (sham (de-cage cage.p.card))])
+      ?:  =(0 hops.manner)  [caz state]
       =-  [[- caz] state]
+      =/  =rumor  (en-rumor cage.p.card)
       card(paths.p [/~/gossip/gossip]~, cage.p [%gossip-rumor !>(rumor)])
     ::
     ++  play-cards
@@ -187,7 +191,7 @@
       =^  caz  state  (play-card i.cards)
       $(out (weld out caz), cards t.cards)
     ::
-    ++  first-cards
+    ++  play-first-cards
       |=  cards=(list card)
       ^-  (quip card _state)
       =|  out=(list card)
@@ -197,6 +201,9 @@
         =^  caz  state  (play-card i.cards)
         $(out (weld out caz), cards t.cards)
       ~&  %first-card-detected
+      ::  if hops is set to 0, we block even the initial response
+      ::
+      ?:  =(0 hops.manner)  $(cards t.cards)
       =.  cage.p.i.cards
         [%gossip-rumor !>((en-rumor cage.p.i.cards))]
       $(out (snoc out i.cards), cards t.cards)
@@ -378,7 +385,7 @@
       ?.  (may-watch:up src.bowl)
         ~|(%gossip-forbidden !!)
       =^  cards  inner  (on-watch:og /~/gossip/source)
-      =^  cards  state  (first-cards:up cards)
+      =^  cards  state  (play-first-cards:up cards)
       [cards this]
     ::
     ++  on-agent

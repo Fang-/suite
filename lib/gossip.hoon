@@ -255,8 +255,10 @@
     ::
     ++  watch-target
       |=  s=ship
-      ^-  card
+      ^-  (list card)
       ~&  [%gossip-watch-target s]
+      ?:  (watching-target s)  ~
+      :_  ~
       :+  %pass  /~/gossip/gossip/(scot %p s)
       [%agent [s dap.bowl] %watch /~/gossip/gossip]
     ::
@@ -293,7 +295,8 @@
         `ship
       %+  weld
         (turn ~(tap in (~(dif in hearing) listen)) leave-target)
-      (turn ~(tap in (~(dif in listen) hearing)) watch-target)
+      ^-  (list card)
+      (zing (turn ~(tap in (~(dif in listen) hearing)) watch-target))
     ::
     ++  tell-changed
       |=  old=whos
@@ -468,13 +471,13 @@
           =*  ship  ship.effect
           ~&  [%hear-pals effect]
           =*  kick  ~&  %kick  [(kick-target:up ship)]~
-          =*  view  ~&  %view  [(watch-target:up ship)]~
+          =*  view  ~&  %view   (watch-target:up ship)
           =*  flee  ~&  %flee  [(leave-target:up ship)]~
           ~&  [-.effect hear.manner (watching-target:up ship)]
           ?-  -.effect
               %meet
             ?-  hear.manner
-              %anybody  ?:((watching-target:up ship) ~ view)
+              %anybody  view
               %targets  view
               %mutuals  ?:((mutual:pals ~. ship) view ~)
             ==
@@ -494,7 +497,7 @@
           ::
               %near
             ?-  hear.manner
-              %anybody  ?:((watching-target:up ship) ~ view)
+              %anybody  view
               %targets  ~
               %mutuals  ?:((mutual:pals ~. ship) view ~)
             ==
@@ -557,13 +560,8 @@
           [%watch @ ~]
         :_  this
         =/  target=ship  (slav %p i.t.t.t.t.wire)
-        ?.  ?&  !(watching-target:up target)
-                (want-target:up target)
-            ==
-          ~&  %skip
-          ~
-        ~&  %actual-retry
-        [(watch-target:up target)]~
+        ?.  (want-target:up target)  ~
+        (watch-target:up target)
       ==
     ::
     ++  on-fail

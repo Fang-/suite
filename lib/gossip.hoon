@@ -286,11 +286,11 @@
         %+  murn  ~(tap by wex.bowl)
         |=  [[=wire =ship =term] [acked=? =path]]
         ^-  (unit ^ship)
-        ?.  =([%~.~ %gossip %gossip @ ~] wire)  ~
+        ?.  ?=([%~.~ %gossip %gossip @ ~] wire)  ~
         `ship
       %+  weld
-        (turn ~(tap in (~(dif in listen) hearing)) watch-target)
-      (turn ~(tap in (~(dif in hearing) listen)) leave-target)
+        (turn ~(tap in (~(dif in hearing) listen)) leave-target)
+      (turn ~(tap in (~(dif in listen) hearing)) watch-target)
     ::
     ++  tell-changed
       |=  old=whos

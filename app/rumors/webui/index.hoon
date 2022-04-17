@@ -142,10 +142,15 @@
     ^-  manx
     ;div#listing
       ;*  ?~  rumors  ;+  ;i:"it's been strangely quiet..."
-          %+  turn  rumors
-          |=  [w=@da r=@t]
+          =/  n=@ud  0
+          |-
+          ?:  (gte n 50)  ~
+          ?:  (lth when.i.rumors (sub now ~d14))  ~
+          =*  w  when.i.rumors
           =.  w  (sub w (mod w ~s1))
-          ;div.rumor(title (scow %da w)):"{(trip r)}"
+          :-  ;div.rumor(title (scow %da w)):"{(trip what.i.rumors)}"
+          ?~  t.rumors  ~
+          $(rumors t.rumors, n +(n))
     ==
   ::
   ++  prompt

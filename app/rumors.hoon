@@ -13,8 +13,7 @@
 |%
 +$  state-0
   $:  %0
-      fresh=rumors
-      stale=(set @uv)
+      fresh=rumors  ::TODO  prune
   ==
 ::
 +$  eyre-id  @ta

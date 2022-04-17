@@ -1,4 +1,4 @@
-|_  face=(unit cord)
+|_  face=[@da (unit cord)]
 ++  grad  %noun
 ++  grow
   |%
@@ -6,6 +6,6 @@
   --
 ++  grab
   |%
-  ++  noun  (unit cord)
+  ++  noun  ,[@da (unit cord)]
   --
 --

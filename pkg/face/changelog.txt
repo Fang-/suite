@@ -1,4 +1,7 @@
 face
 
+v1.1.0, ~2022.04.17
+- use /lib/gossip for content discovery.
+
 v1.0.1, ~2022.01.22
 - use /lib/rudder for serving the web ui.

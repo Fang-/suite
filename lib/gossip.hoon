@@ -1,7 +1,13 @@
 ::  gossip: data sharing with pals
 ::
-::    automates using /app/pals for peer discovery, letting the underlying
-::    agent focus on handling the data.
+::    automates using /app/pals for peer & content discovery,
+::    letting the underlying agent focus on handling the data.
+::
+::    at the time of writing, this library has not seen much real-world
+::    use yet. it may be subject to behavioral or interface changes.
+::    it tries its best to not generate obscene amounts of network load,
+::    but has not yet proven itself in the real world.
+::    for the time being, please tread carefully.
 ::
 ::      usage
 ::
@@ -20,6 +26,10 @@
 ::
 ::    for new incoming subscriptions, the underlying agent's +on-watch is
 ::    called, with /~/gossip/source, so that it may give initial results.
+::TODO  but this is somewhat wrong for multi-hop subscriptions, right?
+::      /source is only intended to give _locally originating_ data.
+::      if hops are >1, should we do both /source and /gossip?
+::      doesn't this result in a lot of traffic, for know-a-lot cases?
 ::
 ::    when data originates locally and needs to be given to our peers,
 ::    simply produce a normal %fact on the /~/gossip/source path.

@@ -52,6 +52,8 @@
 ::    on the other hand, they're still different output types semantically,
 ::    so inconsistency isn't the end of the world. would have to see how
 ::    this ends up looking in practice.
+::  - +argue is awkward because its function signature doesn't really work
+::    if the cmd type is an atom.
 ::  - maybe unsupported methods should go to the fallback too?
 ::  - currently ambiguous: do you catch would-fail actions during +argue,
 ::    or in +solve? might be best to catch earlier, but this splits

@@ -1,0 +1,9 @@
+:~  title+'rumors'
+    info+'anonymous gossip from friends of friends'
+    color+0xbb.77dd
+    site+/rumors
+    base+'rumors'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/rumors'
+    license+'MIT'
+==

@@ -8,9 +8,7 @@
   |=  [head=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder [%set (unit cord)])
   ?~  body  ~
-  =/  args=(map @t @t)
-    %-  ~(gas by *(map @t @t))
-    (fall (rush q.u.body yquy:de-purl:html) ~)
+  =/  args=(map @t @t)  (frisk q.u.body)
   ?:  (~(has by args) 'remove')  [%set ~]
   ?~  face=(~(get by args) 'face')
     ~

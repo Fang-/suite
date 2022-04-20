@@ -40,6 +40,7 @@
 
       background: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
       background-size: 800% 800%;
+      background-attachment: fixed;
 
       -webkit-animation: bg 160s ease infinite;
       -moz-animation: bg 160s ease infinite;

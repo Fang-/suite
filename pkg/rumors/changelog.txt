@@ -1,0 +1,5 @@
+rumors
+
+v1.0.1, ~2022.04.20
+- fix rendering of the background when content can be scrolled.
+

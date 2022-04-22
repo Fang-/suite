@@ -70,7 +70,7 @@
     }
 
     form {
-      margin: 2em auto;
+      margin: 2em auto 1em;
     }
     input, button {
       background-color: rgba(0,0,0,0.3);
@@ -83,7 +83,7 @@
     }
 
     #listing {
-      padding: 0 1em;
+      padding: 1em;
     }
 
     .rumor {

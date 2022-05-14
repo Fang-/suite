@@ -284,17 +284,9 @@
       =+  avg=(div (roll (rip 3 bg) add) 3)
       ?:((gth avg 0xc1) "black" "white")
     =/  bg=tape
-      '#'^((x-co:co 6) bg)
-    =-  ;div.sigil(style "background-color: {bg};")
-          ;+  -
-        ==
-    %.  ship
-    %_  sigil-svg
-      size    20
-      fg      fg
-      bg      bg
-      margin  &
-      icon    &
+      ((x-co:co 6) bg)
+    ;div.sigil(style "background-color: #{bg}; width: 20px; height: 20px;")
+      ;img@"/pals/sigil.svg?p={(scow %p ship)}&fg={fg}&bg=%23{bg}&icon&size=20";
     ==
   ::
   ++  status

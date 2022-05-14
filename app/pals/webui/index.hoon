@@ -129,6 +129,10 @@
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
           ; ~paldev/face
         ==
+        ;br;
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/rumors/"
+          ; ~paldev/rumors
+        ==
 
 
         Tags are there mostly for your own book-keeping. Applications could

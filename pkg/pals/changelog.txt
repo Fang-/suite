@@ -1,5 +1,8 @@
 pals
 
+v1.0.10, ~2022.05.14
+- significantly improve page load times.
+
 v1.0.9, ~2022.04.02
 - add notifications when others add/remove us as pals.
 

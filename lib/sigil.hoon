@@ -150,17 +150,17 @@
     ^-  (list manx)
     =|  i=@ud
     =/  l=@ud  (lent noms)
-    =/  sym    ~(got by (sigil-symbols fg bg))
     |-
     ?~  noms  ~
     :_  $(noms t.noms, i +(i))
     ::TODO  exclude if both 0
     =+  (plan:pos i)
     ;g(transform (transform `[(sun:rd (mul x 128)) (sun:rd (mul y 128))] ~))
-      ;*  =+  (sym i.noms)
+      ;*  =+  ((symbol i.noms) fg bg)
           ?.(icon - (scag 1 -))
     ==
   ::
+  ++  symbol  ~(got by sigil-symbols)
   ::
   ++  transform  ::TODO  take manx instead so we can omit attr entirely?
     |=  [translate=(unit [x=@rd y=@rd]) scale=(unit @rd)]

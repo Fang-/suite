@@ -3,7 +3,7 @@
     color+0x3b.5998
     site+/face
     base+'face'
-    version+[1 1 0]
+    version+[1 1 1]
     website+'https://pal.dev/suite/face'
     license+'MIT'
 ==

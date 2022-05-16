@@ -1,5 +1,8 @@
 face
 
+v1.1.1, ~2022.05.16
+- prevent other ships from setting your face url.
+
 v1.1.0, ~2022.04.17
 - use /lib/gossip for content discovery.
 

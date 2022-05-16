@@ -1,5 +1,8 @@
 fafa
 
+v1.1.2, ~2022.04.16
+- prevent other ships from clobbering app state.
+
 v1.1.1, ~2022.01.22
 - fix visual issues on the factor adding page.
 - use /lib/rudder for serving the web ui.

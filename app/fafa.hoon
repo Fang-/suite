@@ -41,6 +41,7 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
+  ?>  =(src our):bowl
   ?.  =(%handle-http-request mark)
     (on-poke:def mark vase)
   ::

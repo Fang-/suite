@@ -256,11 +256,11 @@
       :-  '📁'  'collector of'                           ::  dir
       :-  '🤪'  'broken'                                 ::  wac
       :-  '✅'  'honest'                                 ::  sab
-      :-  '🧙'  'sage of'                                ::  wis
+      :-  '🧙‍♂️'  'sage of'                               ::  wis
       :-  '🥷'  'covert'                                 ::  sib
       :-  '⛵'  'hoisted'                                ::  rig
       :-  '☀'  'shining'                                ::  sol
-      :-  '☕'  'reduced'                                ::  dop
+      :-  '☕'  'jittery'                                ::  dop
       :-  '💂'  'guardian of'                            ::  mod
       :-  '🌫'  'mysterious'                             ::  fog
       :-  '🧢'  'limited'                                ::  lid
@@ -342,7 +342,7 @@
       :-  '⬆'  'ascendant'                              ::  nor
       :-  '🤖'  'mechanical'                             ::  bot
       :-  '🕯'  'illuminating'                           ::  wic
-      :-  '🧦'  'theoretical'                            ::  soc
+      :-  '🧦'  'matching'                               ::  soc
       :-  '❓'  'perplexed'                              ::  wat
       :-  '🎎'  'imitation'                              ::  dol
       :-  '🚅'  'expedient'                              ::  mag
@@ -424,13 +424,13 @@
       :-  '🥇'  'prioritized'                            ::  dib
       :-  '🐎'  'equestrian'                             ::  hos
       :-  '💯'  'maximal'                                ::  dab
-      :-  '👄'  'suggestive'  ::TODO  lip biting emoji   ::  bit
+      :-  '🫦'  'suggestive'                             ::  bit
       :-  '🍻'  'hospitable'                             ::  bar
       :-  '🦝'  'thieving'                               ::  rac
       :-  '🦜'  'talkative'                              ::  par
       :-  '🔊'  'deafening'                              ::  lod
       :-  '🐫'  'double'                                 ::  dos
-      :-  '🐗'  'gallant'                                ::  bor
+      :-  '🐗'  'strongwilled'                           ::  bor
       :-  '📑'  'arranged'                               ::  toc
       :-  '⛰'  'unyielding'                             ::  hil
       :-  '🍏'  'newtonian'                              ::  mac
@@ -482,7 +482,7 @@
       :-  '🌊'  'cascading'                              ::  riv
       :-  '🧮'  'adder of'                               ::  bac
       :-  '👮'  'upholder of'                            ::  pol
-      :-  '🧎'  'provided'                               ::  lap
+      :-  '🔂'  'repeated'                               ::  lap
       :-  '⛹'  'towering'                               ::  tal
       :-  '🕳'  'abyssal'                                ::  pit
       :-  '📛'  'named'                                  ::  nam
@@ -582,7 +582,7 @@
       :-  '🍷'  'vintage'                                ::  wyn
       :-  '🔴'  'recording'                              ::  rec
       :-  '🗄'  'database'                               ::  meg
-      :-  '🌏'  'worlds'  ::TODO  maybe 🌐?              ::  net
+      :-  '🌐'  'worlds'                                 ::  net
       :-  '👮'  'safekeeper'                             ::  sec
       :-  '🤔'  'contemplation'                          ::  mul
       :-  '📛'  'nomenclature'                           ::  nym
@@ -656,7 +656,7 @@
       :-  '⚡'  'force'                                  ::  ryg
       :-  '🐝'  'monarchy'                               ::  ryx
       :-  '📴'  'retreat'                                ::  fep
-      :-  '🚂'  'locomotion'  ::TODO  wheel emoji        ::  tyr
+      :-  '🛞'  'locomotion'                             ::  tyr
       :-  '🦣'  'mammoth'                                ::  tus
       :-  '⚠'  'attention'                              ::  tyc
       :-  '🦵'  'support'                                ::  leg
@@ -668,7 +668,7 @@
       :-  '💭'  'nous'                                   ::  nus
       :-  '🗝'  'solution'                               ::  syl
       :-  '💻'  'gateway'                                ::  tec
-      :-  '🌮'  'standoff'                               ::  mex
+      :-  '🌮'  'folding'                                ::  mex
       :-  '🍻'  'conviviality'                           ::  pub
       :-  '📝'  'poetry'                                 ::  rym
       :-  '🦃'  'thanksgiving'                           ::  tuc
@@ -688,7 +688,7 @@
       :-  '🚌'  'carriage'                               ::  bus
       :-  '🔊'  'cacophony'                              ::  bep
       :-  '🏃'  'strider'                                ::  run
-      :-  '😵'  'disarray'  ::TODO  melty-face emoji     ::  mel
+      :-  '🫠'  'disarray'                               ::  mel
       :-  '💪'  'strongman'                              ::  pex
       :-  '🌛'  'crepuscule'                             ::  dyt
       :-  '🦈'  'masticator'                             ::  byt
@@ -726,7 +726,7 @@
       :-  '🏠'  'abode'                                  ::  seb
       :-  '🚢'  'vessel'                                 ::  hul
       :-  '🧭'  'exploration'                            ::  ryl
-      :-  '👴'  'rejector'                               ::  lud
+      :-  '👴'  'luddite'                                ::  lud
       :-  '🛡'  'protector'                              ::  rem
       :-  '🤥'  'untruths'                               ::  lys
       :-  '💎'  'rarity'                                 ::  fyn

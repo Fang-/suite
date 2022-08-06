@@ -7,6 +7,7 @@ these softwares can be installed from ~paldev as landscape tiles:
 
 - **pals**: friendlist, for manual peer discovery.
 - **face**: see your pals.
+- **rumors**: gossip among pals-of-pals.
 - **fafa**: 2fa otp authenticator.
 - **cliff**: filesystem explorer & editor.
 - **picture**: a picture frame for the homescreen.
@@ -30,6 +31,7 @@ these softwares are for manual, local installation & configuration:
 ### libraries
 
 - **rudder**: framework for routing & serving simple web frontends.
+- **gossip**: wrapper for p2p data discovery & sharing.
 - **multipart**: parsing for http multipart form-data.
 - **sigil**: sigil-js but in hoon.
 - **emblemish**: alternative sigils & names, based on emoji, currently in beta.
@@ -50,7 +52,3 @@ these softwares have not yet been updated for the new world:
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`.
 - **bard**: interactive storyteller for use with `|link`.
 - **djay**: backend for synced viewing of youtube videos, sourced from a chat channel.
-
-
-
-

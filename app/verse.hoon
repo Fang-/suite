@@ -61,9 +61,12 @@
     |^  ?+  site  [[404 ~] `(as-octs 'unexpected route')]
             [%verse %study ~]
           =-  [[302 ['location' -]~] ~]
+          =.  link-index        
+              ?~  (find "ii " index)  index
+              (weld "2" (oust [0 2] index))
           %^  cat  3
             'https://www.catholiccrossreference.online/fathers/index.php/'
-          (crip (cass index))
+          (crip (cass link-index))
         ::
             [%verse %verse ~]
           =;  svg

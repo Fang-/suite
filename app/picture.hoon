@@ -66,6 +66,7 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
+  ?>  =(our src):bowl
   ?+  mark  (on-poke:def mark vase)
       %noun
     =+  f=(? q.vase)

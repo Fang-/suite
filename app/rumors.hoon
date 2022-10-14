@@ -11,8 +11,8 @@
 /$  grab-rumor  %noun  %rumor
 ::
 |%
-+$  state-0
-  $:  %0
++$  state-1
+  $:  %1
       fresh=rumors  ::TODO  prune
   ==
 ::
@@ -20,7 +20,7 @@
 +$  card     card:agent:gall
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  %+  agent:gossip
@@ -44,8 +44,23 @@
 ++  on-load
   |=  ole=vase
   ^-  (quip card _this)
-  =/  old=state-0  !<(state-0 ole)
-  [~ this(state old)]
+  |^  ^-  (quip card _this)
+      =/  old=state-any  !<(state-any ole)
+      =?  old  ?=(%0 -.old)  (state-0-to-1 old)
+      ?>  ?=(%1 -.old)
+      [~ this(state old)]
+  ::
+  +$  state-any  $%(state-0 state-1)
+  ::
+  +$  state-0  [%0 fresh=rumors]
+  ++  state-0-to-1
+    |=  old=state-0
+    ^-  state-1
+    :-  %1
+    %+  turn  fresh.old
+    |=  r=rumor
+    r(when (min when.r now.bowl))
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -98,6 +113,10 @@
     (on-agent:def wire sign)
   =+  !<(=rumor q.cage.sign)
   :-  ~
+  ::  ignore rumors from the far future
+  ::
+  ?:  (gth when.rumor (add now.bowl ~h1))
+    this
   ::TODO  notify if your @p is mentioned?
   =-  this(fresh -)
   |-  ^+  fresh

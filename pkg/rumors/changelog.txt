@@ -1,5 +1,8 @@
 rumors
 
+v1.0.3, ~2022.10.15
+- ignore future-posters.
+
 v1.0.2, ~2022.04.22
 - fix spacing at the bottom of the list, which was absent in some browsers.
 

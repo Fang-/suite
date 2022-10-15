@@ -1,5 +1,8 @@
 picture
 
+v1.1.3, ~2022.10.15
+- prevent other ships from setting your picture.
+
 v1.1.2, ~2022.01.02
 - disable the christmas frame.
 

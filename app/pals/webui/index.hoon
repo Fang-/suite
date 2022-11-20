@@ -180,22 +180,30 @@
         find ships to talk to, pull content from, etc.
 
         Some applications that are better with pals:
+        ;a/"/apps/grid/perma?ext=web+urbitgraph://~holnes/whom/"
+          ; ~holnes/whom
+        ==
+        ; , contact book.
+        ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
           ; ~hastuc^dibtux/zone
         ==
+        ; , timezone sharing.
         ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~dister-fabnev-hinmur/escape/"
           ; ~fabnev^hinmur/escape
         ==
+        ; , enhanced groups interface.
         ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
           ; ~paldev/face
         ==
+        ; , book of faces.
         ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/rumors/"
           ; ~paldev/rumors
         ==
-
+        ; , gossip mill.
 
         Tags are there mostly for your own book-keeping. Applications could
         make use of them for grouping content, but should not change their

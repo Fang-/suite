@@ -19,6 +19,8 @@
     ~
   ?~  who=(slaw %p (~(gut by args) 'who' ''))
     'invalid ship name'
+  ?:  =(u.who our.bowl)
+    'befriend your inner self'
   |^  ?+  u.what  'say what now'
           ?(%meet %part)
         ?:  ?=(%part u.what)

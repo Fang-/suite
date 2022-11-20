@@ -18,24 +18,29 @@
   ?~  what=(~(get by args) 'what')
     ~
   ?~  who=(slaw %p (~(gut by args) 'who' ''))
-    ~
-  |^  ?+  u.what  ~
+    'invalid ship name'
+  |^  ?+  u.what  'say what now'
           ?(%meet %part)
         ?:  ?=(%part u.what)
           [%part u.who ~]
-        [%meet u.who get-lists]
+        =/  tags  get-lists
+        ?~  tags  tag-error
+        [%meet u.who u.tags]
       ::
           ?(%enlist %unlist)
-        =/  tags=(set @ta)  get-lists
-        ?:  =(~ tags)  ~
+        =/  tags  get-lists
+        ?~  tags  tag-error
+        ?:  =(~ u.tags)  'no-op'
         ?:  ?=(%enlist u.what)
-          [%meet u.who tags]
-        [%part u.who tags]
+          [%meet u.who u.tags]
+        [%part u.who u.tags]
       ==
   ::
+  ++  tag-error
+    'tags must be in @ta (lowercase & url-safe) format and comma-separated'
+  ::
   ++  get-lists
-    ^-  (set @ta)
-    =-  (fall - ~)
+    ^-  (unit (set @ta))
     %+  rush  (~(gut by args) 'lists' '')
     %+  cook
       |=(s=(list @ta) (~(del in (~(gas in *(set @ta)) s)) ''))

@@ -1,5 +1,9 @@
 pals
 
+v1.0.11, ~2022.11.21
+- add filtering to the pals list view, by relation or by tag.
+- improve error handling.
+
 v1.0.10, ~2022.05.14
 - significantly improve page load times.
 

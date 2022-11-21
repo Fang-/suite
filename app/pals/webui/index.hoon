@@ -9,7 +9,7 @@
     +$  role  ?(%all %mutual %target %leeche)
     --
 ::
-|_  [=bowl:gall * records]
+|_  [=bowl:gall order:rudder records]
 ++  argue
   |=  [headers=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder command)
@@ -49,7 +49,7 @@
     (more (ifix [. .]:(star ace) com) urs:ab)
   --
 ::
-++  final  (alert:rudder (cat 3 '/' dap.bowl) build)
+++  final  (alert:rudder url.request build)
 ::
 ++  build
   |=  $:  arg=(list [k=@t v=@t])

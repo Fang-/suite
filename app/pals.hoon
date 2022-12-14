@@ -51,7 +51,7 @@
 ::    /targets   target-effect   effect for every addition/removal
 ::    /leeches   leeche-effect   effect for every addition/removal
 ::
-/-  *pals, hark=hark-store
+/-  *pals
 /+  rudder, dbug, verb, default-agent
 ::
 /~  pages  (page:rudder records command)  /app/pals/webui
@@ -168,17 +168,18 @@
         =/  =cage    [%pals-effect !>(effect)]
         [%give %fact [/leeches]~ cage]
       ::
-        ?.  .^(? %gu /(scot %p our.bowl)/hark-store/(scot %da now.bowl))  ~
-        =/  title=(list content:hark)
+        ?.  .^(? %gu /(scot %p our.bowl)/hark/(scot %da now.bowl))  ~
+        =/  body
           =-  [ship+ship - ~]
           ?-  -.gesture
-            %hey  text+' added you as a pal.'
-            %bye  text+' no longer considers you a pal.'
+            %hey  ' added you as a pal.'
+            %bye  ' no longer considers you a pal.'
           ==
-        =/  =bin:hark     [/[dap.bowl] q.byk.bowl /(scot %p ship)/[-.gesture]]
-        =/  =action:hark  [%add-note bin title ~ now.bowl / /pals]
-        =/  =cage         [%hark-action !>(action)]
-        [%pass /hark %agent [our.bowl %hark-store] %poke cage]~
+        =/  id      (end 7 (shas %pals-notification eny.bowl))
+        =/  rope    [~ ~ q.byk.bowl /(scot %p ship)/[-.gesture]]
+        =/  action  [%add-yarn & & id rope now.bowl body /pals ~]
+        =/  =cage   [%hark-action !>(action)]
+        [%pass /hark %agent [our.bowl %hark] %poke cage]~
     ==
   ::
     ::  %handle-http-request: incoming from eyre

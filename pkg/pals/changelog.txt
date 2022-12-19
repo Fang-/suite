@@ -1,5 +1,8 @@
 pals
 
+v1.0.12, ~2022.12.19
+- update notification mechanism for new hark.
+
 v1.0.11, ~2022.11.21
 - add filtering to the pals list view, by relation or by tag.
 - improve error handling.

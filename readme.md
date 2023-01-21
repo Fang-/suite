@@ -10,6 +10,7 @@ these softwares can be installed from ~paldev as landscape tiles:
 - **rumors**: gossip among pals-of-pals.
 - **fafa**: 2fa otp authenticator.
 - **cliff**: filesystem explorer & editor.
+- **scooore**: local scoreboard for chat reacts.
 - **picture**: a picture frame for the homescreen.
 - **verse**: daily random bible verse for the homescreen.
 

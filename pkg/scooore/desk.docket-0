@@ -1,0 +1,10 @@
+:~  title+'sc\'o\'re'
+    info+'leaderboard for groups\' [\'o\']s, as seen on tv!'
+    color+0xff.ff00
+    image+'/scooore/tile.svg'
+    site+/scooore
+    base+'scooore'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/scooore'
+    license+'MIT'
+==

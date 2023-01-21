@@ -1,0 +1,25 @@
+# general dependencies we need for all our packages
+
+< urbit/pkg/arvo
+> mar
+mar/noun.hoon
+mar/hoon.hoon
+mar/kelvin.hoon
+mar/mime.hoon
+mar/bill.hoon
+mar/txt.hoon
+> sur
+sur/verb.hoon
+> lib
+lib/dbug.hoon
+lib/verb.hoon
+lib/default-agent.hoon
+lib/skeleton.hoon
+
+< landscape/desk
+> mar
+/mar/docket-0.hoon
+> sur
+/sur/docket.hoon
+> lib
+/lib/docket.hoon

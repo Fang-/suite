@@ -1,4 +1,4 @@
-::  then: trigger, condition, action, and so on
+::  then: when trigger, then action
 ::
 ::    "ifttt but for urbit" is, of course, a more interesting pitch than
 ::    ifttt themselves could ever provide.
@@ -9,7 +9,8 @@
 ::
 ::TODO  2023-01-07
 ::    1) import prefab files from installed desks
-::       a) super dumb minimal prefabs for all default behaviors in this desk
+::       - prefabs should be able to take user arguments to adjust their behavior
+::       - super dumb minimal prefabs for all default behaviors in this desk?
 ::    2) present those and their arg fields in the ui
 ::    3) ???
 ::    4) profit
@@ -57,140 +58,181 @@
 ::
 /-  sur=then
 /+  rudder, dbug, verb, default-agent
-/~  pages  (page:rudder xxxx.sur task.sur)  /app/then/webui
+:: /~  pages  (page:rudder xxxx.sur task.sur)  /app/then/webui
 ::
 =,  sur
 ::
 |%
-+$  state-0
-  $:  %0
-      xxxx
-  ==
-::
++$  state-0  [%0 xxxx]
++$  card     $+(card card:agent:gall)
 --
 ::
 ::  +|  %helpfuls
 ::
 |%
+++  pluk
+  |=  =wire
+  ^-  [@ta ^wire]
+  ?>(?=([@ *] wire) wire)
+::
 ++  gild  ::  resolve to gill
   |=  [our=ship =gent]
   ^-  gill:gall
   ?^(gent gent [our gent])
 ::
-++  whin  ::  resolve to inner when
+++  whin  ::  resolve to inner thing
+  |*  x=$^((made *) [@ *])
+  ?@  -.x  x
+  ~|  %uninflated-prefab
+  (need made.x)
+::
+++  will  ::  bill from when
   |=  =when
-  ^+  when
-  ?+  -.when  when
-    %test  $(when when.when)
+  ^-  bill
+  ?+  -.when  [-.when]~
+    %peer  ~[%peer %quit]
+    %fold  $(when when.when)
   ==
-::  +mk: usercode building
 ::
-++  mk
-  |%
-  ++  context
-    |=  [=make =self]
-    ^-  vase
-    %-  slop
-    :_  !>([self=self sur ..zuse])
-    =/  v=vase  !>(~)
-    |-
-    ?~  vars.make  v
-    ::TODO  bunting args somewhat questionable, probably prevent reaching this
-    =?  args.make  ?=(~ args.make)
-      ~&  [%then %oops-arg-bunt [face desc]:i.vars.make]
-      ?:  =(%da aura.i.vars.make)  [*@da ~]
-      [0 ~]
-    ?>  ?=(^ args.make)
-    (slop [[%atom aura.i.vars.make ~] i.args.make] v)
-  ::
-  ++  build  ::  and validate
-    |=  =make
-    ^-  (each nock tang)
-    ::  parse & mint the hoon
-    ::
-    =/  tonk=(each (pair type nock) hair)
-      =/  vex
-        ((full vest) [0 0] (trip code.make))
-      ?~  q.vex  |+p.vex
-      &+(~(mint ut -:(context make *self)) %noun p.u.q.vex)
-    ?:  ?=(%| -.tonk)
-      |+~[leaf+"\{{<p.p.tonk>} {<q.p.tonk>}}" 'syntax error']
-    ::  type-check the result
-    ::TODO  can we type-check to make sure it accepts a fact?
-    ::
-    =/  tout=type  (slit p.p.tonk -:!>(*fact))
-    ?:  (~(nest ut -:!>(*then)) | tout)
-      &+q.p.tonk
-    |+~['nest-fail']  ::TODO  we can't get the need & have out, can we?
-  ::
-  ++  execute
-    |*  prod=mold
-    |=  [=make =self simp=*]
-    ^-  (unit prod)
-    ::TODO  will this +soft be dangerously slow?
-    ::TODO  what if this produces a %make? (forbidden rn, but what if...)
-    %-  (soft prod)
-    =-  (slum - simp)
-    .*(+:(context make self) ?>(?=(%& -.nock.make) p.nock.make))
-  ::
-  ++  inflate-when
-    |=  =when
-    ^-  [? _when]
-    ?+  -.when  &^when
-      %test  ?:  ?=(%& -.nock.make.when)  &^when  ::NOTE  trusts the plan
-             =/  nok  (build make.when)
-             [-.nok when(nock.make nok)]
-      %make  ?:  ?=(%& -.nock.make.when)  &^when  ::NOTE  trusts the plan
-             =/  nok  (build make.when)
-             [-.nok when(nock.make nok)]
-    ==
-  ::
-  ++  inflate-then
-    |=  =then
-    ^-  [? _then]
-    ?+  -.then  &^then
-      %make  ?:  ?=(%& -.nock.make.then)  &^then  ::NOTE  trusts the plan
-             =/  nok  (build make.then)
-             [-.nok then(nock.make nok)]
-      :: %wait  then(then $(then then.then))
-      %both  =/  l  $(then this.then)
-             =/  r  $(then that.then)
-             [&(-.l -.r) then(this +.l, that +.r)]
-    ==
-  ::
-  ++  deflate-when
-    |=  =when
-    ^+  when
-    ?+  -.when  when
-      %test  when(nock.make |+~)
-      %make  when(nock.make |+~)
-    ==
-  ::
-  ++  deflate-then
-    |=  =then
-    ^+  then
-    ?+  -.then  then
-      %make  then(nock.make |+~)
-      :: %wait  then(then $(then then.then))
-      %both  then(this $(then this.then), that $(then that.then))
-    ==
-  --
---
+++  till  ::  bill for then
+  |=  =then
+  ^-  bill
+  ?+  -.then  ~
+    %take  bill.then
+  ==
 ::
-::  +|  %builtins
+++  pays  ::  fact fits bill?
+  |=  [=fact =bill]
+  ^-  ?
+  ?:  =(~ bill)  &
+  =-  (fits - bill)
+  ?.  ?=(%cash -.fact)  [-.fact]~
+  [%cash (turn +.fact head)]~
 ::
-:: |%
-:: ++  if
-::   ^-  (list [@ta part])
-::   :~
-::     :+  'new mutual pal'
-::       'fires if new mutual pal'
-::     :-  %when
-::     :+  %test
-::       [%peer []]
+++  fits  ::  chainable bills?
+  |=  [give=bill take=bill]
+  ^-  ?
+  ?:  =(~ take)  &
+  %+  lien  give
+  |=  give=debt
+  %+  lien  take
+  |=  take=debt
+  ?@  take  =(give take)
+  ?>  =(-.take %cash)
+  ?.  =(-.give %cash)  |
+  ?~  what.take  &
+  =(give take)
+::
+:: ::  +mk: usercode building
+:: ::
+  :: ++  mk
+  ::   |%
+  ::   ++  context
+  ::     |=  [=make =self]
+  ::     ^-  vase
+  ::     %-  slop
+  ::     :_  !>([self=self sur ..zuse])
+  ::     =/  v=vase  !>(~)
+  ::     |-
+  ::     ?~  vars.make  v
+  ::     ::TODO  bunting args somewhat questionable, probably prevent reaching this
+  ::     =?  args.make  ?=(~ args.make)
+  ::       ~&  [%then %oops-arg-bunt [face desc]:i.vars.make]
+  ::       ?:  =(%da aura.i.vars.make)  [*@da ~]
+  ::       [0 ~]
+  ::     ?>  ?=(^ args.make)
+  ::     (slop [[%atom aura.i.vars.make ~] i.args.make] v)
+  ::   ::
+  ::   ++  build  ::  and validate
+  ::     |=  =make
+  ::     ^-  (each nock tang)
+  ::     ::  parse & mint the hoon
+  ::     ::
+  ::     =/  tonk=(each (pair type nock) hair)
+  ::       =/  vex=(like hoon)
+  ::         ?^  code.make  [*hair `[code.make *nail]]
+  ::         ((full vest) [0 0] (trip code.make))
+  ::       ?~  q.vex  |+p.vex
+  ::       &+(~(mint ut -:(context make *self)) %noun p.u.q.vex)
+  ::     ?:  ?=(%| -.tonk)
+  ::       |+~[leaf+"\{{<p.p.tonk>} {<q.p.tonk>}}" 'syntax error']
+  ::     ::  type-check the result
+  ::     ::TODO  can we type-check to make sure it accepts a fact?
+  ::     ::
+  ::     =/  tout=type  (slit p.p.tonk -:!>(*fact))
+  ::     ?:  (~(nest ut -:!>(*then)) | tout)
+  ::       &+q.p.tonk
+  ::     |+~['nest-fail']  ::TODO  we can't get the need & have out, can we?
+  ::   ::
+  ::   ++  execute
+  ::     |*  prod=mold
+  ::     |=  [=make =self simp=*]
+  ::     ^-  (unit prod)
+  ::     ::TODO  will this +soft be dangerously slow?
+  ::     ::TODO  what if this produces a %make? (forbidden rn, but what if...)
+  ::     %-  (soft prod)
+  ::     =-  (slum - simp)
+  ::     .*(+:(context make self) ?>(?=(%& -.nock.make) p.nock.make))
+  ::   ::
+  ::   ++  inflate-when
+  ::     |=  =when
+  ::     ^-  [? _when]
+  ::     ?+  -.when  &^when
+  ::       %test  ?:  ?=(%& -.nock.make.when)  &^when  ::NOTE  trusts the plan
+  ::              =/  nok  (build make.when)
+  ::              [-.nok when(nock.make nok)]
+  ::       %make  ?:  ?=(%& -.nock.make.when)  &^when  ::NOTE  trusts the plan
+  ::              =/  nok  (build make.when)
+  ::              [-.nok when(nock.make nok)]
+  ::     ==
+  ::   ::
+  ::   ++  inflate-then
+  ::     |=  =then
+  ::     ^-  [? _then]
+  ::     ?+  -.then  &^then
+  ::       %make  ?:  ?=(%& -.nock.make.then)  &^then  ::NOTE  trusts the plan
+  ::              =/  nok  (build make.then)
+  ::              [-.nok then(nock.make nok)]
+  ::       :: %wait  then(then $(then then.then))
+  ::       %both  =/  l  $(then this.then)
+  ::              =/  r  $(then that.then)
+  ::              [&(-.l -.r) then(this +.l, that +.r)]
+  ::     ==
+  ::   ::
+  ::   ++  deflate-when
+  ::     |=  =when
+  ::     ^+  when
+  ::     ?+  -.when  when
+  ::       %test  when(nock.make |+~)
+  ::       %make  when(nock.make |+~)
+  ::     ==
+  ::   ::
+  ::   ++  deflate-then
+  ::     |=  =then
+  ::     ^+  then
+  ::     ?+  -.then  then
+  ::       %make  then(nock.make |+~)
+  ::       :: %wait  then(then $(then then.then))
+  ::       %both  then(this $(then this.then), that $(then that.then))
+  ::     ==
+  ::   --
+  :: --
+  ::
+  ::  +|  %builtins
+  ::
+  :: |%
+  :: ++  if
+  ::   ^-  (list [@ta part])
+  ::   :~
+  ::     :+  'new mutual pal'
+  ::       'fires if new mutual pal'
+  ::     :-  %when
+  ::     :+  %test
+  ::       [%peer []]
 
-::   ==
-:: --
+  ::   ==
+  :: --
+--
 ::
 ::  +|  %business
 ::
@@ -198,6 +240,8 @@
 |_  [state-0 =bowl:gall]
 +*  this   .
     state  +<-
+::
+::  +|  %aides
 ::
 ++  abet
   ^-  (quip card:agent:gall _state)
@@ -207,21 +251,7 @@
   |=  =card:agent:gall
   this(caz [card caz])
 ::
-++  pluk
-  |=  =wire
-  ^-  [@ta ^wire]
-  ?>(?=([@ *] wire) [i t]:wire)
-::
-++  want
-  |=  [=when =fact]
-  ^-  ?
-  ?-  -.when
-    %kick  ?=(%kick -.fact)
-    %time  ?=(%time -.fact)
-    %peer  ?=(?(%peer %reap %quit) -.fact)
-    %test  $(when when.when)
-    %make  &(?=(^ have.when) $(when u.have.when))
-  ==
+::  +|  %cycle
 ::
 ++  init
   ^+  this
@@ -229,19 +259,69 @@
       (emit %pass /eyre/bind %arvo %e %connect [~ /[dap.bowl]] dap.bowl)
   ==
 ::
+++  save
+  ^+  state
+  =-  state(flows -)
+  %-  ~(run by flows)
+  |=  f=flow
+  f  ::TODO  deflate gates out of made components?
+  ::TODO  deflate usercode
+::
 ++  load
   ^+  this
-  =/  foz  ~(tap by flows)
-  |-
-  ?~  foz  this
-  =*  f  q.i.foz
-  =^  w  when.f  (inflate-when:mk when.f)
-  =^  t  then.f  (inflate-then:mk then.f)
-  ?:  &(w t)
-    =.  flows  (~(put by flows) p.i.foz f)
-    $(foz t.foz)
-  =.  this  fo-abet:~(fo-halt fo i.foz)
-  $(foz t.foz)
+  ::TODO  inflate gates in made components?
+  this
+  :: =/  foz  ~(tap by flows)
+  :: |-
+  :: ?~  foz  this
+  :: =*  f  q.i.foz
+  :: =^  w  when.f  (inflate-when:mk when.f)
+  :: =^  t  then.f  (inflate-then:mk then.f)
+  :: ?:  &(w t)
+  ::   =.  flows  (~(put by flows) p.i.foz f)
+  ::   $(foz t.foz)
+  :: =.  this  fo-abet:~(fo-halt fo i.foz)
+  :: $(foz t.foz)
+::
+++  surf
+  |=  waz=(list wave:tire:clay)
+  ^+  this
+  ?~  waz  this
+  =.  tires  (wash:tire:clay tires i.waz)
+  ?.  ?=(%zest -.i.waz)  $(waz t.waz)
+  =.  this
+    ::  start yard reads for live apps, stop them for not-running ones
+    =*  desk  desk.i.waz
+    =/  =rave:clay  [%sing %a da+now.bowl /app/then/yard/hoon]
+    =/  =wire       /clay/yard/[desk]
+    ?-  zest.i.waz
+      %live           (emit %pass wire %arvo %c %warp our.bowl desk `rave)
+      ?(%held %dead)  (emit %pass wire %arvo %c %warp our.bowl desk ~)
+    ==
+  $(waz t.waz)
+::
+++  wree
+  |=  [=desk =riot:clay]
+  ^+  this
+  ::  if we get any result, always request the next result
+  ::
+  =/  =case:clay  ?~(riot da+now.bowl q.p.u.riot)
+  =/  =rave:clay  [%next %a case /app/then/yard/hoon]
+  =/  =wire       /clay/yard/[desk]
+  =.  emit        (emit %pass wire %arvo %c %warp our.bowl desk `rave)
+  ::
+  ?~  riot
+    ::TODO  disable flows that depended on this
+    this(yards (~(del by yards) desk))
+  ?>  ?=(%vase p.r.u.riot)
+  =+  !<(=vase q.r.u.riot)
+  ?.  (~(nest ut -:!>(*yard)) | p.vase)
+    ~&  'that aint no yard my man'
+    this
+  =+  !<(=yard vase)
+  ~&  %got-yard-yess
+  ::TODO  try updating flows that depended on this
+  this(yards (~(put by yards) desk yard))
 ::
 ++  call
   |=  =task
@@ -251,7 +331,7 @@
     =,  task
     =?  this  (~(has by flows) nom)
       (call %erase nom)
-    fo-abet:fo-boot:(fo-apex:fo nom `flow`[nam %stop ~ wen den])
+    fo-abet:fo-boot:(fo-apex:fo nom `flow`[nam %stop ~ rop])
   ::
       ?(%pause %erase)
     =/  f  ~(fo-shut fo nom.task (~(got by flows) nom.task))
@@ -264,13 +344,20 @@
     (take /[nom.task]/kick %kick dat.task)
   ==
 ::
+++  reap
+  |=  =wire
+  =^  nom  wire  (pluk wire)
+  ?~  fow=(~(get by flows) nom)
+    ~&  [dap.bowl %reap-on-nonexistent-flow nom -.fact]
+    this
+  fo-abet:(~(fo-reap fo nom u.fow) wire)
+::
 ++  take
   |=  [=wire =fact]
   ^+  this
   =^  nom  wire  (pluk wire)
-  ?~  fow=(~(get by flows) nom)  this
-  ?.  (want when.u.fow fact)
-    ~&  [dap.bowl %dropping-unexpected-take flow=nom when=make take=fact]
+  ?~  fow=(~(get by flows) nom)
+    ~&  [dap.bowl %take-on-nonexistent-flow nom -.fact]
     this
   fo-abet:(~(fo-take fo nom u.fow) wire fact)
 ::
@@ -278,7 +365,7 @@
 ::
 ++  fo
   |_  [name=@ta =flow]
-  +*  fo    .
+  +*  fo  .
   ::
   ::  +|  engine lifecycle
   ::
@@ -307,6 +394,7 @@
   ::
   ++  fo-note
     |=  =tang
+    ::TODO  if now.bowl already an entry, pre/append?
     fo(logs.flow [[now.bowl tang] logs.flow])
   ::
   ++  fo-self
@@ -324,145 +412,164 @@
   ::
   ++  fo-halt  ::  failed to inflate
     |=  =tang
-    ::TODO  =.  live.flow  %fail
+    ::TODO  =.  live.flow  %fail, probably also fo-shut if running
     fo-shut:(fo-note 'failed to (re)compile' tang)
   ::
   ++  fo-boot  ::  set up
     ^+  fo
-    =.  live.flow  then.flow
-    ?-  -.when.flow
+    =.  live.flow  %live
+    =/  =when  (whin when.flow)
+    |-
+    ?-  -.when
       %kick  fo
-      %peer  =/  =gill:gall  (gild our.bowl gent.when.flow)
-             (fo-pass /when %agent gill %watch path.when.flow)
-      %time  (fo-pass /when %arvo %b %wait from.when.flow)
-      %test  =/  orig=when  when.flow
-             =.  fo
-               =/  fo  fo-boot(when.flow when.when.flow)
-               =>(fo(when.flow orig) ?>(?=(%test -.when.flow) .))
-             fo(when.flow orig)
-      %make  =/  orig=when  when.flow
-             =.  fo
-               =/  fo  fo-boot(when.flow (need have.when.flow))
-               =>(fo(when.flow orig) ?>(?=(%make -.when.flow) .))
-             fo(when.flow orig)
+      %peer  (fo-peer +.when)
+      %time  (fo-wait from.when)
+      %fold  $(when when.when)
     ==
   ::
   ++  fo-shut  ::  tear down
     ^+  fo
     =.  live.flow  %stop
-    ?-  -.when.flow
+    =/  =when  (whin when.flow)
+    |-
+    ?-  -.when
       %kick  fo
-      %peer  (fo-pass /when %agent (gild our.bowl gent.when.flow) %leave ~)
-      %time  (fo-pass /when %arvo %b %rest from.when.flow)
-      %test  =/  orig  when.flow
-             =.  fo
-               =/  fo  fo-shut(when.flow when.when.flow)
-               =>(fo(when.flow orig) ?>(?=(%test -.when.flow) .))
-             fo(when.flow orig)
-      %make  =/  orig  when.flow
-             =.  fo
-               =/  fo  fo-shut(when.flow (need have.when.flow))
-               =>(fo(when.flow orig) ?>(?=(%make -.when.flow) .))
-             fo(when.flow orig(have ~))
+      %peer  (fo-pass /when/peer %agent (gild our.bowl gent.when) %leave ~)
+      %time  (fo-pass /when/wait %arvo %b %rest from.when)
+      %fold  $(when when.when)
     ==
   ::
   ++  fo-heal  ::  set up for new cycle
     ^+  fo
-    ?+  -.when.flow
-      ::  re-set the flow
-      ::
-      fo(live.flow then.flow)
+    =/  =when  (whin when.flow)
+    ::TODO  if prefab, do we want to re-compute the trigger?
+    ::      a little bit weird wrt recurring timers, but not that bad?
+    |-
+    ?+  -.when  fo
+      %fold  $(when when.when)
     ::
         %time
-      ?~  reap.when.flow
+      ?~  reap.when
         ::  disable one-off timer flows when done
         ::
         fo(live.flow %stop)
-      ::  re-set the flow & its recurring timer
-      ::
-      =;  nex=@da
-        =.  flow  flow(from.when nex, live then.flow)
-        (fo-pass /when %arvo %b %wait nex)
       ::  the next timer that's in the future
       ::
-      %+  add  now.bowl
-      =*  inc=@dr  u.reap.when.flow
-      (sub inc (mod (sub now.bowl from.when.flow) inc))
-    ::
-        %make
-      =.  live.flow  then.flow
-      =/  orig=when  when.flow
-      =/  next=(unit when)
-        ::  compute the next trigger
-        ::
-        ::NOTE  we don't inflate, producing a new %make illegal for now
-        %-  (execute:mk when)
-        [make.when.flow fo-self ~]
-      ?~  next
-        (fo-fail 'dynamic trigger not valid')
-      ::  if the new trigger is different, re-do the setup
+      =/  nex=@da
+        %+  add  now.bowl
+        =*  inc=@dr  u.reap.when
+        (sub inc (mod (sub now.bowl from.when) inc))
+      ::  re-set the flow & its recurring timer
       ::
-      ?:  =(have.when.flow next)
-        fo
-      =.  fo
-        ::  i hate this compiler-enforced pattern...
-        =/  fo  fo-shut(when.flow (need have.when.flow))
-        =>(fo(when.flow orig) ?>(?=(%make -.when.flow) .))
-      fo-boot(have.when.flow next)
+      =.  from.when  nex
+      =.  when.flow
+        ?@  -.when.flow  when
+        ?>  ?=(^ made.when.flow)
+        when.flow(u.made when)
+      (fo-wait nex)
     ==
   ::
+  ++  fo-reap
+    |=  =wire
+    ?.  =(%live live.flow)  fo
+    =/  =when  (whin when.flow)
+    ?.  ?=(%peer -.when)  fo
+    ::TODO  what if it's for an old subscription?
+    (fo-peer +.when)
+  ::
+  ::TODO  logging and lifecycle management is split apart between +fo-take,
+  ::      +fo-wave and +fo-then. lifecycle management is maybe fine, but do
+  ::      need to be careful. logging clearly needs reform.
   ++  fo-take
     |=  [=wire =fact]
     ^+  fo
-    ?@  live.flow  fo
-    =/  =when  (whin when.flow)
+    ~|  [flow=name wire]
+    ?.  ?=([%when *] wire)
+      ~|  todo+wire
+      !!
+    ?.  =(%live live.flow)
+      ~&  [dap.bowl %dropping-take-on-dead-flow name -.fact]
+      fo
+    =?  fo  =(%live live.flow)
+      (fo-wave fact)
     ::  if subscription got killed, kill the flow
     ::
+    ::TODO  %peer check here necessary as guard against mismatching/late nack?
+    ::TODO  what if it's for an old subscription?
     ?:  &(?=(%quit -.fact) ?=(%peer -.when))
       fo-shut:(fo-note 'subscription nacked; disabling flow' tang.fact)
-    ::  if subscription got kicked, repair it
     ::
-    ?:  &(?=(%reap -.fact) ?=(%peer -.when))
-      =/  =gill:gall  (gild our.bowl gent.when)
-      (fo-pass /when %agent gill %watch path.when)
-    ::  if needed, filter
+    ?:  =(%live live.flow)
+      fo-done
+    fo
+  ::
+  ++  fo-wave
+    |=  =fact
+    ^+  fo
+    ::  ensure the fact lines up with the trigger
     ::
-    ?:  ?=(%test -.when.flow)
-      =/  good=(unit ?)
-        ((execute:mk ?) make.when.flow fo-self fact)
-      ?~  good
-        (fo-fail 'dynamic filter not valid')
-      ?.  u.good  fo
-      (fo-step live.flow fact)
-    ::  otherwise, simply trigger
+    =/  =when  (whin when.flow)
+    ?.  (pays fact (will when))
+      ?:  ?=(%quit -.fact)  fo  ::TODO  just a lil sus
+      ::TODO  kind want to render took=%cash in full
+      ~|  [%strange-fact flow=name xpec=(will when) took=-.fact]
+      !!
+    ::  apply all the transformations, but stop if the input doesn't match
     ::
-    (fo-step live.flow fact)
+    =/  fols  fold.flow
+    |-  ^+  fo
+    ?^  fols
+      =/  =fold  (whin i.fols)
+      ?.  (pays fact take.fold)
+        fo  ::TODO  may want to store metadata about how far we got
+      =/  felt=(unit ^fact)  (gait.fold fo-self fact)
+      ?~  felt
+        fo  ::TODO  may want to store metadata about how far we got
+      ?.  (pays fact give.fold)
+        (fo-fail 'unexpected output by fold')  ::TODO  more deets
+      $(fols t.fols, fact u.felt)
+    ::  run all the actions for which the final fact matches
+    ::
+    =/  thes  then.flow
+    |-  ^+  fo
+    ?^  thes
+      =/  =then  (whin i.thes)
+      ?.  (pays fact (till then))
+        fo
+      =.  fo  (fo-then then fact)
+      $(thes t.thes)
+    fo
   ::
   ::TODO  would really rather inline this in +fo-take,
   ::      but the type information from the ?- propagates up to the |-
   ::      it would be under, making $ recursion nearly impossible
-  ++  fo-step
+  ++  fo-then
     |=  [=then =fact]
     ^+  fo
     ?-  -.then
-      %poke  fo-done:(fo-poke [gent cage]:then)
-      %talk  fo-done:(fo-talk what.then)
-      %none  fo-done
+      %poke  fo:(fo-poke [gent cage]:then)
+      %talk  fo:(fo-talk tank.then)
+      %none  fo
       %kill  fo-shut:(fo-note 'disabled by self' ~)
     ::
-      %make  =/  next=(unit ^then)
-               ::NOTE  we don't inflate, producing a new %make illegal for now
-               %-  (execute:mk ^then)
-               [make.then fo-self fact]
-             ?~  next
-               (fo-fail 'dynamic action not valid')
-             $(then u.next)
-      %both  =/  next=^then  that.then
-             =.  fo  $(then this.then)
-             ?:  |(?=(@ live.flow) =(live.flow then.flow))
-               $(then next)
-             $(then [%both live.flow next])
+        %take
+      ::  should have been checked by caller
+      ?>  (pays fact bill.then)
+      =/  that=(unit ^then)  (gait.then fo-self fact)
+      ?~  that  fo
+      $(then u.that)
     ==
+  ::
+  ::  +|  triggers
+  ::
+  ++  fo-wait
+    |=  when=@da
+    (fo-pass /when/wait %arvo %b %wait when)
+  ::
+  ++  fo-peer
+    |=  [=gent =path]
+    =/  =gill:gall  (gild our.bowl gent)
+    (fo-pass /when/peer %agent gill %watch path)
   ::
   ::  +|  actions
   ::
@@ -471,14 +578,10 @@
     (fo-pass /then/poke %agent (gild our.bowl gent) %poke cage)
   ::
   ++  fo-talk
-    |=  what=tank
-    ?@  what
-      (fo-pass /then %arvo %d %text (trip what))
-    (fo-pass /then/talk %arvo %d %talk what)
-  ::
-  ++  fo-wait
-    |=  wait=@dr
-    (fo-pass /then/wait %arvo %b %wait (add now.bowl wait))
+    |=  =tank
+    ?@  tank
+      (fo-pass /then %arvo %d %text (trip tank))
+    (fo-pass /then/talk %arvo %d %talk tank ~)
   --
 --
 ::
@@ -503,14 +606,7 @@
 ::
 ++  on-save
   ^-  vase
-  =.  flows
-    %-  ~(run by flows)
-    |=  f=flow
-    %_  f
-      when  (deflate-when:mk when.f)
-      then  (deflate-then:mk then.f)
-    ==
-  !>(state)
+  !>(save:main)
 ::
 ++  on-load
   |=  old=vase
@@ -535,8 +631,8 @@
       [-.out this(+.state +.out)]
     %.  [bowl !<(order:rudder vase) +.state]
     %-  (steer:rudder xxxx task)
-    :^    pages
-        (point:rudder /[dap.bowl] & ~(key by pages))
+    :^    ~ ::pages
+        (point:rudder /[dap.bowl] & ~(key by ~)) ::pages))
       (fours:rudder +.state)
     |=  =task
     ^-  $@(brief:rudder [brief:rudder (list card:agent:gall) xxxx])
@@ -555,7 +651,7 @@
       %fact       abet:(take:main t.wire %peer cage.sign)
       %watch-ack  ?~  p.sign  [~ state]
                   abet:(take:main t.wire %quit u.p.sign)
-      %kick       abet:(take:main t.wire %reap ~)
+      %kick       abet:(reap:main t.wire)
     ==
   [caz this]
 ::
@@ -563,8 +659,20 @@
   |=  [=wire =sign-arvo]
   ^-  (quip card:agent:gall _this)
   ?:  ?=([%clay %tire ~] wire)
-    ~&  [%would-clay-tire sign-arvo]
-    [~ this]
+    ?>  ?=([%clay %tire *] sign-arvo)
+    =/  waz=(list wave:tire:clay)
+      ?-  -.p.sign-arvo
+        %&  (walk:tire:clay tires p.p.sign-arvo)
+        %|  [p.p.sign-arvo]~
+      ==
+    =^  caz  state  abet:(surf:main waz)
+    [caz this]
+  ?:  ?=([%clay %yard @ ~] wire)
+    =*  desk  i.t.t.wire
+    ?>  ?=([%clay %writ *] sign-arvo)
+    ~&  >  [%got-yard-res ?=(^ p.sign-arvo)]
+    =^  caz  state  abet:(wree:main desk p.sign-arvo)
+    [caz this]
   ?:  ?=([%eyre %bind ~] wire)
     ?>  ?=([%eyre %bound *] sign-arvo)
     ~?  !accepted.sign-arvo
@@ -586,7 +694,13 @@
   ?>  =(our.bowl src.bowl)
   [~ this]
 ::
-++  on-peek   on-peek:def
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?+  path  [~ ~]
+    [%x %dbug %state ~]  ``noun+!>(save:main)
+  ==
+::
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
 --

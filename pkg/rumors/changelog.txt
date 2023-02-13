@@ -1,5 +1,8 @@
 rumors
 
+v1.1.1, ~2023.02.13
+- re-improve text legibility.
+
 v1.1.0, ~2023.02.13
 - provide plausible deniability for posted rumors by using the new /lib/gossip.
 - prevent accidental double-posting.

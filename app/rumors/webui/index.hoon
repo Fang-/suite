@@ -88,7 +88,9 @@
 
     .rumor {
       margin-bottom: 2em;
-      text-shadow: 0 0 3px black;
+      background: rgba(0,0,0,0.05);
+      padding: 0.3rem 0.5rem;
+      width: fit-content;
     }
     '''
   ::

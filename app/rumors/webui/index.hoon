@@ -88,6 +88,7 @@
 
     .rumor {
       margin-bottom: 2em;
+      text-shadow: 0 0 3px black;
     }
     '''
   ::

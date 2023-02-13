@@ -151,7 +151,7 @@
       pass=?     ::  whether to (50/50) emit through proxy
   ==
 ::
-+$  pass-timeout  ~s30
+++  pass-timeout  ~s30
 ::
 ++  invent
   |=  =cage
@@ -289,7 +289,7 @@
       ::  poke a randomly chosen proxy with the rumor
       ::
       =/  proxy=ship  (snag (~(rad og +(eny.bowl)) count) ~(tap in aides))
-      =/  =time       (add now.bowl ~s30)
+      =/  =time       (add now.bowl pass-timeout)
       =.  passed      (~(put by passed) hash [rumor time])
       :_  state
       =/  =wire  /~/gossip/passed/(scot %uv hash)

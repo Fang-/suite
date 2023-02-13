@@ -6,21 +6,22 @@
 /-  *rumors
 /+  gossip, rudder, default-agent
 ::
-/~  pages  (page:rudder rumors [~ @t])  /app/rumors/webui
+/~  pages  (page:rudder [rumors @t] [~ @t])  /app/rumors/webui
 ::
 /$  grab-rumor  %noun  %rumor
 ::
 |%
-+$  state-1
-  $:  %1
++$  state-2
+  $:  %2
       fresh=rumors  ::TODO  prune
+      ditto=@t
   ==
 ::
 +$  eyre-id  @ta
 +$  card     card:agent:gall
 --
 ::
-=|  state-1
+=|  state-2
 =*  state  -
 ::
 %-  %+  agent:gossip
@@ -47,10 +48,11 @@
   |^  ^-  (quip card _this)
       =/  old=state-any  !<(state-any ole)
       =?  old  ?=(%0 -.old)  (state-0-to-1 old)
-      ?>  ?=(%1 -.old)
+      =?  old  ?=(%1 -.old)  (state-1-to-2 old)
+      ?>  ?=(%2 -.old)
       [~ this(state old)]
   ::
-  +$  state-any  $%(state-0 state-1)
+  +$  state-any  $%(state-0 state-1 state-2)
   ::
   +$  state-0  [%0 fresh=rumors]
   ++  state-0-to-1
@@ -60,6 +62,12 @@
     %+  turn  fresh.old
     |=  r=rumor
     r(when (min when.r now.bowl))
+  ::
+  +$  state-1  [%1 fresh=rumors]
+  ++  state-1-to-2
+    |=  old=state-1
+    ^-  state-2
+    [%2 fresh.old '']
   --
 ::
 ++  on-poke
@@ -70,19 +78,23 @@
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
-    =;  out=(quip card _fresh)
-      [-.out this(fresh +.out)]
-    %.  [bowl !<(order:rudder vase) fresh]
-    %-  (steer:rudder _fresh ,[~ @t])
+    ::TODO  it's somewhat annoying that display state and updateable state
+    ::      are coupled here...
+    =;  out=(quip card _+.state)
+      [-.out this(+.state +.out)]
+    %.  [bowl !<(order:rudder vase) +.state]
+    %-  (steer:rudder _+.state ,[~ @t])
     :^    pages
         (point:rudder /[dap.bowl] & ~(key by pages))
-      (fours:rudder fresh)
+      (fours:rudder +.state)
     |=  [~ new=@t]
-    ^-  $@(brief:rudder [brief:rudder (list card) _fresh])
+    ^-  $@(brief:rudder [brief:rudder (list card) _+.state])
+    ?:  =(ditto new)
+      ['your voice echoes...' ~ +.state]
     =/  =rumor  [now.bowl new]
     :+  'the wind carries along your careless whisper...'
       [(invent:gossip %rumor !>(rumor))]~
-    [rumor fresh]
+    [[rumor fresh] new]
   ==
 ::
 ++  on-watch

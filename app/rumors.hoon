@@ -65,6 +65,7 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
+  ?>  =(src our):bowl
   ?+  mark  (on-poke:def mark vase)
     ::  %handle-http-request: incoming from eyre
     ::

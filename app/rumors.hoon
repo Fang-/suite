@@ -24,7 +24,7 @@
 =*  state  -
 ::
 %-  %+  agent:gossip
-      [2 %anybody %anybody]
+      [2 %anybody %anybody &]
     %+  ~(put by *(map mark $-(* vase)))
       %rumor
     |=(n=* !>((grab-rumor n)))

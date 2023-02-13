@@ -542,6 +542,14 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
+      ?:  =(/x/whey path)
+        :+  ~  ~
+        :-  %mass
+        !>  ^-  (list mass)
+        :-  %gossip^&+state
+        =/  dat  (on-peek:og path)
+        ?:  ?=(?(~ [~ ~]) dat)  ~
+        (fall ((soft (list mass)) q.q.u.u.dat) ~)
       ?:  =(/x/dbug/state path)
         ``noun+(slop on-save:og !>(gossip=state))
       ?.  ?=([@ %~.~ %gossip *] path)

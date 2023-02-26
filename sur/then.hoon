@@ -44,24 +44,32 @@
 |%
 +$  xxxx
   $+  xxxx
-  $:  flows=(map @ta flow)
-      tires=rock:tire:clay
-      yards=(map desk yard)
-      parts=(map from part)  ::TODO  with revision nr?
+  $:  flows=(map @ta flow)                              ::  primary product
+      draft=draft
+      ::TODO  story=(list [from=?(~ @ta) when=@da =tang])  ::  logs
+      tires=rock:tire:clay                              ::  watched outsides
+      yards=(map desk yard)                             ::  outside suppliers
+      ::TODO  codes=(map ship (map @ta code))           ::  usercode
+      ::TODO  plans=(map ship (map @ta hint))           ::  flow descriptions
   ==
 ::
-:: +$  bank
-::   $:  parts=(mip desk @ta part)
-::       codes=(mip ship @ta code)
-::   ==
++$  draft
+  $:  have=@ta
+      step=$~(%when ?(%when %fold %then %last))
+      flow  ::TODO  just rope?
+  ==
 ::
 ::  +|  %outsides
 ::
 +$  task
-  $%  [%start nom=@ta nam=@t rop=rope]
+  $~  [%draft *draft]
+  $%  [%build nom=@ta nam=@t rop=rope]
       [%pause nom=@ta]
+      [%start nom=@ta]
       [%erase nom=@ta]
       [%crank nom=@ta dat=vase]
+      [%draft daf=draft]
+      [%multi taz=(list task)]
   ==
 ::
 +$  beep
@@ -74,32 +82,39 @@
 ::
 +$  flow                                                ::  script:
   $:  name=@t                                           ::  descriptor
-      live=?(%live %stop %fail)                         ::  status
+      live=?(%live %stop %fail)                         ::  run status
       ::TODO  maybe log as what=?(%ran tang) etc
       logs=(list [when=@da what=tang])                  ::  run outputs
       rope                                              ::  body
       ::TODO  could be made to carry state              ::
   ==                                                    ::
 +$  rope                                                ::  script body:
-  $:  when=$^((made when) when)                         ::  trigger
-      fold=(list $^((made fold) fold))                  ::  transformations
-      then=(list $^((made then) then))                  ::  actions
+  $:  when=(made when)                                  ::  trigger
+      fold=(list (made fold))                           ::  transformations
+      then=(list (made then))                           ::  actions
   ==                                                    ::
 ::
-::NOTE  output bill from tag, except for %code
+::TODO  %fold and %take are special, since they carry code along.
+::      _they_ need to be deflated alongside the yard parts' gates,
+::      but the other ones we can just keep around.
+::      we can also keep their inner $when and $then around,
+::      but we probably still want to re-build in case code changed...
+::
+::NOTE  output bill deduced from tag, except for %fold
 ::TODO  need to track trigger state somewhere, like %peer status
 +$  when                                                ::  triggers:
   $~  [%kick ~]
   $%  [%kick ~]                                         ::  on-demand (%crank)
       [%time from=@da reap=(unit @dr)]                  ::  at time, repeat
       [%peer =gent =path]                               ::  gall subscription
-      [%fold =when fold=(gait fact fact) =bill]         ::  transform included
+      [%fold =whin fold=(gait fact fact) =bill]         ::  transform included
       :: [%code =code =args =bill have=(unit when)]        ::  usercode
   ==                                                    ::
++$  whin  $~([%kick ~] $<(%fold when))
 ::
 ::TODO  produce (list fact) instead?
 +$  fold                                                ::  transformation:
-  $:  ~
+  $:  ~  ::TODO  %fold ?
       take=bill                                         ::  input shape(s)
       gait=(gait fact fact)                             ::  logic
       give=bill                                         ::  output shape(s)
@@ -109,11 +124,12 @@
 +$  then                                                ::  action:
   $%  [%poke =gent =cage]                               ::  poke agent
       [%none ~]                                         ::  no-op
-      [%talk =$+(tank tank)]
+      ::TODO  [%hush ~]  ::  no-op but do not log this run
+      [%talk talk=(list tank)]
       [%kill =$+(tang tang)]                            ::  disable self
       [%take =bill =(gait fact thin)]                   ::  dynamic $<(%take $)
       :: [%code =bill =code =args]                         ::  usercode
-      ::TODO  %both/%more ?
+      [%many thes=(list thin)]
       ::TODO  %log ?
   ==                                                    ::
 +$  thin  $~([%none ~] $<(%take then))                  ::  static action
@@ -149,6 +165,15 @@
   $+  gait
   $-([self take] (unit give))
 ::
+++  makr                                                ::  prefab:
+  |$  give                                              ::  result
+  $%  [%easy made=give]                                 ::  static, or
+  $:  %vary                                             ::  configurable:
+      =bill                                             ::  compatible inputs
+      =vars                                             ::  config spec
+      =(gait args give)                                 ::  builder
+  ==  ==                                                ::
+::
 +$  self                                                ::  execution context:
   $:  our=@p                                            ::  home
       now=@da                                           ::  time
@@ -168,21 +193,23 @@
 +$  part                                                ::  prefab component:
   $:  name=@t                                           ::  descriptor
       desc=@t                                           ::  details
-      vars=vars                                         ::  config spec
       ::TODO  pers:gall required perms?
       ::TODO  provide potential bills ahead of time?
   $=  make                                              ::  part builder
-  $%  [%when (gait args when)]                          ::
-      [%fold (gait args fold)]                          ::
-      [%then (gait args then)]                          ::
+  $%  [%when (makr when)]                               ::
+      [%fold (makr fold)]                               ::
+      [%then (makr then)]                               ::
   ==  ==                                                ::
 ::
 ::TODO  cache original $part in here or elsewhere?
+::TODO  "made" is way overloaded, used in three ways. fix!
 ++  made                                                ::  configured prefab:
   |$  what                                              ::  kind
   $:  from=from                                         ::  source
+      ::TODO  hash=@uv  ::  version?
+      ::TODO  cache original bill for if we can not auto-upgrade?
       args=args                                         ::  user config
-      made=(unit what)                                  ::  end product
+      made=(unit [tone=?(%good %weak) form=what])       ::  build result
   ==                                                    ::
 ::
 ::  +|  %usercode

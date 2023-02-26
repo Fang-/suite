@@ -56,11 +56,11 @@
 ::TODO  would be cool to implement parts of this in itself,
 ::      for example "when prefab file changes, load in new prefab"
 ::
-/-  sur=then
+/+  lib=then
 /+  rudder, dbug, verb, default-agent
-:: /~  pages  (page:rudder xxxx.sur task.sur)  /app/then/webui
+/~  pages  (page:rudder xxxx.lib task.lib)  /app/then/webui
 ::
-=,  sur
+=,  lib
 ::
 |%
 +$  state-0  [%0 xxxx]
@@ -74,54 +74,6 @@
   |=  =wire
   ^-  [@ta ^wire]
   ?>(?=([@ *] wire) wire)
-::
-++  gild  ::  resolve to gill
-  |=  [our=ship =gent]
-  ^-  gill:gall
-  ?^(gent gent [our gent])
-::
-++  whin  ::  resolve to inner thing
-  |*  x=$^((made *) [@ *])
-  ?@  -.x  x
-  ~|  %uninflated-prefab
-  (need made.x)
-::
-++  will  ::  bill from when
-  |=  =when
-  ^-  bill
-  ?+  -.when  [-.when]~
-    %peer  ~[%peer %quit]
-    %fold  $(when when.when)
-  ==
-::
-++  till  ::  bill for then
-  |=  =then
-  ^-  bill
-  ?+  -.then  ~
-    %take  bill.then
-  ==
-::
-++  pays  ::  fact fits bill?
-  |=  [=fact =bill]
-  ^-  ?
-  ?:  =(~ bill)  &
-  =-  (fits - bill)
-  ?.  ?=(%cash -.fact)  [-.fact]~
-  [%cash (turn +.fact head)]~
-::
-++  fits  ::  chainable bills?
-  |=  [give=bill take=bill]
-  ^-  ?
-  ?:  =(~ take)  &
-  %+  lien  give
-  |=  give=debt
-  %+  lien  take
-  |=  take=debt
-  ?@  take  =(give take)
-  ?>  =(-.take %cash)
-  ?.  =(-.give %cash)  |
-  ?~  what.take  &
-  =(give take)
 ::
 :: ::  +mk: usercode building
 :: ::
@@ -248,8 +200,12 @@
   [(flop caz) state]
 ::
 ++  emit
-  |=  =card:agent:gall
+  |=  =card
   this(caz [card caz])
+::
+++  emil
+  |=  cars=(list card)
+  this(caz (weld (flop cars) caz))
 ::
 ::  +|  %cycle
 ::
@@ -261,29 +217,44 @@
 ::
 ++  save
   ^+  state
-  =-  state(flows -)
-  %-  ~(run by flows)
-  |=  f=flow
-  f  ::TODO  deflate gates out of made components?
-  ::TODO  deflate usercode
+  %_  state
+      flows
+    %-  ~(run by flows)
+    |=  f=flow
+    %_  f
+      made.when  ~
+      fold  (turn fold.f |=(m=(made fold) m(made ~)))
+      then  (turn then.f |=(m=(made then) m(made ~)))
+    ==
+  ::
+      yards
+    (~(run by yards) |=(* 0+~))
+  ==
 ::
 ++  load
   ^+  this
-  ::TODO  inflate gates in made components?
-  this
-  :: =/  foz  ~(tap by flows)
-  :: |-
-  :: ?~  foz  this
-  :: =*  f  q.i.foz
-  :: =^  w  when.f  (inflate-when:mk when.f)
-  :: =^  t  then.f  (inflate-then:mk then.f)
-  :: ?:  &(w t)
-  ::   =.  flows  (~(put by flows) p.i.foz f)
-  ::   $(foz t.foz)
-  :: =.  this  fo-abet:~(fo-halt fo i.foz)
-  :: $(foz t.foz)
+  =-  (anew(yards -) ~)
+  %-  ~(urn by yards)
+  |=  [=desk =yard]
+  ?>  =(0+~ yard)
+  ::  this should never crash, because if we have a yard entry, and we only
+  ::  have that if latest change affecting the yard file resulted in a
+  ::  successful build.
+  ::  of course, this assumes the yard type didn't change, so we'll have
+  ::  to be careful here around type upgrades. we have a version tag at the
+  ::  head, that should be sufficient for the foreseeable future.
+  ::
+  ~&  [dap.bowl %load-yardd desk]
+  !<  ^yard
+  .^  vase
+    %ca
+    (scot %p our.bowl)
+    desk
+    (scot %da now.bowl)
+    /app/then/yard/hoon
+  ==
 ::
-++  surf
+++  wash
   |=  waz=(list wave:tire:clay)
   ^+  this
   ?~  waz  this
@@ -300,7 +271,7 @@
     ==
   $(waz t.waz)
 ::
-++  wree
+++  writ
   |=  [=desk =riot:clay]
   ^+  this
   ::  if we get any result, always request the next result
@@ -311,27 +282,96 @@
   =.  emit        (emit %pass wire %arvo %c %warp our.bowl desk `rave)
   ::
   ?~  riot
-    ::TODO  disable flows that depended on this
+    ::TODO  mark flows that depend on this as weak? or disable fully?
     this(yards (~(del by yards) desk))
   ?>  ?=(%vase p.r.u.riot)
   =+  !<(=vase q.r.u.riot)
   ?.  (~(nest ut -:!>(*yard)) | p.vase)
-    ~&  'that aint no yard my man'
+    ~&  >>  ['that aint no yard my man' desk]
     this
   =+  !<(=yard vase)
-  ~&  %got-yard-yess
-  ::TODO  try updating flows that depended on this
+  ~&  >  [%got-yard-for desk]
+  ::TODO  if map is different, rebuild flows that depended on it.
+  ::      don't nuke flows with removed components, but do mark them %weak
   this(yards (~(put by yards) desk yard))
+::
+++  anew
+  |=  dif=(set from)
+  |^  ^+  this
+      this(flows (~(urn by flows) try))
+  ::
+  ++  new
+    |=  =from
+    |(=(~ dif) (~(has in dif) from))
+  ::
+  ++  nab
+    |*  [what=?(%when %fold %then) have=(unit [tone=?(%good %weak) form=*])]
+    |=  [=from =self =args]
+    ^+  have
+    ?.  (new from)  have
+    =?  have  ?=(^ have)  have(tone.u %weak)
+    ?>  ?=(%desk -.from)
+    ?~  yard=(~(get by yards) desk.from)   have
+    ?~  part=(~(get by +.u.yard) id.from)  have
+    ?.  =(what -.make.u.part)              have
+    =-  (bind - (lead %good))
+    ?:  ?=(%easy +<.make.u.part)
+      :-  ~
+      ?-  what
+        %when  ?>(?=(%when -.make.u.part) made.make.u.part)
+        %fold  ?>(?=(%fold -.make.u.part) made.make.u.part)
+        %then  ?>(?=(%then -.make.u.part) made.make.u.part)
+      ==
+    ?-  what
+      %when  ?>(?=(%when -.make.u.part) (gait.make.u.part self args))
+      %fold  ?>(?=(%fold -.make.u.part) (gait.make.u.part self args))
+      %then  ?>(?=(%then -.make.u.part) (gait.make.u.part self args))
+    ==
+  ::
+  ++  try
+    |=  [id=@ta =flow]
+    =/  =self  ~(fo-self fo id flow)
+    =.  made.when.flow
+      %+  (nab %when made.when.flow)
+        from.when.flow
+      [self args.when.flow]
+    ::
+    =.  fold.flow
+      %+  turn  fold.flow
+      |=  fold=(made fold)  ::TODO  dedupe with when
+      =-  fold(made -)
+      ((nab %fold made.fold) from.fold self args.fold)
+    ::
+    =.  then.flow  ::TODO  dedupe with fold
+      %+  turn  then.flow
+      |=  then=(made then)
+      =-  then(made -)
+      ((nab %then made.then) from.then self args.then)
+    ::
+    flow
+    ::TODO  deduce build status summary, give update fact if changed
+    :: =;  bad=?
+    ::   ::TODO  if bad, and was live, make not live
+    ::   ::TODO  but we need to know _what_ was live if we want to clean up??
+    ::   flow(make ?:(bad %fail %good))
+    :: ?|  ?=(~ made.when.flow)
+    ::     (levy fold.flow |=(m=(made fold) ?=(~ made.m)))
+    ::     (levy then.flow |=(m=(made then) ?=(~ made.m)))
+    :: ==
+  --
 ::
 ++  call
   |=  =task
   ^+  this
   ?-  -.task
-      %start
+      %build
     =,  task
     =?  this  (~(has by flows) nom)
       (call %erase nom)
     fo-abet:fo-boot:(fo-apex:fo nom `flow`[nam %stop ~ rop])
+  ::
+      %start
+    fo-abet:fo-boot:(fo-apex:fo nom.task (~(got by flows) nom.task))
   ::
       ?(%pause %erase)
     =/  f  ~(fo-shut fo nom.task (~(got by flows) nom.task))
@@ -342,6 +382,15 @@
   ::
       %crank
     (take /[nom.task]/kick %kick dat.task)
+  ::
+      %draft
+    this(draft daf.task)
+  ::
+      %multi
+    |-
+    ?~  taz.task  this
+    =.  this  (call i.taz.task)
+    $(taz.task t.taz.task)
   ==
 ::
 ++  reap
@@ -412,11 +461,12 @@
   ::
   ++  fo-halt  ::  failed to inflate
     |=  =tang
-    ::TODO  =.  live.flow  %fail, probably also fo-shut if running
-    fo-shut:(fo-note 'failed to (re)compile' tang)
+    =.  fo  fo-shut:(fo-note 'failed to (re)compile' tang)
+    fo(live.flow %fail)
   ::
   ++  fo-boot  ::  set up
     ^+  fo
+    ?<  =(%live live.flow)
     =.  live.flow  %live
     =/  =when  (whin when.flow)
     |-
@@ -424,11 +474,14 @@
       %kick  fo
       %peer  (fo-peer +.when)
       %time  (fo-wait from.when)
-      %fold  $(when when.when)
+      %fold  $(when whin.when)
     ==
   ::
   ++  fo-shut  ::  tear down
     ^+  fo
+    ?.  =(%live live.flow)
+      ~&  [dap.bowl %strange-shut name live.flow]
+      fo
     =.  live.flow  %stop
     =/  =when  (whin when.flow)
     |-
@@ -436,17 +489,17 @@
       %kick  fo
       %peer  (fo-pass /when/peer %agent (gild our.bowl gent.when) %leave ~)
       %time  (fo-pass /when/wait %arvo %b %rest from.when)
-      %fold  $(when when.when)
+      %fold  $(when whin.when)
     ==
   ::
   ++  fo-heal  ::  set up for new cycle
     ^+  fo
-    =/  =when  (whin when.flow)
+    =/  =when  (whin when.flow)  ::TODO  =whin
     ::TODO  if prefab, do we want to re-compute the trigger?
     ::      a little bit weird wrt recurring timers, but not that bad?
     |-
     ?+  -.when  fo
-      %fold  $(when when.when)
+      %fold  $(when whin.when)
     ::
         %time
       ?~  reap.when
@@ -458,14 +511,14 @@
       =/  nex=@da
         %+  add  now.bowl
         =*  inc=@dr  u.reap.when
+        ~|  [inc=inc from=from.when now=now.bowl]
         (sub inc (mod (sub now.bowl from.when) inc))
       ::  re-set the flow & its recurring timer
       ::
       =.  from.when  nex
       =.  when.flow
-        ?@  -.when.flow  when
         ?>  ?=(^ made.when.flow)
-        when.flow(u.made when)
+        when.flow(form.u.made when)
       (fo-wait nex)
     ==
   ::
@@ -548,7 +601,7 @@
     ^+  fo
     ?-  -.then
       %poke  fo:(fo-poke [gent cage]:then)
-      %talk  fo:(fo-talk tank.then)
+      %talk  fo:(fo-talk talk.then)
       %none  fo
       %kill  fo-shut:(fo-note 'disabled by self' ~)
     ::
@@ -558,6 +611,11 @@
       =/  that=(unit ^then)  (gait.then fo-self fact)
       ?~  that  fo
       $(then u.that)
+    ::
+        %many
+      ?~  thes.then  fo
+      =.  fo  (fo-then i.thes.then fact)
+      $(thes.then t.thes.then)
     ==
   ::
   ::  +|  triggers
@@ -578,7 +636,11 @@
     (fo-pass /then/poke %agent (gild our.bowl gent) %poke cage)
   ::
   ++  fo-talk
-    |=  =tank
+    |=  talk=(list tank)
+    ^+  fo
+    ?~  talk  fo
+    =*  tank  i.talk
+    =-  $(fo -, talk t.talk)
     ?@  tank
       (fo-pass /then %arvo %d %text (trip tank))
     (fo-pass /then/talk %arvo %d %talk tank ~)
@@ -626,17 +688,17 @@
     [caz this]
   ::
       %handle-http-request
-    ~&  %lo
     =;  out=(quip card:agent:gall xxxx)
       [-.out this(+.state +.out)]
     %.  [bowl !<(order:rudder vase) +.state]
     %-  (steer:rudder xxxx task)
-    :^    ~ ::pages
-        (point:rudder /[dap.bowl] & ~(key by ~)) ::pages))
+    :^    pages
+        (point:rudder /[dap.bowl] & ~(key by pages))
       (fours:rudder +.state)
     |=  =task
     ^-  $@(brief:rudder [brief:rudder (list card:agent:gall) xxxx])
-    'not implemented lol'  ::TODO
+    =^  caz  this  (on-poke %noun !>(task))
+    [~ caz +.state]
   ==
 ::
 ++  on-agent
@@ -658,6 +720,7 @@
 ++  on-arvo
   |=  [=wire =sign-arvo]
   ^-  (quip card:agent:gall _this)
+  ~|  on-arvo-wire=wire
   ?:  ?=([%clay %tire ~] wire)
     ?>  ?=([%clay %tire *] sign-arvo)
     =/  waz=(list wave:tire:clay)
@@ -665,13 +728,12 @@
         %&  (walk:tire:clay tires p.p.sign-arvo)
         %|  [p.p.sign-arvo]~
       ==
-    =^  caz  state  abet:(surf:main waz)
+    =^  caz  state  abet:(wash:main waz)
     [caz this]
   ?:  ?=([%clay %yard @ ~] wire)
     =*  desk  i.t.t.wire
     ?>  ?=([%clay %writ *] sign-arvo)
-    ~&  >  [%got-yard-res ?=(^ p.sign-arvo)]
-    =^  caz  state  abet:(wree:main desk p.sign-arvo)
+    =^  caz  state  abet:(writ:main desk p.sign-arvo)
     [caz this]
   ?:  ?=([%eyre %bind ~] wire)
     ?>  ?=([%eyre %bound *] sign-arvo)
@@ -701,6 +763,11 @@
     [%x %dbug %state ~]  ``noun+!>(save:main)
   ==
 ::
+++  on-fail
+  |=  [=term =tang]
+  %-  (slog leaf+"{(trip dap.bowl)}: on-fail" term tang)
+  ~&  xx+tang  ::TODO  parse out on-arvo-wire, kill responsible flow?
+  [~ this]
+::
 ++  on-leave  on-leave:def
-++  on-fail   on-fail:def
 --

@@ -6,7 +6,8 @@
 ::    triggers ($when) describe the thing that will cause the script to run.
 ::    this can be a timer, a subscription, or manual user input.
 ::    transforms ($fold) take the fact output by a trigger and transform it.
-::    any number of transforms may be applied in sequence.
+::    any number of transforms may be applied in sequence, and transforms may
+::    opt to produce no output in order to act as a filter.
 ::    actions ($then) take the transformed fact and produce an effect.
 ::    any number of actions may be performed based on a single trigger/output.
 ::
@@ -16,32 +17,39 @@
 ::    produce. if they produce facts outside of this specification, the script
 ::    will be halted.
 ::    transforms and actions may specify the shape(s) of facts they accept.
-::    these are somewat advisory, a transform may still fail to produce a new
-::    fact for supported input shapes. but in combination with the output
-::    specifications, this can be used to help the user figure out which
-::    components can be chained together.
+::    in combination with the output specifications, this can be used to help
+::    the user figure out which components can be chained together.
 ::
 ::      components
 ::    pre-fabricated, user-configurable components ($part) can be supplied by
 ::    apps the user has installed. they are loaded from /app/then/yard.hoon.
+::    evaluating this file should produce a $yard.
+::    the $parts therein can be static or user-configurable. a $vars describes
+::    the input fields a user will be presented with. the $part provides a
+::    function that takes the inputs as an $args (list @), and produces an
+::    appropriate result based on that.
 ::
 ::      design notes
 ::    the two most important properties this aims to achieve is that it's easy
 ::    for developers to create components for their apps, and that it's easy
 ::    for users to slot these together to create configurable automation flows.
-::    poweruser customization takes a back seat, but will still be served well
+::    poweruser customization takes a back seat, but can still be served well
 ::    through that first aim.
 ::    the %fold $when, for example, primarily exists so that developers can
-::    provide simple outputs directly from their triggers.
+::    provide simple outputs directly from their triggers. (but maybe that's
+::    a design smell?)
 ::
 ::      todo
 ::    formalize logging
-::    figure out what to do about de/inflation
 ::    figure out how to handle usercode. probably same as $part, somehow?
 ::    some way to run the action on every item in the _list_ input
+::    mb we want stateful flows at some point?
 ::
 ^?
 |%
+::
+::  +|  %stateful
+::
 +$  xxxx
   $+  xxxx
   $:  flows=(map @ta flow)                              ::  primary product
@@ -94,25 +102,18 @@
       then=(list (made then))                           ::  actions
   ==                                                    ::
 ::
-::TODO  %fold and %take are special, since they carry code along.
-::      _they_ need to be deflated alongside the yard parts' gates,
-::      but the other ones we can just keep around.
-::      we can also keep their inner $when and $then around,
-::      but we probably still want to re-build in case code changed...
-::
-::NOTE  output bill deduced from tag, except for %fold
 ::TODO  need to track trigger state somewhere, like %peer status
+::NOTE  output bill deduced from tag, except for %fold
 +$  when                                                ::  triggers:
   $~  [%kick ~]
   $%  [%kick ~]                                         ::  on-demand (%crank)
       [%time from=@da reap=(unit @dr)]                  ::  at time, repeat
       [%peer =gent =path]                               ::  gall subscription
       [%fold =whin fold=(gait fact fact) =bill]         ::  transform included
-      :: [%code =code =args =bill have=(unit when)]        ::  usercode
   ==                                                    ::
-+$  whin  $~([%kick ~] $<(%fold when))
++$  whin  $~([%kick ~] $<(%fold when))                  ::  static $when
 ::
-::TODO  produce (list fact) instead?
+::TODO  allow producing (list fact) instead?
 +$  fold                                                ::  transformation:
   $:  ~  ::TODO  %fold ?
       take=bill                                         ::  input shape(s)
@@ -120,19 +121,18 @@
       give=bill                                         ::  output shape(s)
   ==                                                    ::
 ::
-::NOTE  input bill is ~, except for %take & %code
+::NOTE  input bill is ~, except for %take
 +$  then                                                ::  action:
   $%  [%poke =gent =cage]                               ::  poke agent
-      [%none ~]                                         ::  no-op
-      ::TODO  [%hush ~]  ::  no-op but do not log this run
-      [%talk talk=(list tank)]
+      [%none ~]                                         ::  nothing
+      ::TODO  [%hush ~]                                 ::  logless no-op ?
+      [%talk talk=(list tank)]                          ::  display output
       [%kill =$+(tang tang)]                            ::  disable self
       [%take =bill =(gait fact thin)]                   ::  dynamic $<(%take $)
-      :: [%code =bill =code =args]                         ::  usercode
-      [%many thes=(list thin)]
+      [%many thes=(list thin)]                          ::  do many
       ::TODO  %log ?
   ==                                                    ::
-+$  thin  $~([%none ~] $<(%take then))                  ::  static action
++$  thin  $~([%none ~] $<(%take then))                  ::  static $then
 ::
 +$  fact                                                ::  in/output:
   $%  [%kick =vase]                                     ::  user input (%crank)
@@ -148,7 +148,7 @@
       [%cash what=(list aura)]                          ::  ~ for all cash
   ==                                                    ::
 +$  bill  (list debt)                                   ::  viable in/output(s)
-::NOTE  empty bill means any fact valid, but unused
+::NOTE  empty bill means any fact valid
 ::
 ::  +|  %variable
 ::
@@ -158,21 +158,38 @@
 +$  cent  [aura @]                                      ::  faceless dime
 +$  cash  (pole cent)                                   ::  faceless inputs
 ::
-::  +|  %dynamism
+::  +|  %pre-fabs
 ::
-++  gait                                                ::  then gate
-  |$  [take give]
-  $+  gait
-  $-([self take] (unit give))
++$  from                                                ::  source:
+  $%  [%desk =desk id=@ta]                              ::  installed app yard
+      [%ship =ship id=@ta]                              ::  external author
+  ==                                                    ::
 ::
-++  makr                                                ::  prefab:
++$  yard  [%0 (map @ta part)]                           ::  scrapyard
+::
++$  part                                                ::  building block:
+  $:  name=@t                                           ::  descriptor
+      desc=@t                                           ::  details
+      ::TODO  pers:gall required perms?                 ::
+  $=  make                                              ::  part builder
+  $%  [%when (make when)]                               ::
+      [%fold (make fold)]                               ::
+      [%then (make then)]                               ::
+  ==  ==                                                ::
+::
+++  make                                                ::  block builder:
   |$  give                                              ::  result
-  $%  [%easy made=give]                                 ::  static, or
+  $%  [%easy easy=give]                                 ::  static, or
   $:  %vary                                             ::  configurable:
       =bill                                             ::  compatible inputs
       =vars                                             ::  config spec
       =(gait args give)                                 ::  builder
   ==  ==                                                ::
+::
+++  gait                                                ::  builder gate
+  |$  [take give]
+  $+  gait
+  $-([self take] (unit give))
 ::
 +$  self                                                ::  execution context:
   $:  our=@p                                            ::  home
@@ -181,25 +198,7 @@
       why=flow                                          ::  meta
   ==
 ::
-::  +|  %drop-ins
-::
-+$  from                                                ::  source:
-  $%  [%desk =desk id=@ta]                              ::  installed app
-      [%ship =ship id=@ta]                              ::  external author
-  ==                                                    ::
-::
-+$  yard  [%0 (map @ta part)]                           ::  components
-::
-+$  part                                                ::  prefab component:
-  $:  name=@t                                           ::  descriptor
-      desc=@t                                           ::  details
-      ::TODO  pers:gall required perms?
-      ::TODO  provide potential bills ahead of time?
-  $=  make                                              ::  part builder
-  $%  [%when (makr when)]                               ::
-      [%fold (makr fold)]                               ::
-      [%then (makr then)]                               ::
-  ==  ==                                                ::
+::  +|  %usercode
 ::
 ::TODO  cache original $part in here or elsewhere?
 ::TODO  "made" is way overloaded, used in three ways. fix!
@@ -209,10 +208,8 @@
       ::TODO  hash=@uv  ::  version?
       ::TODO  cache original bill for if we can not auto-upgrade?
       args=args                                         ::  user config
-      made=(unit [tone=?(%good %weak) form=what])       ::  build result
+      have=(unit [tone=?(%good %weak) form=what])       ::  build result
   ==                                                    ::
-::
-::  +|  %usercode
 ::
 ::TODO  should this be implemented as $part instead?
 +$  code                                                ::  user program:

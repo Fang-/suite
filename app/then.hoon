@@ -7,37 +7,6 @@
 ::    flows can only operate in terms of these primitives. most userspace
 ::    tasks and some kernel tasks can be specified this way.
 ::
-::TODO  2023-01-07
-::    1) import prefab files from installed desks
-::       - prefabs should be able to take user arguments to adjust their behavior
-::       - super dumb minimal prefabs for all default behaviors in this desk?
-::    2) present those and their arg fields in the ui
-::    3) ???
-::    4) profit
-::
-::TODO  so what's the angle here? do we want to actively prevent footguns,
-::      or just go for max freedom for powerusers?
-::
-::TODO  in order:
-::  - minimally viable triggers & actions
-::  - minimally viable templates
-::    - take a (list [=aura name=@t desc=@t]), to get a list of @ values,
-::      which we then inject into the subject under the given names
-::    - cache compilation, stub out in +on-save
-::    - "the four steps are ream, mint, .*, and slam, and most of the helper functions do more than one, but you should think of them individually"
-::      - "you can cache the first three, then slam as necessary"
-::      - ream                @t -> hoon
-::      - mint:ut    [type hoon] -> [type nock]
-::      - .*         [subj nock] -> *
-::      - slam       [gatv samv] -> vase
-::
-::NOTE  examples:
-::  - when msg in channel, if contains word, create notification
-::  - when timer, if hoon code, post msg
-::  - when pal, if name is x, add pal
-::  - when msg in channel, then timer, then xx
-::  - when clay file changes
-::
 ::TODO  prefabs:
 ::  - listen to chat channel
 ::  - send chat message
@@ -48,13 +17,11 @@
 ::TODO  once permissions are in, make everything we could use optional,
 ::      but pause/block flows if they are missing any possibly-needed perms.
 ::
-::NOTE  approach:
-::  after talking to wicdev, probably amazing to let other apps/desks bring their own prefabs.
-::  then distinguish between internal built-ins (for system (kernel) and system (then) level actions and prefabs.
-::  only thing that goes over the network are examples?
-::
 ::TODO  would be cool to implement parts of this in itself,
 ::      for example "when prefab file changes, load in new prefab"
+::      that's quite complicated maybe, but we could certainly ship with some
+::      components & flows out of the box that say "send a notification when a
+::      flow gets halted, or its build status changes"
 ::
 /+  lib=then
 /+  rudder, dbug, verb, default-agent
@@ -222,9 +189,9 @@
     %-  ~(run by flows)
     |=  f=flow
     %_  f
-      made.when  ~
-      fold  (turn fold.f |=(m=(made fold) m(made ~)))
-      then  (turn then.f |=(m=(made then) m(made ~)))
+      have.when  ~
+      fold  (turn fold.f |=(m=(made fold) m(have ~)))
+      then  (turn then.f |=(m=(made then) m(have ~)))
     ==
   ::
       yards
@@ -318,9 +285,9 @@
     ?:  ?=(%easy +<.make.u.part)
       :-  ~
       ?-  what
-        %when  ?>(?=(%when -.make.u.part) made.make.u.part)
-        %fold  ?>(?=(%fold -.make.u.part) made.make.u.part)
-        %then  ?>(?=(%then -.make.u.part) made.make.u.part)
+        %when  ?>(?=(%when -.make.u.part) easy.make.u.part)
+        %fold  ?>(?=(%fold -.make.u.part) easy.make.u.part)
+        %then  ?>(?=(%then -.make.u.part) easy.make.u.part)
       ==
     ?-  what
       %when  ?>(?=(%when -.make.u.part) (gait.make.u.part self args))
@@ -331,22 +298,22 @@
   ++  try
     |=  [id=@ta =flow]
     =/  =self  ~(fo-self fo id flow)
-    =.  made.when.flow
-      %+  (nab %when made.when.flow)
+    =.  have.when.flow
+      %+  (nab %when have.when.flow)
         from.when.flow
       [self args.when.flow]
     ::
     =.  fold.flow
       %+  turn  fold.flow
       |=  fold=(made fold)  ::TODO  dedupe with when
-      =-  fold(made -)
-      ((nab %fold made.fold) from.fold self args.fold)
+      =-  fold(have -)
+      ((nab %fold have.fold) from.fold self args.fold)
     ::
     =.  then.flow  ::TODO  dedupe with fold
       %+  turn  then.flow
       |=  then=(made then)
-      =-  then(made -)
-      ((nab %then made.then) from.then self args.then)
+      =-  then(have -)
+      ((nab %then have.then) from.then self args.then)
     ::
     flow
     ::TODO  deduce build status summary, give update fact if changed
@@ -354,9 +321,9 @@
     ::   ::TODO  if bad, and was live, make not live
     ::   ::TODO  but we need to know _what_ was live if we want to clean up??
     ::   flow(make ?:(bad %fail %good))
-    :: ?|  ?=(~ made.when.flow)
-    ::     (levy fold.flow |=(m=(made fold) ?=(~ made.m)))
-    ::     (levy then.flow |=(m=(made then) ?=(~ made.m)))
+    :: ?|  ?=(~ have.when.flow)
+    ::     (levy fold.flow |=(m=(made fold) ?=(~ have.m)))
+    ::     (levy then.flow |=(m=(made then) ?=(~ have.m)))
     :: ==
   --
 ::
@@ -517,8 +484,8 @@
       ::
       =.  from.when  nex
       =.  when.flow
-        ?>  ?=(^ made.when.flow)
-        when.flow(form.u.made when)
+        ?>  ?=(^ have.when.flow)
+        when.flow(form.u.have when)
       (fo-wait nex)
     ==
   ::

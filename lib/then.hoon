@@ -11,7 +11,7 @@
   |*  x=$^((made *) [@ *])
   ?@  -.x  x
   ~|  %uninflated-prefab
-  form:(need made.x)
+  form:(need have.x)
 ::
 ++  will  ::  bill from when
   |=  =when
@@ -116,9 +116,9 @@
   ?:  ?=(%easy +<.make.u.par)
     :+  u.fro  ~
     ?-  step
-      %when  ?>(?=(%when -.make.u.par) made.make.u.par)
-      %fold  ?>(?=(%fold -.make.u.par) made.make.u.par)
-      %then  ?>(?=(%then -.make.u.par) made.make.u.par)
+      %when  ?>(?=(%when -.make.u.par) easy.make.u.par)
+      %fold  ?>(?=(%fold -.make.u.par) easy.make.u.par)
+      %then  ?>(?=(%then -.make.u.par) easy.make.u.par)
     ==
   ::  for variable ones, fetch all the args and make sure they fit
   ::

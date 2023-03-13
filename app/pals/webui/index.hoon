@@ -364,8 +364,17 @@
           ==
     ==
   ::
+  ++  por
+    |=  [a=* b=*]
+    ?:  ?=(@ a)
+      ?>  ?=(@ b)
+      (aor (scot %p a) (scot %p b))
+    ?>  ?=(@ -.a)
+    ?>  ?=([@ *] b)
+    (aor (scot %p -.a) (scot %p -.b))
+  ::
   ++  mutuals  ~+
-    %+  skim  (sort ~(tap by outgoing) dor)
+    %+  skim  (sort ~(tap by outgoing) por)
     |=  [=ship les=(set @ta)]
     ?&  (~(has in incoming) ship)
     ?|  =(~ tag)
@@ -383,12 +392,12 @@
     |=  [[sa=ship ma=*] [sb=ship mb=*]]
     =+  a=(~(get by receipts) sa)
     =+  b=(~(get by receipts) sb)
-    ?:  =(a b)  (dor ma mb)
+    ?:  =(a b)  (por sa sb)
     ?~(a ?=(~ b) ?~(b & |(u.a !u.b)))
   ::
   ++  leeches  ~+
     ?.  =(~ tag)  ~
-    %+  murn  (sort ~(tap in incoming) dor)
+    %+  murn  (sort ~(tap in incoming) por)
     |=  =ship
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)

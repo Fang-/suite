@@ -3,8 +3,8 @@
 /-  *rumors
 /+  rudder
 ::
-^-  (page:rudder [rumors @t] [~ @t])
-|_  [bowl:gall * =rumors @t]
+^-  (page:rudder [rumors @t (list @t)] [~ @t])
+|_  [bowl:gall * =rumors @t (list @t)]
 ++  argue
   |=  [head=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder [~ @t])

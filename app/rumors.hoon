@@ -6,22 +6,23 @@
 /-  *rumors
 /+  gossip, rudder, default-agent
 ::
-/~  pages  (page:rudder [rumors @t] [~ @t])  /app/rumors/webui
+/~  pages  (page:rudder [rumors @t (list @t)] [~ @t])  /app/rumors/webui
 ::
 /$  grab-rumor  %noun  %rumor
 ::
 |%
-+$  state-2
-  $:  %2
++$  state-3
+  $:  %3
       fresh=rumors  ::TODO  prune
       ditto=@t
+      avoid=(list @t)
   ==
 ::
 +$  eyre-id  @ta
 +$  card     card:agent:gall
 --
 ::
-=|  state-2
+=|  state-3
 =*  state  -
 ::
 %-  %+  agent:gossip
@@ -49,10 +50,11 @@
       =/  old=state-any  !<(state-any ole)
       =?  old  ?=(%0 -.old)  (state-0-to-1 old)
       =?  old  ?=(%1 -.old)  (state-1-to-2 old)
-      ?>  ?=(%2 -.old)
+      =?  old  ?=(%2 -.old)  (state-2-to-3 old)
+      ?>  ?=(%3 -.old)
       [~ this(state old)]
   ::
-  +$  state-any  $%(state-0 state-1 state-2)
+  +$  state-any  $%(state-0 state-1 state-2 state-3)
   ::
   +$  state-0  [%0 fresh=rumors]
   ++  state-0-to-1
@@ -68,6 +70,12 @@
     |=  old=state-1
     ^-  state-2
     [%2 fresh.old '']
+  ::
+  +$  state-2  [%2 fresh=rumors ditto=@t]
+  ++  state-2-to-3
+    |=  old=state-2
+    ^-  state-3
+    [%3 fresh.old ditto.old ~]
   --
 ::
 ++  on-poke
@@ -75,6 +83,14 @@
   ^-  (quip card _this)
   ?>  =(src our):bowl
   ?+  mark  (on-poke:def mark vase)
+    ::  %noun: misc bespoke self-management
+    ::
+      %noun
+    ?+  q.vase  !!
+      [%avoid ~]  [~ this(avoid ~)]
+      [%avoid @]  [~ this(avoid [+>.q.vase avoid])]
+    ==
+  ::
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
@@ -94,7 +110,7 @@
     =/  =rumor  [now.bowl new]
     :+  'the wind carries along your careless whisper...'
       [(invent:gossip %rumor !>(rumor))]~
-    [[rumor fresh] new]
+    [[rumor fresh] new avoid]
   ==
 ::
 ++  on-watch
@@ -131,6 +147,10 @@
   ?:  (gth when.rumor (add now.bowl ~h1))
     [~ this]
   ?:  (gth (met 3 what.rumor) 1.024)  ::  1.024 bytes should be enough 4 anyone
+    [~ this]
+  ?:  %+  levy  avoid
+      |=  =@t
+      ?=(^ (find (trip t) (cass (trip what.rumor))))
     [~ this]
   :-  [%give %fact [/rumors]~ %rumor !>(rumor)]~
   =-  this(fresh -)

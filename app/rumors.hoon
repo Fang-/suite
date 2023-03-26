@@ -125,13 +125,14 @@
     ~&  [dap.bowl %strange-sign wire sign]
     (on-agent:def wire sign)
   =+  !<(=rumor q.cage.sign)
-  :-  ~
   ::  ignore rumors from the far future
   ::
   ?:  (gth when.rumor (add now.bowl ~h1))
-    this
+    [~ this]
+  ?:  (gth (met 3 what.rumor) 1.024)  ::  1.024 bytes should be enough 4 anyone
+    [~ this]
   ::TODO  notify if your @p is mentioned?
-  =-  this(fresh -)
+  =-  [~ this(fresh -)]
   |-  ^+  fresh
   ?~  fresh  [rumor ~]
   ?:  (gte when.rumor when.i.fresh)

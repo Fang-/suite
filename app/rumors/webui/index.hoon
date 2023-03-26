@@ -15,6 +15,8 @@
     ~
   ?:  =('' u.what)
     'like a fart in the wind'
+  ?:  (gth (met 3 u.what) 1.024)
+    'your tirade falls on deaf ears'
   [~ u.what]
 ::
 ++  final  (alert:rudder (cat 3 '/' dap) build)

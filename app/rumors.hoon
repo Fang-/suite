@@ -75,7 +75,8 @@
   ++  state-2-to-3
     |=  old=state-2
     ^-  state-3
-    [%3 fresh.old ditto.old ~]
+    =-  [%3 - ditto.old ~]
+    (skip fresh.old |=([* r=@t] (gth (met 3 r) 1.024)))
   --
 ::
 ++  on-poke

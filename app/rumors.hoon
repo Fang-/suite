@@ -100,7 +100,8 @@
 ++  on-watch
   |=  =path
   ^-  (quip card _this)
-  ?:  ?=([%http-response *] path)  [~ this]
+  ?:  ?=([%http-response *] path)         [~ this]
+  ?:  &(=(/rumors path) =(our src):bowl)  [~ this]
   ?.  =(/~/gossip/source path)
     (on-watch:def path)
   :_  this
@@ -131,8 +132,8 @@
     [~ this]
   ?:  (gth (met 3 what.rumor) 1.024)  ::  1.024 bytes should be enough 4 anyone
     [~ this]
-  ::TODO  notify if your @p is mentioned?
-  =-  [~ this(fresh -)]
+  :-  [%give %fact [/rumors]~ %rumor !>(rumor)]~
+  =-  this(fresh -)
   |-  ^+  fresh
   ?~  fresh  [rumor ~]
   ?:  (gte when.rumor when.i.fresh)
@@ -142,10 +143,8 @@
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
-  ::TODO
-  ::  /x/rumors
-  ::  /x/rumor ? for frontend refresh button
-  ~
+  ?.  ?=([%x %rumors ~] path)  [~ ~]
+  ``noun+!>(fresh)
 ::
 ++  on-arvo
   |=  [=wire =sign-arvo]

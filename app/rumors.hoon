@@ -3,6 +3,12 @@
 ::    fiction and falsehood, or a glimpse of the truth?
 ::    say it loudly enough for the whole network to hear!
 ::
+::    to scry all known rumors out of this agent:
+::    .^((list [when=@da what=@t]) %gx /=rumors=/rumors/noun)
+::
+::    to be notified of new rumors as they come in, %watch on /rumors.
+::    %facts will have the %rumor mark, unpack to [when=@da what=@t].
+::
 /-  *rumors
 /+  gossip, rudder, default-agent,
     markov, pals

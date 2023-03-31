@@ -90,6 +90,8 @@
 
     .rumor {
       margin-bottom: 2em;
+      text-shadow: 1px 1px 3px rgb(0 0 0 / 15%);
+      letter-spacing: 0.1px;
     }
     '''
   ::

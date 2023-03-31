@@ -201,7 +201,8 @@
     [~ this]
   ::  ignore rumors that contain content from the avoid-list
   ::
-  ?:  %+  levy  avoid
+  ?:  ?:  =(~ avoid)  |
+      %+  levy  avoid
       |=  =@t
       ?=(^ (find (trip t) (cass (trip what.rumor))))
     [~ this]

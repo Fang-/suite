@@ -1,6 +1,6 @@
 ::  rudder: framework for routing & serving simple web frontends
 ::
-::      v1.0.1: newborn helmsman
+::      v1.0.2: newborn helmsman
 ::
 ::    the primary usage pattern involves your app calling steer:rudder
 ::    with a configuration, then calling the resulting gate with an
@@ -172,6 +172,7 @@
         =?  act  ?=(~ act)  'failed to process request'
         (spout id (paint (final:page | res)))
       :_  +>.res
+      =.  +<+>.page  +>.res
       (weld (spout id (paint (final:page & -.res))) +<.res)
     ==
   --

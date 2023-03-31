@@ -32,7 +32,6 @@
     '''
     * { margin: 0; padding: 0; color: #fff0ff; font-family: sans-serif; }
     .status, .warn { margin: 1em; clear: both; }
-    .red { color: #dd2266; }
 
     body {
       height: 100vh;
@@ -40,7 +39,7 @@
       text-align: center;
       overflow-x: hidden;
 
-      background: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
+      background-image: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
       background-size: 800% 800%;
       background-attachment: fixed;
 
@@ -133,9 +132,7 @@
   ++  status
     ^-  manx
     ?~  msg  :/""
-    ?:  o.u.msg
-      ;p.status.green:"{(trip t.u.msg)}"
-    ;p.status.red:"{(trip t.u.msg)}"
+    ;p.status:"{(trip t.u.msg)}"
   ::
   ++  input
     ^-  manx

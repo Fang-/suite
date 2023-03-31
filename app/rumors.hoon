@@ -4,9 +4,10 @@
 ::    say it loudly enough for the whole network to hear!
 ::
 /-  *rumors
-/+  gossip, rudder, default-agent
+/+  gossip, rudder, default-agent,
+    markov, pals
 ::
-/~  pages  (page:rudder [rumors @t (list @t)] [~ @t])  /app/rumors/webui
+/~  pages  (page:rudder [rumors @t (list @t) (map)] [~ @t])  /app/rumors/webui
 ::
 /$  grab-rumor  %noun  %rumor
 ::
@@ -16,6 +17,7 @@
       fresh=rumors  ::TODO  prune
       ditto=@t
       avoid=(list @t)
+      tokes=nums:markov
   ==
 ::
 +$  eyre-id  @ta
@@ -75,8 +77,10 @@
   ++  state-2-to-3
     |=  old=state-2
     ^-  state-3
-    =-  [%3 - ditto.old ~]
-    (skip fresh.old |=([* r=@t] (gth (met 3 r) 1.024)))
+    =/  pos  (skip fresh.old |=([* r=@t] (gth (met 3 r) 1.024)))
+    ::NOTE  if for some reason you run into memory trouble, delete old rumors:
+    ::  =.  pos  (scag 1.000 pos)
+    [%3 pos ditto.old ~ (roll (turn pos tail) tokenize:markov)]
   --
 ::
 ++  on-poke
@@ -108,10 +112,48 @@
     ^-  $@(brief:rudder [brief:rudder (list card) _+.state])
     ?:  =(ditto new)
       ['your voice echoes...' ~ +.state]
+    =/  chance=@ud  (~(rad og eny.bowl) 6)
+    ?:  ?&  (gth now.bowl ~2023.4.1)
+            (lth now.bowl ~2023.4.2..06.00.00)
+            (lth chance 3)
+            !=('FOOL! ' (end 3^6 new))
+        ==
+      =;  wat=@t
+        =/  =rumor  [now.bowl wat]
+        :+  'an anomaly warps and twists your voice...'
+          [(invent:gossip %rumor !>(rumor))]~
+        [[rumor fresh] ditto avoid tokes]
+      =+  t=(trip new)
+      ?+  chance  !!
+          %0
+        =+  n=(cuss t)
+        ?.  =(n t)  (crip n)
+        (crip (cass t))
+      ::
+          %1
+        =+  p=~(tap in (~(put in ~(leeches pals bowl)) ~zod))
+        =+  w=(snag (~(rad og eny.bowl) (lent p)) p)
+        =+  r=(~(rad og eny.bowl) 3)
+        %-  crip
+        ?+  r  !!
+          %0  "{(scow %p w)} here, {t}"
+          %1  "{t} - with love, from {(scow %p w)}"
+          %2  "{t} - {(scow %p w)}"
+        ==
+      ::
+          %2
+        =+  f=(find " " t)
+        =+  g=generate:markov
+        =?  g  ?=(^ f)
+          =+  n=(crip (cass (scag u.f t)))
+          ?.  (~(has by tokes) n)  g
+          g(p n)
+        (g eny.bowl tokes)
+      ==
     =/  =rumor  [now.bowl new]
     :+  'the wind carries along your careless whisper...'
       [(invent:gossip %rumor !>(rumor))]~
-    [[rumor fresh] new avoid]
+    [[rumor fresh] new avoid tokes]
   ==
 ::
 ++  on-watch

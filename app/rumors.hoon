@@ -189,8 +189,12 @@
   ::
   ?:  (gth when.rumor (add now.bowl ~h1))
     [~ this]
-  ?:  (gth (met 3 what.rumor) 1.024)  ::  1.024 bytes should be enough 4 anyone
+  ::  1.024 bytes should be enough for anyone
+  ::
+  ?:  (gth (met 3 what.rumor) 1.024)
     [~ this]
+  ::  ignore rumors that contain content from the avoid-list
+  ::
   ?:  %+  levy  avoid
       |=  =@t
       ?=(^ (find (trip t) (cass (trip what.rumor))))

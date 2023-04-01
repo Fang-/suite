@@ -72,8 +72,8 @@
     ^-  manx
     ;div#head
       ;div(style "float: left;")
-        ;h1:"The Million $U Urbit App™"
-        ;span:"1,000,000 pixels • One $U per pixel • Own a piece of Urbit history!"
+        ;h1:"The Million Dollar Urbit App™"
+        ;span:"1,000,000 pixels • $1 per pixel • Own a piece of Urbit history!"
       ==
       ;+  stat
     ==

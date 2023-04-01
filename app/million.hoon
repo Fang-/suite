@@ -1,6 +1,6 @@
-::  million: the million $u urbit app
+::  million: the million dollar urbit app
 ::
-::    a million pixels. one $u per pixel. sold in blocks of 10x10 pixels.
+::    a million pixels. $1 per pixel. sold in blocks of 10x10 pixels.
 ::    get yours today!
 ::
 ::    possible use cases for a "map of owned space" include:

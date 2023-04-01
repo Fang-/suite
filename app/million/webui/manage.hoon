@@ -267,7 +267,7 @@
       updateCart();
     }
     function updateCart() {
-      buybutton.innerHTML = 'Buy for $U ' + (cart.length * 100);
+      buybutton.innerHTML = 'Buy for $' + (cart.length * 100);
       spots.value = cart.map(s => (s.x + ',' + s.y)).join(',');
       buybutton.disabled = !(cart.length > 0);
     }
@@ -311,7 +311,7 @@
     ^-  manx
     ;html
       ;head
-        ;title:"Million $U Urbit Page"
+        ;title:"Million Dollar Urbit Page"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;style:"{(trip style)}"
@@ -352,8 +352,8 @@
             =name      "buy"
             =id        "buybutton"
             =disabled  ""
-            =onclick   "return confirm('Are you sure? You will be on the hook for $U ' + (cart.length*100) + '.')"
-            ; purchase for $U 0
+            =onclick   "return confirm('Are you sure? You will be on the hook for $' + (cart.length*100) + '.')"
+            ; purchase for $0
           ==
           ;
           ;a/"/million/tos"(target "_blank"):"(?)"

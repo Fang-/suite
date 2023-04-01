@@ -66,7 +66,7 @@
     ^-  manx
     ;html
       ;head
-        ;title:"Million $U Urbit Page"
+        ;title:"Million Dollar Urbit Page"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;style:"{(trip style)}"
@@ -81,8 +81,8 @@
     ^-  manx
     ;div#head
       ;div(style "float: left;")
-        ;h1:"The Million $U Urbit App™"
-        ;span:"1,000,000 pixels • One $U per pixel • Own a piece of Urbit history!"
+        ;h1:"The Million Dollar Urbit App™"
+        ;span:"1,000,000 pixels • $1 per pixel • Own a piece of Urbit history!"
       ==
       ;+  stat
     ==

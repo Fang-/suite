@@ -57,7 +57,7 @@
     ^-  manx
     ;html
       ;head
-        ;title:"Million $U Urbit Page"
+        ;title:"Million Dollar Urbit Page"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;style:"{(trip style)}"

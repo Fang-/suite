@@ -1,0 +1,10 @@
+:~  title+'Million $U Urbit App'
+    info+'Uncharted territory available!'
+    color+0xff.ffff
+    image+'https://urb.pal.dev/million/image.svg'
+    site+/million
+    base+'million'
+    version+[1 0 0]
+    website+'https://pal.dev/suite/million'
+    license+'MIT'
+==

@@ -42,7 +42,7 @@
         %+  bind  (link link.tile)
         |=  l=@t
         ::TODO  if unauthed, and url starts with /, alert instead
-        ;a(href "{(trip l)}");
+        ;a(href "{(trip l)}", target "_blank");
   ==
 ::
 ++  link

@@ -342,7 +342,7 @@
       ;div#basket
         ;div#selected(style "float: left;")
           ;h3.scoords:"[x=? y=?]"
-          ;button(onclick "buy()", id "addbutton"):"add to basket"
+          ;button(onclick "buy()", id "addbutton"):"add to cart"
         ==
         ;div#receipts;
         ;form(method "post")

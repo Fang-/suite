@@ -200,7 +200,7 @@
     =^  caz  this  p.res
     :_  [caz grid]
     ?+  -.action  ~
-      %buy  'A sales representative will reach out to you within 24 hours.'
+      %buy  (crip "Our sales representative, {(scow %p aide)}, will reach out to you within 24 hours. Please watch your DMs.")
     ==
   ::
       %million-action

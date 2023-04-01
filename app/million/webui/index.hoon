@@ -93,7 +93,7 @@
       ; Available: {(scow %ud a)}
       ;br;
       ;+  ?.  authenticated.order
-            ;span:"Want in? Install ~paldev/million!"
+            ;span:"Want in? |install ~paldev %million"
           ;a.buy/"/million/manage":"Buy now!"
     ==
   ::

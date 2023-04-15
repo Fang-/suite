@@ -243,9 +243,9 @@
       if (p.length === 27) {
         c = p.slice(-13).replace('-', '^');
       } else if (p.length > 27) {
-        c = p.slice(0, 6) + '_' + p.slice(p.length - 6)
+        c = '~' + p.slice(1, 6) + '_' + p.slice(p.length - 6)
       }
-      return '~' + c;
+      return c;
     }
 
     function renderAuthor(author) {

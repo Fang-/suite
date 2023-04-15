@@ -19,7 +19,7 @@ these softwares can be installed from ~paldev as landscape tiles:
 these softwares are for manual, local installation & configuration:
 
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
-- **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
+- **chat-stream**: allows unauthenticated randos to partake in chats over http.
 - **emblemish**: provides an http endpoint for emblemish data. (instance powering [@everyemblemish](https://twitter.com/everyemblemish) is deployed [here](http://159.65.204.48:8081/emblemish/random.html).)
 
 ## for developers

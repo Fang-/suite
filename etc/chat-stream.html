@@ -1,4 +1,5 @@
 <html>
+
 <head>
   <title>~paldev/lobby</title>
   <style>
@@ -7,6 +8,7 @@
       padding: 0;
       font-size: 11pt;
     }
+
     body {
       overflow: hidden;
     }
@@ -19,6 +21,7 @@
       line-height: 1.3em;
       overflow-y: scroll;
     }
+
     #head pre {
       font-family: monospace;
       display: inline-block;
@@ -38,9 +41,11 @@
       margin: 0 auto;
       font-family: monospace;
     }
+
     .bad {
       border-color: #f60 !important;
     }
+
     #viewport:after {
       content: '';
       position: absolute;
@@ -50,12 +55,14 @@
       bottom: -3px;
       z-index: -1;
     }
+
     #bottomSnapper {
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       height: 100%;
     }
+
     #scroller {
       display: flex;
       flex-direction: column;
@@ -68,30 +75,37 @@
       padding: 8px;
       line-height: 1.3em;
     }
+
     .timestamp {
       color: #bbb;
     }
+
     .author {
       margin-left: 10px;
       color: #777;
     }
+
     .author.comet {
       cursor: pointer;
       color: #888;
     }
-    .metadata {
-    }
+
+    .metadata {}
+
     .content {
       margin-left: 10px;
     }
+
     a {
       color: black;
     }
+
     pre {
       background-color: #ddd;
       margin: 0;
       padding: 2px;
     }
+
     .message pre:nth-child(2) {
       clear: left;
       background-color: #eee;
@@ -129,7 +143,7 @@
     function startStream() {
       let stream = new EventSource(
         base + '.json',
-        {withCredentials:true}
+        { withCredentials: true }
       );
       stream.onopen = e => {
         console.log('open');
@@ -178,20 +192,22 @@
         credentials: 'include',
         body: msg
       })
-      .then(response => {
-        showSendStatus(response.status === 200);
-      });
+        .then(response => {
+          showSendStatus(response.status === 200);
+        });
     }
 
     function handleUpdate(data) {
       console.log('event', data);
       if (!data) return; // heartbeat
       let messages = data;
+      if (typeof messages !== 'array') messages = [data];
+      console.log('messages', messages);
 
       for (i in messages) {
         const msg = messages[i];
-        if (known.includes(msg.index)) continue;
-        known.push(msg.index);
+        if (known.includes(msg.sent)) continue;
+        known.push(msg.sent);
         appendMessage(renderPost(msg));
       }
     }
@@ -204,7 +220,7 @@
       meta.appendChild(renderTimestamp(post['time-sent']));
       meta.appendChild(renderAuthor(post.author));
       body.appendChild(meta);
-      body.appendChild(renderContents(post.contents));
+      body.appendChild(renderContents(post.content));
       return body;
     }
 
@@ -226,7 +242,7 @@
       if (p.length === 27) {
         c = p.slice(-13).replace('-', '^');
       } else if (p.length > 27) {
-        c = p.slice(0,6) + '_' + p.slice(p.length-6)
+        c = p.slice(0, 6) + '_' + p.slice(p.length - 6)
       }
       return '~' + c;
     }
@@ -243,31 +259,54 @@
       return body;
     }
 
-    function renderContents(contents) {
+    function renderContents(content) {
+      let contents = [];
+      if (typeof content === 'array') {
+        contents = content;
+      } else if (content.notice) {
+        contents = content.notice.pfix + ' ~??? ' + content.notice.sfix;
+      } else if (content.story) {
+        contents = content.story.inline;
+      }
       let body = document.createElement('span');
       body.setAttribute('class', 'content');
       while (contents.length > 0) {
         const c = contents[0];
         contents = contents.slice(1);
 
-        if (c.text === '' || c.text) {
-          body.appendChild(document.createTextNode(c.text));
-        } else if (c.mention) {
-          body.appendChild(document.createTextNode(' '+ cite(c.mention) +' '));
-        } else if (c.url) {
+        if (typeof c === 'string') {
+          body.appendChild(document.createTextNode(c));
+        } else if (typeof c === 'null') {
+          body.appendChild(document.createElement('br'));
+        } else if (c.ship) {
+          body.appendChild(document.createTextNode(' ' + cite(c.ship) + ' '));
+        } else if (c.link) {
           let a = document.createElement('a');
-          a.setAttribute('href', c.url);
-          a.appendChild(document.createTextNode(c.url));
+          a.setAttribute('href', c.link.href);
+          a.appendChild(document.createTextNode(c.link.content));
           body.appendChild(a);
-        } else if (c.code) {
+        } else if (c.code || c.tag || c['inline-code']) {
           let code = document.createElement('pre');
-          code.appendChild(document.createTextNode(c.code.expression));
+          code.appendChild(document.createTextNode(c.code || c.tag || c['inline-code']));
           body.appendChild(code);
-          let out = document.createElement('pre');
-          out.appendChild(document.createTextNode(c.code.output));
-          body.appendChild(out);
-        } else if (c.reference) {
-          body.appendChild(document.createTextNode('^'));
+        } else if (c.italics) {
+          let text = document.createElement('i');
+          text.appendChild(document.createTextNode(renderContents(c.italics)));
+          body.appendChild(text);
+        } else if (c.bold) {
+          let text = document.createElement('b');
+          text.appendChild(document.createTextNode(renderContents(c.bold)));
+          body.appendChild(text);
+        } else if (c.strike) {
+          let text = document.createElement('strike');
+          text.appendChild(document.createTextNode(renderContents(c.strike)));
+          body.appendChild(text);
+        } else if (c.blockquote) {
+          let text = document.createElement('quote');
+          text.appendChild(document.createTextNode(renderContents(c.blockquote)));
+          body.appendChild(text);
+        } else if (c.block) {
+          body.appendChild(document.createTextNode('## '));
         } else {
           console.log('weird node', c);
           body.appendChild(document.createTextNode('[??]'));
@@ -293,13 +332,17 @@
 
   </script>
 </head>
+
 <body>
 
   <div id="head">
-    Public gateway to <pre>~paldev/lobby</pre>. Might be slow during busy hours.<br/>
-    If you have an Urbit, just join there! It's in the <pre>~paldev/group</pre>.<br/>
-    Keep it civil, rabble-rousers will be banned.<br/>
-    Hoon source lives <a href="https://github.com/fang-/suite/blob/master/app/graph-stream-hook.hoon" target="_blank">here</a>.
+    Public gateway to
+    <pre>~paldev/lobby</pre>. Might be slow during busy hours.<br />
+    If you have an Urbit, just join there! It's in the
+    <pre>~paldev/group</pre>.<br />
+    Keep it civil, rabble-rousers will be banned.<br />
+    Hoon source lives <a href="https://github.com/fang-/suite/blob/master/app/graph-stream-hook.hoon"
+      target="_blank">here</a>.
   </div>
 
   <div id="viewport" class="bad">
@@ -312,4 +355,5 @@
   </div>
 
 </body>
+
 </html>

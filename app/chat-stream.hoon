@@ -1,23 +1,23 @@
-::  graph-stream-hook: graph proxy for earthlings
+::  chat-stream: chat proxy for earthlings
 ::
-::    makes specified chat graphs accessible over unauthenticated http
-::    requests.
-::    GET at /stream/graph-name.json to receive json updates as messages happen.
-::    POST at /stream/graph-name with a body to send a chat message.
+::    makes specified chats accessible over unauthenticated http requests.
+::    GET at /stream/chat-name.json to receive json updates as messages happen.
+::    POST at /stream/chat-name with a body to send a chat message.
 ::
 ::    hands out temporary identities (using fakeid) using which stream viewers
-::    can post to exposed graphs.
+::    can post to exposed chats.
 ::    NOTE that the cookie it gives out is marked Secure and SameSite=None!
 ::
-::    when streaming a graph, any messages sent into it (by real identities)
+::    when streaming a chat, any messages sent into it (by real identities)
 ::    of the form "!ban ~ship" will result in an ip ban for that ship,
 ::    denying them posting privileges in all local streams.
 ::
-::    usage: poke with an action. ie :graph-stream-hook [%stream %urbit-help]
+::    usage: poke with an action. ie :chat-stream [%stream %urbit-help]
 ::
-/+  graph-store,
+/-  chat
+/+  chat-json,
     default-agent, verb, dbug,
-    fid=fakeid, *server, graph
+    fid=fakeid, *server
 ::
 |%
 +$  state-0
@@ -31,7 +31,7 @@
       banned=(set address:eyre)
   ==
 ::
-::NOTE  we could support _streaming_ foreign graphs fairly easily,
+::NOTE  we could support _streaming_ foreign chats fairly easily,
 ::      but posting to them is a way different story,
 ::      so we just go full local-only for now.
 +$  source  term
@@ -66,11 +66,10 @@
     ::NOTE  careful! install currently proceeds fine if this crashes.
     ::      you'll need to |uninstall the desk and |nuke the app.
     |^  =+  (check-dependency %fakeid-store)
-        =+  (check-dependency %graph-store)
+        =+  (check-dependency %chat)
         :_  this
         :~  [%pass /connect %arvo %e %connect [~ /stream] dap.bowl]
             kick-heartbeat:do
-            watch-graphs:do
         ==
     ::
     ++  check-dependency
@@ -138,18 +137,19 @@
       ?~  p.sign  [~ this]
       %-  (slog leaf+"failed poke on {(spud wire)}" u.p.sign)
       [~ this]
-    ?.  ?=([%listen ~] wire)  (on-agent:def wire sign)
+    ?.  ?=([%listen @ ~] wire)  (on-agent:def wire sign)
+    =*  source  i.t.wire
     ?+  -.sign  (on-agent:def wire sign)
         %kick
-      [[watch-graphs:do]~ this]
+      [[(watch-chat:do our.bowl source)]~ this]
     ::
         %fact
       =*  mark  p.cage.sign
       =*  vase  q.cage.sign
       ?+  mark  (on-agent:def wire sign)
-          %graph-update-3
+          %writ-diff
         =^  cards  state
-          (handle-graph-update:do !<(update:graph-store vase))
+          (handle-chat-update:do source !<(diff:writs:chat vase))
         [cards this]
       ==
     ==
@@ -174,7 +174,6 @@
 ::
 |_  =bowl:gall
 +*  fakeid  ~(. fid bowl)
-    g       ~(. graph bowl)
 ::
 ::  config
 ::
@@ -208,18 +207,24 @@
     ::
       %http-response-data
       !>  ^-  (unit octs)
-      `[1 '\0a']
+      `[1 '\0a']  ::TODO  prefix with : ?
   ==
 ::
-++  watch-graphs
+++  watch-chat
+  |=  [our=ship =term]
   ^-  card
   :*  %pass
-      /listen
+      /listen/[term]
       %agent
-      [our.bowl %graph-store]
+      [our %chat]
       %watch
-      /updates
+      /chat/(scot %p our)/[term]/ui/writs
   ==
+::
+++  leave-chat
+  |=  [our=ship =term]
+  ^-  card
+  [%pass /listen/[term] %agent [our %chat] %leave ~]
 ::
 ++  send-to-viewers
   |=  [=source =json]
@@ -256,7 +261,7 @@
           (~(has in streams) source)
       ==
     [~ state]
-  :-  ~
+  :-  [(watch-chat our.bowl source)]~
   state(streams (~(put in streams) source))
 ::
 ++  stop-stream
@@ -264,7 +269,7 @@
   ^-  (quip card _state)
   ?.  (~(has in streams) source)
     [~ state]
-  :-  ~
+  :-  [(leave-chat our.bowl source)]~
   %_  state
     streams  (~(del in streams) source)
     viewers  (~(del by viewers) source)
@@ -289,48 +294,35 @@
 ::
 ::  outgoing flows
 ::
-++  handle-graph-update
-  |=  [upd=update:graph-store]
+++  handle-chat-update
+  |=  [=source =diff:writs:chat]
   ^-  (quip card _state)
-  ?.  ?=(%add-nodes -.q.upd)
+  ?.  ?=(%add -.q.diff)
     [~ state]
-  =*  source  name.resource.q.upd
   ?.  (~(has in streams) source)
+    ~&  [dap.bowl %unexpected-diff-for source]
     [~ state]
-  ::  accept !ban commands from text messages sent by real identities
+  ::  accept !ban commands from real identites,
+  ::  as plaintext "!ban " followed by a mention
   ::
-  =/  banlist=(list @p)
-    %+  murn
-      ~(val by nodes.q.upd)
-    |=  [m=maybe-post:graph-store *]
-    ?:  ?=(%| -.m)  ~
-    =+  p.m
-    ?.  (lte (met 3 author) 8)  ~
-    ~&  contents
-    ?.  ?=([[%text *] *] contents)  ~
-    ?:  ?&  =('!ban' text.i.contents)
-            ?=([[%mention *] *] t.contents)
-        ==
-      (some ship.i.t.contents)
-    %+  rush  text.i.contents
-    (ifix [(jest '!ban ~') (star next)] fed:ag)
-  =|  cards=(list card)
-  |-
-  ?~  banlist
-    :_  state
-    %+  weld  cards
-    ::  forward posts to all viewers
-    ::
-    %+  send-to-viewers  source
-    :-  %a
-    %+  murn  ~(val by nodes.q.upd)
-    |=  [post=maybe-post:graph-store *]
-    ^-  (unit json)
-    ?:  ?=(%| -.post)  ~
-    `(post:enjs:graph-store p.post)
+  =/  banned=(unit @p)
+    ?.  (lte (met 3 author.p.q.diff) 8)  ~
+    =/  body=(list inline:chat)
+      ?+  -.content.p.q.diff  ~
+        %story  q.p.content.p.q.diff
+      ==
+    ?.  ?=([%'!ban ' [%ship @] ~] body)  ~
+    ?.  =('!ban ' i.body)  ~
+    ~&  [%gottem p.i.t.body]
+    `p.i.t.body
   =^  caz  state
-    (ban-comet i.banlist)
-  $(banlist t.banlist, cards (weld caz cards))
+    ?~  banned  [~ state]
+    (ban-comet u.banned)
+  :_  state
+  ::  forward posts to all viewers
+  ::
+  %+  send-to-viewers  source
+  (memo:enjs:chat-json p.q.diff)
 ::
 ::  incoming flows
 ::
@@ -411,16 +403,17 @@
   %-  some
   %-  make-stream-data
   :-  %a
-  =;  recents=(list [* maybe-post:graph-store *])
-    %+  murn  recents
-    |=  [* m=maybe-post:graph-store *]
-    ^-  (unit json)
-    ?:  ?=(%| -.m)  ~
-    `(post:enjs:graph-store p.m)
+  =-  (turn - |=([* * m=memo:chat] (memo:enjs:chat-json m)))
   %-  flop
-  %+  scag  initial-messages
-  %-  tap:orm:graph-store
-  (get-graph-mop:g our.bowl source)
+  ^-  (list [time writ:chat])
+  %-  tap:((on time writ:chat) lte)
+  .^  ((mop time writ:chat) lte)
+    %gx
+    (scot %p our.bowl)
+    %chat
+    (scot %da now.bowl)
+    /chat/(scot %p our.bowl)/[source]/writs/newest/(scot %ud initial-messages)
+  ==
 ::
 ++  handle-post
   |=  [=eyre-id =inbound-request]
@@ -459,6 +452,8 @@
   %^  send-message
       source
     u.who
+  :+  %story  ~
+  :_  ~
   %-  text-to-content
   (end 3^max-message-length body)
 ::
@@ -466,8 +461,8 @@
   %+  curr  rash
   ::NOTE  we intentionally don't do #expression parsing
   |^  ;~  pose
-        (stag %url turl)
-        (stag %text text)
+        (cook |=(=@t [%link t t]) turl)
+        text
       ==
   ::  +turl: url parser
   ::
@@ -483,31 +478,20 @@
   --
 ::
 ++  send-message
-  |=  [=source as=ship =content:graph-store]
+  |=  [=source as=ship =content:chat]
   ^-  card
   :*  %pass
       /send/[source]
       %agent
-      [our.bowl %graph-store]
+      [our.bowl %chat]
       %poke
-      %graph-update-3
+      %chat-action-0
     ::
-      !>  ^-  update:graph-store
-      ::TODO  this is api, man... move into lib or w/e
-      =|  nodes=(list [index:graph-store node:graph-store])
-      :-  now.bowl
-      :+  %add-nodes  [our.bowl source]
-      %+  ~(put by *(map index:graph-store node:graph-store))
-        [now.bowl]~
-      :_  [%empty ~]
-      ^-  maybe-post:graph-store
-      :*  %&
-          as
-          [now.bowl]~
-          now.bowl
-          [content]~
-          ~
-          ~
-      ==
+      !>  ^-  action:chat
+      :-  [our.bowl source]
+      :+  now.bowl  %writs
+      ^-  diff:writs:chat
+      ::TODO  as in place of our for msg id?
+      [[our.bowl now.bowl] %add [~ as now.bowl content]]
   ==
 --

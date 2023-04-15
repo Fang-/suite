@@ -305,19 +305,17 @@
   ::  accept !ban commands from real identites,
   ::  as plaintext "!ban " followed by a mention
   ::
-  =/  banned=(unit @p)
+  =/  banning=(unit @p)
     ?.  (lte (met 3 author.p.q.diff) 8)  ~
     =/  body=(list inline:chat)
       ?+  -.content.p.q.diff  ~
         %story  q.p.content.p.q.diff
       ==
-    ?.  ?=([%'!ban ' [%ship @] ~] body)  ~
-    ?.  =('!ban ' i.body)  ~
-    ~&  [%gottem p.i.t.body]
+    ?.  ?=([%'!ban ' [%ship @] *] body)  ~
     `p.i.t.body
   =^  caz  state
-    ?~  banned  [~ state]
-    (ban-comet u.banned)
+    ?~  banning  [~ state]
+    (ban-comet u.banning)
   :_  state
   ::  forward posts to all viewers
   ::
@@ -404,7 +402,6 @@
   %-  make-stream-data
   :-  %a
   =-  (turn - |=([* * m=memo:chat] (memo:enjs:chat-json m)))
-  %-  flop
   ^-  (list [time writ:chat])
   %-  tap:((on time writ:chat) lte)
   .^  ((mop time writ:chat) lte)

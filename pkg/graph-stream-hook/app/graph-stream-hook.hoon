@@ -1,1 +1,0 @@
-../../../app/graph-stream-hook.hoon

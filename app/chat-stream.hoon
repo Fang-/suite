@@ -412,7 +412,10 @@
     (scot %p our.bowl)
     %chat
     (scot %da now.bowl)
-    /chat/(scot %p our.bowl)/[source]/writs/newest/(scot %ud initial-messages)
+    %chat
+    (scot %p our.bowl)
+    source
+    /writs/newest/(scot %ud initial-messages)/chat-writs
   ==
 ::
 ++  handle-post

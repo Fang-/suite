@@ -201,7 +201,7 @@
       console.log('event', data);
       if (!data) return; // heartbeat
       let messages = data;
-      if (typeof messages !== 'array') messages = [data];
+      if (!Array.isArray(messages)) messages = [data];
       console.log('messages', messages);
 
       for (i in messages) {
@@ -213,11 +213,12 @@
     }
 
     function renderPost(post) {
+      console.log('render post', post);
       let body = document.createElement('div');
       body.setAttribute('class', 'message');
       let meta = document.createElement('span');
       meta.setAttribute('class', 'metadata');
-      meta.appendChild(renderTimestamp(post['time-sent']));
+      meta.appendChild(renderTimestamp(post.sent));
       meta.appendChild(renderAuthor(post.author));
       body.appendChild(meta);
       body.appendChild(renderContents(post.content));
@@ -250,7 +251,7 @@
     function renderAuthor(author) {
       let body = document.createElement('span');
       if (author.length > 27) {
-        body.setAttribute('onClick', `navigator.clipboard.writeText('~${author}')`);
+        body.setAttribute('onClick', 'navigator.clipboard.writeText(author)');
         body.setAttribute('class', 'author comet');
       } else {
         body.setAttribute('class', 'author');
@@ -261,7 +262,7 @@
 
     function renderContents(content) {
       let contents = [];
-      if (typeof content === 'array') {
+      if (Array.isArray(content)) {
         contents = content;
       } else if (content.notice) {
         contents = content.notice.pfix + ' ~??? ' + content.notice.sfix;
@@ -276,7 +277,7 @@
 
         if (typeof c === 'string') {
           body.appendChild(document.createTextNode(c));
-        } else if (typeof c === 'null') {
+        } else if (c.break === null) {
           body.appendChild(document.createElement('br'));
         } else if (c.ship) {
           body.appendChild(document.createTextNode(' ' + cite(c.ship) + ' '));

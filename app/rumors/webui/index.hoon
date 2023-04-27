@@ -126,7 +126,7 @@
     ==
   ::
   ++  pals-installed  ~+
-    .^(? %gu /(scot %p our)/pals/(scot %da now))
+    .^(? %gu /(scot %p our)/pals/(scot %da now)/$)
   ::
   ++  mutuals  ~+
     .^((set ship) %gx /(scot %p our)/pals/(scot %da now)/mutuals/noun)

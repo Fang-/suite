@@ -8,8 +8,11 @@
 ++  target   |=  [list=@ta =ship]  (s _| /mutuals/[list]/(scot %p ship))
 ++  mutual   |=  [list=@ta =ship]  (s _| /mutuals/[list]/(scot %p ship))
 ::
-++  base     ~+  /(scot %p our)/pals/(scot %da now)
-++  running  ~+  .^(? %gu base)
+++  labels   ?.  running  `(set @ta)`~
+             ~(key by dir:.^(arch %gy (snoc base %targets)))
+::
+++  base     ~+  `path`/(scot %p our)/pals/(scot %da now)
+++  running  ~+  .^(? %gu (snoc base %$))
 ::
 ++  s
   |*  [=mold =path]  ~+

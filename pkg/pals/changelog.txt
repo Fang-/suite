@@ -1,5 +1,8 @@
 pals
 
+v1.0.14, ~2023.04.27
+- use %contacts instead of %contact-store
+
 v1.0.13, ~2023.03.16
 - sort pals, within categories, alphabetically.
 

@@ -168,7 +168,7 @@
         =/  =cage    [%pals-effect !>(effect)]
         [%give %fact [/leeches]~ cage]
       ::
-        ?.  .^(? %gu /(scot %p our.bowl)/hark/(scot %da now.bowl))  ~
+        ?.  .^(? %gu /(scot %p our.bowl)/hark/(scot %da now.bowl)/$)  ~
         =/  body
           =-  [ship+ship - ~]
           ?-  -.gesture

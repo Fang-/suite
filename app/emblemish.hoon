@@ -82,7 +82,7 @@
   ::
       [~ %json]
     :-  [200 ['content-type'^'application/json;charset=utf-8']~]
-    %-  some  %-  crip  %-  en-json:html
+    %-  some  %-  en:json:html
     %-  pairs:enjs:format
     :~  'p'^s+(scot %p u.who)
         'title'^s+(name:emblemish | u.who)

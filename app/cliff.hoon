@@ -397,7 +397,7 @@
                        '{(spud (slag 2 spot))}';
                        """
             ;*  %+  turn
-                  (sort ~(tap in .^((set desk) %cd rend(s.beam ~))) aor)
+                  (sort ~(tap in .^((set desk) %cd rend(q.beam %$, s.beam ~))) aor)
                 |=  d=desk
                 =+  p=(trip d)
                 ?.  =(d q.beam)

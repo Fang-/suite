@@ -75,7 +75,7 @@
     ++  check-dependency
       |=  app=dude:gall
       ~|  [%missing-dependency %app app]
-      ?>  .^(? %gu /(scot %p our.bowl)/[app]/(scot %da now.bowl))
+      ?>  .^(? %gu /(scot %p our.bowl)/[app]/(scot %da now.bowl)/$)
       ~
     --
   ::
@@ -249,8 +249,8 @@
 ++  make-stream-data
   |=  =json
   ^-  octs
-  %-  as-octt:mimes:html
-  :(weld "data:" (en-json:html json) "\0a\0a")
+  %-  as-octs:mimes:html
+  (rap 3 'data:' (en:json:html json) '\0a\0a' ~)
 ::
 ::  actions
 ::

@@ -407,7 +407,6 @@
     =/  base=path
       /(scot %p our.bowl)/contacts/(scot %da now.bowl)
     ?.  .^(? %gu (snoc base %$))  *rolodex:contact
-    ~&  %hittem
     .^(rolodex:contact %gx (weld base /all/noun))
   ::
   ++  sigil

@@ -185,16 +185,6 @@
         ==
         ; , contact book.
         ;br;
-        ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
-          ; ~hastuc^dibtux/zone
-        ==
-        ; , timezone sharing.
-        ;br;
-        ;a/"/apps/grid/perma?ext=web+urbitgraph://~dister-fabnev-hinmur/escape/"
-          ; ~fabnev^hinmur/escape
-        ==
-        ; , enhanced groups interface.
-        ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
           ; ~paldev/face
         ==

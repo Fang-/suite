@@ -3,8 +3,8 @@
 /-  *rumors
 /+  rudder
 ::
-^-  (page:rudder rumors [~ @t])
-|_  [bowl:gall * =rumors]
+^-  (page:rudder [rumors @t (list @t) (map)] [~ @t])
+|_  [bowl:gall order:rudder =rumors @t (list @t) (map)]
 ++  argue
   |=  [head=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder [~ @t])
@@ -15,9 +15,16 @@
     ~
   ?:  =('' u.what)
     'like a fart in the wind'
+  ?:  (gth (met 3 u.what) 1.024)
+    'your tirade falls on deaf ears'
   [~ u.what]
 ::
-++  final  (alert:rudder (cat 3 '/' dap) build)
+++  final  ::  (alert:rudder (cat 3 '/' dap) build)
+  |=  [done=? =brief:rudder]
+  ?:  =('an anomaly warps and twists your voice...' brief)
+    =+  r=(~(got by (frisk:rudder q:(need body.request))) 'rumor')
+    (build ['rumor' r]~ `[done ?>(?=(@t brief) brief)])
+  ((alert:rudder (cat 3 '/' dap) build) done brief)
 ::
 ++  build
   |=  $:  arg=(list [k=@t v=@t])
@@ -27,10 +34,13 @@
   |^  [%page page]
   ::
   ++  style
+    =;  s=@t
+      ?.  &((gth now ~2023.4.1) (lth now ~2023.4.2..06.00.00))  s
+      %^  cat  3  s
+      'body{background-image:linear-gradient(345deg, #99eaea, #8fdb78, #a0a0e5, #7bdfdf);}'
     '''
     * { margin: 0; padding: 0; color: #fff0ff; font-family: sans-serif; }
     .status, .warn { margin: 1em; clear: both; }
-    .red { color: #dd2266; }
 
     body {
       height: 100vh;
@@ -38,7 +48,7 @@
       text-align: center;
       overflow-x: hidden;
 
-      background: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
+      background-image: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
       background-size: 800% 800%;
       background-attachment: fixed;
 
@@ -88,6 +98,8 @@
 
     .rumor {
       margin-bottom: 2em;
+      text-shadow: 1px 1px 3px rgb(0 0 0 / 15%);
+      letter-spacing: 0.1px;
     }
     '''
   ::
@@ -114,7 +126,7 @@
     ==
   ::
   ++  pals-installed  ~+
-    .^(? %gu /(scot %p our)/pals/(scot %da now))
+    .^(? %gu /(scot %p our)/pals/(scot %da now)/$)
   ::
   ++  mutuals  ~+
     .^((set ship) %gx /(scot %p our)/pals/(scot %da now)/mutuals/noun)
@@ -129,14 +141,15 @@
   ++  status
     ^-  manx
     ?~  msg  :/""
-    ?:  o.u.msg
-      ;p.status.green:"{(trip t.u.msg)}"
-    ;p.status.red:"{(trip t.u.msg)}"
+    ;p.status:"{(trip t.u.msg)}"
   ::
   ++  input
     ^-  manx
+    =/  value=tape
+      ?.  ?=([[%rumor @] *] arg)  ""
+      (trip v.i.arg)
     ;form(method "post")
-      ;input(type "text", name "rumor", required "", placeholder prompt);
+      ;input(type "text", name "rumor", required "", placeholder prompt, value value);
     ==
   ::
   ++  listing

@@ -8,6 +8,7 @@ epic.hoon
 resource.hoon
 group-store.hoon
 chat-0.hoon
+chat-1.hoon
 cite.hoon
 < urbit/pkg/landscape/sur
 metadata-store.hoon

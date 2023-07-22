@@ -1,6 +1,6 @@
 ::  pals index
 ::
-/-  *pals, contact=contact-store
+/-  *pals, contact=contacts
 /+  rudder, sigil-svg=sigil
 ::
 ^-  (page:rudder records command)
@@ -185,16 +185,6 @@
         ==
         ; , contact book.
         ;br;
-        ;a/"/apps/grid/perma?ext=web+urbitgraph://~littel-dister-hastuc-dibtux/zone/"
-          ; ~hastuc^dibtux/zone
-        ==
-        ; , timezone sharing.
-        ;br;
-        ;a/"/apps/grid/perma?ext=web+urbitgraph://~dister-fabnev-hinmur/escape/"
-          ; ~fabnev^hinmur/escape
-        ==
-        ; , enhanced groups interface.
-        ;br;
         ;a/"/apps/grid/perma?ext=web+urbitgraph://~paldev/face/"
           ; ~paldev/face
         ==
@@ -364,8 +354,17 @@
           ==
     ==
   ::
+  ++  por
+    |=  [a=* b=*]
+    ?:  ?=(@ a)
+      ?>  ?=(@ b)
+      (aor (scot %p a) (scot %p b))
+    ?>  ?=(@ -.a)
+    ?>  ?=([@ *] b)
+    (aor (scot %p -.a) (scot %p -.b))
+  ::
   ++  mutuals  ~+
-    %+  skim  (sort ~(tap by outgoing) dor)
+    %+  skim  (sort ~(tap by outgoing) por)
     |=  [=ship les=(set @ta)]
     ?&  (~(has in incoming) ship)
     ?|  =(~ tag)
@@ -383,27 +382,31 @@
     |=  [[sa=ship ma=*] [sb=ship mb=*]]
     =+  a=(~(get by receipts) sa)
     =+  b=(~(get by receipts) sb)
-    ?:  =(a b)  (dor ma mb)
+    ?:  =(a b)  (por sa sb)
     ?~(a ?=(~ b) ?~(b & |(u.a !u.b)))
   ::
   ++  leeches  ~+
     ?.  =(~ tag)  ~
-    %+  murn  (sort ~(tap in incoming) dor)
+    %+  murn  (sort ~(tap in incoming) por)
     |=  =ship
     ?:  (~(has by outgoing) ship)  ~
     (some ship ~)
   ::
   ++  contacts  ~+
+    ::TODO  but only if permission has been granted
     =/  base=path
-      /(scot %p our.bowl)/contact-store/(scot %da now.bowl)
-    ?.  .^(? %gu base)  *rolodex:contact
+      /(scot %p our.bowl)/contacts/(scot %da now.bowl)
+    ?.  .^(? %gu (snoc base %$))  *rolodex:contact
     .^(rolodex:contact %gx (weld base /all/noun))
   ::
   ++  sigil
     |=  =ship
     ^-  manx
     =/  bg=@ux
-      ?~(p=(~(get by contacts) ship) 0xff.ffff color.u.p)
+      ?~  p=(~(get by contacts) ship)  0xff.ffff
+      ?@  for.u.p                      0xff.ffff
+      ?@  con.for.u.p                  0xff.ffff
+      color.con.for.u.p
     =/  fg=tape
       ::TODO  move into sigil.hoon or elsewhere?
       =+  avg=(div (roll (rip 3 bg) add) 3)

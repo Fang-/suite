@@ -1,5 +1,17 @@
 pals
 
+v1.0.15, ~2023.07.22
+- improve behavior around breached pals.
+- add full state scry endpoint.
+- fix a bug where receipts were not updated correctly.
+- remove stale apps from app listing.
+
+v1.0.14, ~2023.04.27
+- use %contacts instead of %contact-store
+
+v1.0.13, ~2023.03.16
+- sort pals, within categories, alphabetically.
+
 v1.0.12, ~2022.12.19
 - update notification mechanism for new hark.
 

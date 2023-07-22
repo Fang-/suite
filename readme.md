@@ -19,7 +19,7 @@ these softwares can be installed from ~paldev as landscape tiles:
 these softwares are for manual, local installation & configuration:
 
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
-- **graph-stream-hook**: allows unauthenticated randos to partake in graphs over http.
+- **chat-stream**: allows unauthenticated randos to partake in chats over http.
 - **emblemish**: provides an http endpoint for emblemish data. (instance powering [@everyemblemish](https://twitter.com/everyemblemish) is deployed [here](http://159.65.204.48:8081/emblemish/random.html).)
 
 ## for developers
@@ -37,6 +37,7 @@ these softwares are for manual, local installation & configuration:
 - **sigil**: sigil-js but in hoon.
 - **emblemish**: alternative sigils & names, based on emoji, currently in beta.
 - **twemoji**: subset of the twemoji.twitter.com svgs used by emblemish.
+- **markov**: dumb markov chain text generation.
 - **bbcode**: bbcode parsing and rendering.
 - **benc**: b-encoding and -decoding.
 - **torn**: parsing and rendering of torrent files & magnet links.

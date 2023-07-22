@@ -1,5 +1,7 @@
 ::  gossip: data sharing with pals
 ::
+::      v1.1.0: sneaky whisper
+::
 ::    automates using /app/pals for peer & content discovery,
 ::    letting the underlying agent focus on handling the data.
 ::
@@ -44,6 +46,10 @@
 ::    setting hops to 1 distributes the data to direct pals only.
 ::    setting hops to 0 prevents emission of any gossip data at all,
 ::    even during initial subscription setup.
+::    setting pass to true causes 50% of locally-originating data to be
+::    proxied through a random "tell" peer. note that the proxy will have
+::    a 50% chance of proxying in turn. for low amounts of hops, data could
+::    escape the local social graph entirely.
 ::
 ::    (we introduce the /~/etc path prefix convention to indicate paths
 ::     that are for library-specific use only.
@@ -75,6 +81,12 @@
 ::    we may want to use pokes exclusively, instead of watches/facts,
 ::    making it easier to exclude the src.bowl, include metadata, etc.
 ::
+::    we currently only emit every rumor as a fact once at most. but we might
+::    receive it again later, with a higher hop count. if we want to try for
+::    maximum reach within the given hops, we should re-send if we receive a
+::    known rumor with higher hop counter. but this may not be worth the added
+::    complexity...
+::
 ::    what if this was a userspace-infrastructure app instead of a wrapper?
 ::    how would ensuring installation of this app-dependency work?
 ::    it gains us... a higher chance of peers having this installed.
@@ -93,6 +105,7 @@
 ::    - if pals ever watch-nacks (it shouldn't), we try rewatching after ~m1.
 ::
 ::    - for facts produced on /~/gossip/source, we
+::      - 50% chance to redirect into the "pass flow" (see below)
 ::      - wrap them as %gossip-rumor to send them out on /~/gossip/gossip
 ::    - for new pals matching the hear mode, we watch their /~/gossip/gossip
 ::    - for gone pals, we leave that watch
@@ -101,6 +114,16 @@
 ::      - unwrap them and +on-agent /~/gossip/gossip into the inner agent, and
 ::      - re-emit them as facts on /~/gossip/gossip if there are hops left
 ::    - for nacks on those watches, we retry after ~m30
+::
+::    - other gossip instances may poke us with rumors directly
+::    - the inner agent learns the rumor normally, as if it came from a fact
+::    - based on randomness (50/50), we do one of two things:
+::      - publish the rumor as a fact to our subscribers, like the above
+::      - poke a randomly selected peer (in the "tell" set) with the rumor
+::    - when poking, store the rumor until we receive a poke-ack
+::    - upon receiving a positive poke-ack, delete the local datum
+::    - upon receiving a negative poke-ack, do the 50/50 again
+::    - if we do not receive a poke-ack within some time, do the 50/50 again
 ::
 /-  pals
 /+  lp=pals, dbug, verb
@@ -111,6 +134,8 @@
       data=(cask *)
   ==
 +$  meta-0  hops=_0
+::
++$  hash    @uv
 ::
 +$  whos
   $?  %anybody  ::  any ship discoverable through pals
@@ -123,7 +148,11 @@
                  ::  (1 hop is pals only, 0 stops exposing data at all)
       hear=whos  ::  who to subscribe to
       tell=whos  ::  who to allow subscriptions from
+      pass=?     ::  whether to (50/50) emit through proxy
   ==
+::
+++  pass-timeout  ~s30
+::
 ++  invent
   |=  =cage
   ^-  card:agent:gall
@@ -146,17 +175,19 @@
   ^-  $-(agent:gall agent:gall)
   |^  agent
   ::
-  +$  state-0
-    $:  %0
-        manner=config        ::  latest config
-        memory=(set @uv)     ::  datums seen
-        future=(list rumor)  ::  rumors of unknown kinds
+  +$  state-1
+    $:  %1
+        manner=config                  ::  latest config
+        memory=(set hash)              ::  datums seen (by inner agent)
+        shared=(set hash)              ::  datums shared (as fact)
+        passed=(map hash [rumor @da])  ::  pending relays & timeouts
+        future=(list rumor)            ::  rumors of unknown kinds
     ==
   ::
   +$  card  card:agent:gall
   ::
   ++  helper
-    |_  [=bowl:gall state-0]
+    |_  [=bowl:gall state-1]
     +*  state  +<+
         pals   ~(. lp bowl)
     ++  en-cage
@@ -176,6 +207,10 @@
       :_  (de-cage cage)
       ~|  [%en-rumor initial-hops=hops.manner]
       [%0 `meta-0`(dec hops.manner)]
+    ::
+    ++  en-hash
+      |=  rumor
+      (sham data)
     ::
     ++  play-card  ::  en-rumor relevant facts, handle config changes
       |=  =card
@@ -211,11 +246,57 @@
       ?>  =(/~/gossip/source path)
       ::  if hops is configured at 0, we don't broadcast at all.
       ::
-      =.  memory  (~(put in memory) (sham (de-cage cage.p.card)))
-      ?:  =(0 hops.manner)  [caz state]
-      =-  [[- caz] state]
       =/  =rumor  (en-rumor cage.p.card)
-      card(paths.p [/~/gossip/gossip]~, cage.p [%gossip-rumor !>(rumor)])
+      =.  memory  (~(put in memory) (en-hash rumor))
+      ?:  =(0 hops.manner)
+        [caz state]
+      =^  cas  state  (emit-rumor rumor)
+      [(weld cas caz) state]
+    ::
+    ++  emit-rumor  ::  gossip a rumor as-is
+      |=  =rumor
+      ^-  (quip card _state)
+      =/  =hash  (en-hash rumor)
+      =*  fact
+        :-  [%give %fact [/~/gossip/gossip]~ %gossip-rumor !>(rumor)]~
+        %_  state
+          passed  (~(del by passed) hash)
+          shared  (~(put in shared) hash)
+        ==
+      ::  if we don't want to proxy, always send as fact
+      ::
+      ?.  pass.manner
+        fact
+      ::  if we want to proxy, do so 50% of the time
+      ::
+      ?.  =(0 (~(rad og eny.bowl) 2))
+        fact
+      ::  if we're proxying, but there's no reasonable targets, send as fact
+      ::
+      =/  aides=(set ship)
+        ::  reasonable targets do not include ourselves, or whoever
+        ::  caused us to want to (re)send this rumor
+        ::
+        =-  (~(del in (~(del in -) our.bowl)) src.bowl)
+        ?-  tell.manner
+          %anybody  (~(uni in (targets:pals ~.)) leeches:pals)
+          %targets  (targets:pals ~.)
+          %mutuals  (mutuals:pals ~.)
+        ==
+      =/  count=@ud  ~(wyt in aides)
+      ?:  =(0 count)
+        fact
+      ::  poke a randomly chosen proxy with the rumor
+      ::
+      =/  proxy=ship  (snag (~(rad og +(eny.bowl)) count) ~(tap in aides))
+      =/  =time       (add now.bowl pass-timeout)
+      =.  passed      (~(put by passed) hash [rumor time])
+      :_  state
+      =/  =wire  /~/gossip/passed/(scot %uv hash)
+      =/  =cage  gossip-rumor+!>(rumor)
+      :~  [%pass wire %agent [proxy dap.bowl] %poke cage]
+          [%pass wire %arvo %b %wait time]
+      ==
     ::
     ++  play-cards
       |=  cards=(list card)
@@ -242,15 +323,18 @@
         [%gossip-rumor !>((en-rumor cage.p.i.cards))]
       $(out (snoc out i.cards), cards t.cards)
     ::
-    ++  resend-rumor
+    ++  jump-rumor  ::  relay a rumor if we haven't yet
       |=  =rumor
-      ^-  (unit card)
+      ^-  (quip card _state)
+      =/  =hash  (en-hash rumor)
+      ?:  (~(has in shared) hash)  [~ state]
       ?>  =(%0 kind.rumor)  ::NOTE  should have been checked for already
-      ?~  meta=((soft ,hops=@ud) meta.rumor)  ~
+      ?~  meta=((soft ,hops=@ud) meta.rumor)  [~ state]
       =*  hops  hops.u.meta
-      ?:  =(0 hops)  ~
+      ?:  =(0 hops)  [~ state]
       =.  meta.rumor  (dec hops)
-      `[%give %fact [/~/gossip/gossip]~ %gossip-rumor !>(rumor)]
+      :-  [%give %fact [/~/gossip/gossip]~ %gossip-rumor !>(rumor)]~
+      state(shared (~(put in shared) (en-hash rumor)))
     ::
     ++  may-watch
       |=  who=ship
@@ -364,7 +448,7 @@
   ::
   ++  agent
     |=  inner=agent:gall
-    =|  state-0
+    =|  state-1
     =*  state  -
     %+  verb  |
     %-  agent:dbug
@@ -388,16 +472,32 @@
       ^-  (quip card _this)
       ?.  ?=([[%gossip *] *] q.ole)
         =.  manner  init
-        =^  cards   inner   (on-load:og ole)
+        =^  cards   inner  (on-load:og ole)
         =^  cards   state  (play-cards:up cards)
         [(weld watch-pals:up cards) this]
       ::
-      =+  !<([[%gossip old=state-0] ile=vase] ole)
-      =.  state  old
-      =^  cards  inner  (on-load:og ile)
-      =^  cards  state  (play-cards:up cards)
-      ::TODO  for later versions, add :future retry logic as needed
-      [cards this]
+      |^  =+  !<([[%gossip old=state-any] ile=vase] ole)
+          =?  old  ?=(%0 -.old)  (state-0-to-1 old)
+          ?>  ?=(%1 -.old)
+          =.  state  old
+          =^  cards  inner  (on-load:og ile)
+          =^  cards  state  (play-cards:up cards)
+          ::TODO  for later versions, add :future retry logic as needed
+          [cards this]
+      ::
+      +$  state-any  $%(state-0 state-1)
+      ::
+      +$  state-0    [%0 manner=config-0 memory=(set hash) future=(list rumor)]
+      +$  config-0   [hops=_1 hear=whos tell=whos]
+      ++  state-0-to-1
+        |=  state-0
+        ^-  state-1
+        [%1 (config-0-to-1 manner) memory memory ~ future]
+      ++  config-0-to-1
+        |=  config-0
+        ^-  config
+        [hops hear tell pass.init]
+      --
     ::
     ++  on-watch
       |=  =path
@@ -414,13 +514,38 @@
       =^  cards  state  (play-first-cards:up cards)
       [cards this]
     ::
+    ++  on-poke
+      |=  [=mark =vase]
+      ^-  (quip card _this)
+      ::TODO  gossip config pokes
+      ?.  =(%gossip-rumor mark)
+        =^  cards  inner  (on-poke:og +<)
+        =^  cards  state  (play-cards:up cards)
+        [cards this]
+      ?.  (want-target:up src.bowl)
+        ~|(%gossip-rejected !!)
+      =+  !<(=rumor vase)
+      ::TODO  dedupe with +on-agent %fact
+      =/  =hash  (en-hash:up rumor)
+      ?:  (~(has in memory) hash)
+        [~ this]
+      ?.  =(%0 kind.rumor)
+        ~&  [gossip+dap.bowl %delaying-unknown-rumor-kind kind.rumor]
+        [~ this(future [rumor future])]
+      =.  memory        (~(put in memory) hash)
+      =/  mage=cage     (en-cage:up data.rumor)
+      =^  cards  inner  (on-agent:og /~/gossip/gossip %fact mage)
+      =^  caz1   state  (play-cards:up cards)
+      =^  caz2   state  (emit-rumor:up rumor)
+      [(weld caz1 caz2) this]
+    ::
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
       ?.  ?=([%~.~ %gossip *] wire)
         =^  cards  inner  (on-agent:og wire sign)
         =^  cards  state  (play-cards:up cards)
-      [cards this]
+        [cards this]
       ::
       ?+  t.t.wire  ~|([%gossip %unexpected-wire wire] !!)
           [%gossip @ ~]
@@ -433,18 +558,21 @@
           ?.  =(%gossip-rumor mark)
             ~&  [gossip+dap.bowl %ignoring-unexpected-fact mark=mark]
             [~ this]
+          ::TODO  de-dupe with +on-poke
           =+  !<(=rumor vase)
-          =/  hash  (sham data.rumor)
+          =/  =hash  (en-hash:up rumor)
           ?:  (~(has in memory) hash)
-            [~ this]
+            =^  cards  state  (jump-rumor:up rumor)
+            [cards this]
           ?.  =(%0 kind.rumor)
             ~&  [gossip+dap.bowl %delaying-unknown-rumor-kind kind.rumor]
             [~ this(future [rumor future])]
+          =.  memory        (~(put in memory) hash)
           =/  mage=cage     (en-cage:up data.rumor)
           =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage mage))
-          =^  cards  state  (play-cards:up cards)
-          :_  this(memory (~(put in memory) hash))
-          (weld (drop (resend-rumor:up rumor)) cards)
+          =^  caz1   state  (play-cards:up cards)
+          =^  caz2   state  (jump-rumor:up rumor)
+          [(weld caz1 caz2) this]
         ::
             %watch-ack
           :_  this
@@ -471,6 +599,22 @@
           ~&  [gossip+dap.bowl %unexpected-poke-ack wire]
           [~ this]
         ==
+      ::
+          [%passed @ ~]
+        ?.  ?=(%poke-ack -.sign)
+          ~&  [gossip+dap.bowl %unexpected-sign wire -.sign]
+          [~ this]
+        ~|  t.t.wire
+        =/  =hash  (slav %uv i.t.t.t.wire)
+        ?~  rum=(~(get by passed) hash)
+          [~ this]
+        ::NOTE  emitting rest is cute, but doesn't actually work reliably,
+        ::      due to userspace duct shenanigans. %wake logic will have to
+        ::      be defensive...
+        =/  rest=card   [%pass wire %arvo %b %rest +.u.rum]
+        ?~  p.sign      [[rest]~ this(passed (~(del by passed) hash))]
+        =^  caz  state  (emit-rumor:up -.u.rum)
+        [[rest caz] this]
       ::
           [%pals @ ~]
         ?-  -.sign
@@ -542,6 +686,14 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
+      ?:  =(/x/whey path)
+        :+  ~  ~
+        :-  %mass
+        !>  ^-  (list mass)
+        :-  %gossip^&+state
+        =/  dat  (on-peek:og path)
+        ?:  ?=(?(~ [~ ~]) dat)  ~
+        (fall ((soft (list mass)) q.q.u.u.dat) ~)
       ?:  =(/x/dbug/state path)
         ``noun+(slop on-save:og !>(gossip=state))
       ?.  ?=([@ %~.~ %gossip *] path)
@@ -560,14 +712,6 @@
       =^  cards  state  (play-cards:up cards)
       [cards this]
     ::
-    ++  on-poke
-      |=  cage
-      ^-  (quip card _this)
-      ::TODO  gossip config pokes?
-      =^  cards  inner  (on-poke:og +<)
-      =^  cards  state  (play-cards:up cards)
-      [cards this]
-    ::
     ++  on-arvo
       |=  [=wire sign=sign-arvo:agent:gall]
       ^-  (quip card _this)
@@ -575,19 +719,28 @@
         =^  cards  inner  (on-arvo:og wire sign)
         =^  cards  state  (play-cards:up cards)
         [cards this]
-      ?>  ?=([%retry *] t.t.wire)
-      ?>  ?=(%wake +<.sign)
-      ?+  t.t.t.wire  ~|(wire !!)
-          [%pals *]
-        ::NOTE  this might result in subscription wire re-use,
-        ::      but if we hit this path we should be loud anyway.
-        [watch-pals:up this]
+      ?+  t.t.wire  ~|(wire !!)
+          [%passed @ ~]
+        =/  =hash  (slav %uv i.t.t.t.wire)
+        ?~  rum=(~(get by passed) hash)  [~ this]
+        ?:  (gth +.u.rum now.bowl)       [~ this]
+        =^  cards  state  (emit-rumor:up -.u.rum)
+        [cards this]
       ::
-          [%watch @ ~]
-        :_  this
-        =/  target=ship  (slav %p i.t.t.t.t.wire)
-        ?.  (want-target:up target)  ~
-        (watch-target:up target)
+          [%retry *]
+        ?>  ?=(%wake +<.sign)
+        ?+  t.t.t.wire  ~|(wire !!)
+            [%pals *]
+          ::NOTE  this might result in subscription wire re-use,
+          ::      but if we hit this path we should be loud anyway.
+          [watch-pals:up this]
+        ::
+            [%watch @ ~]
+          :_  this
+          =/  target=ship  (slav %p i.t.t.t.t.wire)
+          ?.  (want-target:up target)  ~
+          (watch-target:up target)
+        ==
       ==
     ::
     ++  on-fail

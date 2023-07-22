@@ -1,0 +1,13 @@
+> sur
+< landscape-apps/desk/sur
+contacts.hoon
+epic.hoon
+groups.hoon
+meta.hoon
+group-store.hoon
+group.hoon
+metadata-store.hoon
+resource.hoon
+# what's up with this straggler?
+< urbit/pkg/landscape/sur
+metadata-store.hoon

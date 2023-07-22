@@ -114,6 +114,11 @@
     =/  known=?  (~(has by outgoing) ship.cmd)
     =;  [yow=? =_outgoing]
       ^-  (quip card _this)
+      =?  receipts  yow
+        ::  if we're sending a new %hey, clear any existing receipt.
+        ::  if we're sending a %bye, no need to track the old receipt.
+        ::
+        (~(del by receipts) ship.cmd)
       :_  this(outgoing.state outgoing)
       ?.  yow  ~
       :~  =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])

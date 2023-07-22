@@ -59,18 +59,12 @@
 /~  pages  (page:rudder records command)  /app/pals/webui
 ::
 |%
-+$  state-0  [%0 records]
++$  state-1  [%1 records]
 ::
-+$  eyre-id  @ta
-+$  card  (wind note gift)
-+$  gift  gift:agent:gall
-+$  note  note:agent:gall
-  :: $%  [%agent [ship %pals] task:agent:gall]
-  ::     [%arvo %e %connect [~ %pals ~] term]
-  :: ==
++$  card  card:agent:gall
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -85,21 +79,57 @@
   ^-  (quip card _this)
   =^  cards  this
     (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
-  =-  [[- cards] this]
-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+  :_  this
+  :+  [%pass /jael/pubs %arvo %j %public-keys ~]
+    [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+  cards
 ::
 ++  on-save  !>(state)
 ::
 ++  on-load
   |=  ole=vase
-  ^-  (quip card _this)
-  =/  old=state-0  !<(state-0 ole)
-  [~ this(state old)]
+  |^  ^-  (quip card _this)
+      =/  old=state-n  !<(state-n ole)
+      =^  caz=(list card)  old
+        ?.  ?=(%0 -.old)  [~ old]
+        =.  state  [%1 +.old]
+        =^  caz    this
+          ::TODO  run this again some time in the future, to solve for
+          ::      the "breached & never re-added you" case, where they
+          ::      might not know you need to hear a %bye.
+          (on-poke %noun !>(%resend))
+        [[[%pass /jael/pubs %arvo %j %public-keys ~] caz] state]
+      ?>  ?=(%1 -.old)
+      [caz this(state old)]
+  ::
+  +$  state-n  $%(state-1 state-0)
+  +$  state-0  [%0 records]
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?+  mark  (on-poke:def mark vase)
+      %noun
+    ?+  q.vase  $(mark %pals-command)
+        %resend
+      =/  out=(set ship)  ~(key by outgoing)
+      =.  receipts
+        =/  out=(list ship)  ~(tap in out)
+        |-
+        ?~  out  receipts
+        =.  receipts  (~(del by receipts) i.out)
+        $(out t.out)
+      :_  this
+      %+  weld
+        %+  turn  ~(tap in out)
+        |=  o=ship
+        [%pass /hey %agent [o dap.bowl] %poke %pals-gesture !>([%hey ~])]
+      %+  turn  ~(tap in (~(dif in incoming) out))
+      |=  i=ship
+      [%pass /bye %agent [i dap.bowl] %poke %pals-gesture !>([%bye ~])]
+    ==
+  ::
     ::  %pals-command: local app control
     ::
       %pals-command
@@ -248,6 +278,46 @@
     ==
   ==
 ::
+++  on-arvo
+  |=  [=wire =sign-arvo]
+  ^-  (quip card _this)
+  ?+  wire  ~|([dap.bowl %strange-wire wire] !!)
+      [%eyre %connect ~]
+    ?.  ?=([%eyre %bound *] sign-arvo)
+      (on-arvo:def wire sign-arvo)
+    ~?  !accepted.sign-arvo
+      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
+    [~ this]
+  ::
+      [%jael %pubs ~]
+    ?.  ?=([%jael %public-keys *] sign-arvo)
+      (on-arvo:def wire sign-arvo)
+    =/  who=(unit ship)
+      =*  pkr  public-keys-result.sign-arvo
+      ?+  -.public-keys-result.sign-arvo  ~
+        %breach  `who.pkr
+      ==
+    ?~  who  [~ this]
+    :_  %_  this
+          incoming  (~(del in incoming) u.who)
+          receipts  (~(del by receipts) u.who)
+        ==
+    =;  caz=(list (unit card))
+      (murn caz same)
+    :~  ::  if they liked us, for now that's no longer true
+        ::
+        ?.  (~(has in incoming) u.who)  ~
+        =/  =cage  [%pals-effect !>(`effect`[%away u.who])]
+        `[%give %fact [/leeches]~ cage]
+      ::
+        ::  if we liked them, assume they come back and remind them
+        ::
+        ?.  (~(has by outgoing) u.who)  ~
+        =/  =cage  [%pals-gesture !>(`gesture`[%hey ~])]
+        `[%pass /hey %agent [u.who dap.bowl] %poke cage]
+    ==
+  ==
+::
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
@@ -309,16 +379,6 @@
   ++  targets  ~(key by outgoing)
   ++  mutuals  (~(int in targets) leeches)
   --
-::
-++  on-arvo
-  |=  [=wire =sign-arvo]
-  ^-  (quip card _this)
-  ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-      [%eyre %bound *]
-    ~?  !accepted.sign-arvo
-      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
-    [~ this]
-  ==
 ::
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def

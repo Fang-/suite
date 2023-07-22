@@ -36,9 +36,11 @@
 ::    is bad manners. managing pals without informing the user is evil.
 ::
 ::      scry endpoints (all %noun marks)
+::NOTE  %y at / doesn't actually work because gall eats it ):
 ::    y  /                       arch        [%leeches %targets %mutuals ~]
 ::    y  /[status]               arch        non-empty lists listing
 ::
+::    x  /                       records     full pals state
 ::    x  /leeches                (set ship)  foreign one-sided friendships
 ::    x  /targets(/[list])       (set ship)  local one-sided friendships
 ::    x  /mutuals(/[list])       (set ship)  mutual friendships
@@ -246,6 +248,7 @@
   ^-  (unit (unit cage))
   ?>  =(our src):bowl
   |^  ?+  path  [~ ~]
+        [%x ~]                 ``noun+!>(`records`+.state)
         [%y ~]                 (arc %leeches %targets %mutuals ~)
         [%y %leeches ~]        (arc ~)
         [%y %targets ~]        (arc (las targets))

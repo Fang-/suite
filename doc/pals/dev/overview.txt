@@ -1,0 +1,104 @@
+# api
+
+
+## overview
+
+Pals lets users track their friends. When adding a ship as a friend, that ship
+is notified of this, so that one-sided and mutual friendships may be
+distinguished.
+
+Pals primarily deals in sets of ships. A ship known to Pals is known as a "pal".
+A pal belongs to one of three "status" groups, indicating the nature of the
+friendship:
+- target  one-sided, outgoing
+- leeche  one-sided, incoming
+- mutual  two-sided, counting as both outgoing *and* incoming
+
+Any pal may be associated with any number of "lists". These are meant to be used
+for display-level filtering. The ~. list (that is, the list with the empty name)
+contains every pal.
+
+The primary mode of integration with Pals should be to scry its data out
+on-demand. If you must be notified of changes, use its subscription interface
+instead.
+
+Pals can be poked to manage the user's pals, but this must never be done without
+explicit user approval.
+
+To do peer-to-peer data exchange with Pals (and optionally pals of pals),
+consider using the /lib/gossip. It is a configurable plug-and-play solution.
+See also the accompanying docs. (TODO write accompanying docs)
+
+
+## scry
+
+For scrying into Pals, please use /lib/pals. Manual scry construction should
+not be necessary, and the endpoints are only documented here for completeness.
+To illustrate, we will include the relevant /lib/pals invocations alongside
+each endpoint. (For brevity, "pals" is an alias for "~(. pals bowl)".)
+
+All of the supported scry paths take the following shape, where each subsequent
+path element is optional:
+/(status)/(list)/(ship)
+
+### %x scries
+
+All scry results have the %noun mark.
+
+The following scry paths are supported for the %x care:
+
+path:  /[status]/(list)
+type:  (set ship)
+e.g.:  leeches:pals
+       (targets:pals ~.)
+       (mutuals:pals ~.tlon)
+
+path:  /[status]/[list]/[ship]
+type:  ?
+e.g.:  (leeche:pals ~zod)
+       (target:pals ~paldev)
+       (mutual:pals ~sampel-palbud)
+
+### %y scries
+
+Additionally, Pals' scry namespace is partially discoverable using the %y care.
+This way, the various lists that targets (and mutuals) might belong to can be
+discovered:
+
+path:  /targets
+type:  arch
+e.g.:  labels:pals
+
+
+## subscription
+
+Pals' subscription interface is primarily concerned with providing notification
+of changes in our relationship to other ships. It lets you watch for "ships we
+target" and "ships that target us".
+
+path:  /targets
+mark:  %pals-effect
+type:  $effect (but in practice, just $target-effect. see /sur/pals)
+
+path:  /leeches
+mark:  %pals-effect
+type:  $effect (but in practice, just $leeche-effect. see /sur/pals)
+
+You will always get a single fact per changed pal. When you first open the
+subscription, you will receive a fact for every pal. Handle these as normal.
+This way, you do not need to first scry, then subscribe: the subscription will
+tell you the full current state.
+
+To be notified of all changes, simply subscribe to both endpoints.
+
+
+## poke
+
+Pals may be poked to manage the pals on the user's behalf. Again, this should
+never be done without explicit user approval. Friends don't let friends install
+software that violates this.
+
+The %pals-command mark matches the $command type defined in /sur/pals.
+%meet adds the ship as a pal, and/or puts it into the provided lists.
+%part removes the ship from the provided lists. If not lists are provided, the
+ship is removed as a pal altogether.

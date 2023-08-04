@@ -5,12 +5,6 @@
 ::    automates using /app/pals for peer & content discovery,
 ::    letting the underlying agent focus on handling the data.
 ::
-::    at the time of writing, this library has not seen much real-world
-::    use yet. it may be subject to behavioral or interface changes.
-::    it tries its best to not generate obscene amounts of network load,
-::    but has not yet proven itself in the real world.
-::    for the time being, please tread carefully.
-::
 ::      usage
 ::
 ::    to use this library, call its +agent arm with an initial
@@ -194,6 +188,7 @@
       |=  =(cask *)
       ^-  cage
       ?^  to=(~(get by grab) p.cask)
+        ::TODO  +soft or otherwise virtualize? don't want to risk crashes, right?
         [p.cask (u.to q.cask)]
       ~&  [gossip+dap.bowl %no-mark p.cask]
       [%gossip-unknown !>(cask)]

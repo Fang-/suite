@@ -1,0 +1,242 @@
+# "gossip" networking
+
+/lib/gossip aims to trivialize peer-to-peer data sharing. It depends on Pals for
+peer discovery and read permissions.
+
+For implementation-level details and libdev musings, please see the
+documentation at the head of /lib/gossip itself.
+
+Below, you will find a comprehensive description of the library's concepts and
+behavior. If you really must, there is a simplified usage example near the
+bottom of this document, but we do strongly urge you take the time to fully
+internalize the behavior of this library before deploying it to production.
+
+Please note that despite the name, /lib/gossip does not implement "gossip
+networking" in the strictest sense. Instead of sharing data with a subset of
+known peers, it eagerly saturates the entire known neighborhood (of eligible
+pals), and relies on "hop counting" to put a cap on the total distance any piece
+of data may travel through (well-behaved) peers.
+
+This documentation is up to date for versions v1.1.x of /lib/gossip.
+
+The latest version of /lib/gossip can always be found here:
+https://github.com/fang-/suite/blob/master/lib/gossip.hoon
+
+## concepts & behavior
+
+The gossip library uses the "wrapper agent" pattern. You call a function from
+the library with your own agent, and the library will act as a filter and/or
+transformer on top of the events and effects coming in and out of your agent.
+
+The above function call is provided with initial configuration parameters and
+mark validators. The configuration parameters are only used during first "boot"
+_of the library_. Usually, this matches the +on-init of the inner agent, but
+wrapping the library around an already-running agent is also supported.
+
+Subsequently, the library interacts with the inner agent through the gall agent
+interface. This means that the inner agent, type-wise, is no different from
+agents that do not use the gossip library. But, implementation-wise, it must be
+aware of special events sent into it by the gossip library, and special effects
+it can send up into the gossip library.
+
+As part of normal operation, the library may subscribe to eligible (as per the
+configuration) pals, accept incoming subscriptions from the same, emit new data
+produced by the underlying agent on those subscriptions, or relay (as per the
+configuration) data newly received from its subscriptions. The library will
+react to changes in the local ship's Pals and manages its subscriptions
+accordingly.
+
+### configuration
+
+The $config:gossip passed into the gossip library describes the rules & limits
+of its networking behavior. It looks as follows:
+
+  +$  config
+    $:  hops=_1    ::  how far away gossip may travel
+                   ::  (1 hop is pals only, 0 stops exposing data at all)
+        hear=whos  ::  who to subscribe to
+        tell=whos  ::  who to allow subscriptions from
+        pass=?     ::  whether to (50/50) emit through proxy
+    ==
+
+  +$  whos
+    $?  %anybody  ::  any ship discoverable through pals
+        %targets  ::  any ship we've added as a pal
+        %mutuals  ::  any mutual pal
+    ==
+
+.hops determines the distance, counted in recipient peers, that any piece of
+data we emit will travel. Common values are 1, for only sharing directly with
+the set of pals from .tell, and values slightly higher than 1, in order to reach
+friends-of-friends. It is presently unknown what value would approximate full
+network coverage, but we gently advise against setting values in the upper
+single digits and above.
+
+Two important caveats must be noted:
+- There is no hard guarantee that recipients will honor the hop limit set on a
+  piece of data. For applications that share potentially-sensitive data, .tell
+  should be set to %targets or %mutuals, since those more likely to be trusted
+  by the user.
+- The library no-ops when receiving data it has already seen. The library may
+  receive a datum with many hops remaining, but refuse to relay it, because it
+  already heard it previously. If the previous instance of the datum had a lower
+  remaining hop count, however, this means the "reach" of that datum (through
+  this peer) has been reduced.
+  (Arguably, the library should relay the datum again, conditional on the higher
+  hop count, but this may significantly increase the amount of network traffic.
+  Perhaps a specific mode for it is warranted, but does not exist at this time.)
+
+.hear and .tell determine, respectively, who to subscribe to and who to allow
+subscriptions from. %mutuals are confirmed two-sided friendships. %targets are
+ships the user trusts (enough to add them as a pal). %anybody also includes
+ships that have added the user as a pal one-sidedly.
+
+To avoid needless subscription polling, avoid combinations of .hear and .tell
+where the .hear is more "narrow" than the .tell. For example, if your agent
+is subscribing to %targets, but only ever accepts subscriptions from %mutuals,
+the library is forced to continuously try reestablishing a subscription that
+will always get rejected.
+Of course, your application might make the .hear and .tell values
+user-configurable, in which case subscription rejections may be more common.
+(The library handles these gracefully, waiting 30 minutes before retrying, but
+it's still best to avoid if you can help it.)
+
+#### proxy passing
+
+.pass is a feature flag. If it is disabled, gossip behaves as described above.
+If it is enabled, there is a 50% chance that any given datum we emit or relay
+takes the alternative pathway described below.
+
+Instead of propagating data through subscription updates, we may instead poke a
+peer from the .tell set with a datum directly. If that peer has us in its .hear
+set, it will accept and relay the datum as normal, subject to all the usual
+rules & constraints, and if they too have the .pass flag set, again with a 50%
+chance of following this alternative pathway.
+
+If proxying fails (we receive a negative %poke-ack, or don't hear from the proxy
+at all within ~s30), we simply retry, starting at the 50% chance.
+
+The main property achieved by this feature is plausible deniability on
+originating any given datum. Emitting a datum with the hop counter at some
+maximum-for-this-application value is no longer "proof" of being the first to
+send it, you could simply be proxying for someone else, who might in turn be
+proxying for someone else, etc.
+
+### mark validation
+
+The data shared by the gossip library is marked, just like normal subscription
+updates would be. However, because the library wraps the data with library-
+specific metadata, it cannot rely on gall to do the mark conversions.
+
+Alongside the configuration parameters, the library must be provided with mark
+validators for each mark that will be gossiped around. Specifically, you give
+it a map of the following type:
+
+  (map mark $-(* vase))
+
+This way, the library can turn raw nouns into $cages, letting you handle them as
+you would any other datum received through gall.
+
+If the library receives a datum with a mark it does not have a validator for,
+it will instead inject the raw $cask with the faux %gossip-unknown mark.
+
+(If validation is available, but it crashes, this presently, probably, is bad
+news. The should maybe be updated to give %gossip-unknown in that case as well.)
+
+### events
+
+The gossip library communicates with the inner agent by providing it with
+artificial events. These events stick closely to the semantics of the usual
+agent interface, and so are easily recognized and handled.
+
+#### +on-agent
+
+New data received from peers comes in through the +on-agent arm. The wire will
+be /~/gossip and the $sign will always be a %fact. The mark of the fact is as
+originally emitted by the datum's creator, or %gossip-unknown if we don't know
+the mark that they specified. (See also the "mark validation" section above.)
+
+#### +on-watch
+
+When a new peer subscribes to us, +on-watch gets called, with /~/gossip/source
+as the $path. As normal, this is where you may provide an initial subscription
+result. It is recommended to, if possible, only give data here that originated
+locally.
+
+### effects
+
+The inner agent may communicate with the gossip library by emitting effects.
+Specifically, %facts given on paths starting with /~/gossip will be handled
+specially by the library. Presently, two paths are supported: one for publishing
+new data, and one for updating the local gossip configuration.
+
+#### publishing new data
+
+New data may be published by emitting it as a %fact on the /~/gossip/source
+subscription path (possibly alongside other non-gossip paths). Other than the
+special target path, nothing about the %fact needs to be special. But, keep two
+things in mind:
+- For marks that you will be publishing through gossip, keep the "mark
+  validation" section from above in mind.
+- The library no-ops on receiving data it has already received it previously.
+  This means that highly minimalist user-generated content, like a plain @t for
+  "anonymous message", risks ignoring reposts, even if they happen far apart
+  in time. Adding a timestamp to the datum is a good way to work around this.
+
+For convenience, the library exposes an +invent function that you can call with
+a $cage. It will construct the %fact $card for you.
+
+#### modifying gossip configuration
+
+The configuration of the library can be modified at runtime by emitting a %fact
+on the /~/gossip/config path. The %fact must have a %gossip-config mark and
+contain a $config noun. The library will immediately open and/or close incoming
+and/or outgoing subscriptions to match the new configuration.
+
+For convenience, the library exposes a +configure function that you can call
+with a $config. It will construct the %fact $card for you.
+
+At any point, the current configuration can be scried out of the library. Call
+the +read-config function with the current $bowl:gall, and it will produce an
+up-to-date $config.
+
+
+## usage
+
+Simple usage of the library, where we share nouns with our mutuals, would look
+something like this:
+
+  /+  gossip
+  ::
+  %-  %+  agent:gossip
+        [1 %mutuals %mutuals |]
+      %-  ~(put by *(map mark $-(* vase))
+      noun+|=(n=* !>(n))
+  ::
+  =|  our-last-noun=*
+  ::
+  ^-  agent:gall
+  |_  =bowl:gall
+  +*  this  *
+  ++  on-poke
+    |=  [=mark =vase]
+    ?>  =(src our):bowl
+    ?>  =(%noun mark)
+    =.  our-last-noun  q.vase
+    [[(invent:gossip %noun vase)]~ this]
+  ::
+  ++  on-watch
+    |=  =path
+    ?>  =(/~/gossip/source path)
+    [[%give %fact ~ %noun !>(our-last-noun)]~ this]
+  ::
+  ++  on-agent
+    |=  [=wire =sign:agent:gall]
+    ?>  =(/~/gossip/gossip wire)
+    ?>  ?=(%fact -.sign)
+    ?>  =(%noun p.cage.sign)
+    ~&  [%got-a-noun from=src.bowl noun=q.cage.sign]
+    [~ this]
+  ::
+  ++  on-etc  !!
+  --

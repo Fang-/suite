@@ -1,4 +1,4 @@
-# api
+# pals api
 
 
 ## overview
@@ -27,7 +27,7 @@ explicit user approval.
 
 To do peer-to-peer data exchange with Pals (and optionally pals of pals),
 consider using the /lib/gossip. It is a configurable plug-and-play solution.
-See also the accompanying docs. (TODO write accompanying docs)
+See also the accompanying docs.
 
 
 ## scry

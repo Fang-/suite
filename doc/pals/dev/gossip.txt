@@ -22,6 +22,7 @@ This documentation is up to date for versions v1.1.x of /lib/gossip.
 The latest version of /lib/gossip can always be found here:
 https://github.com/fang-/suite/blob/master/lib/gossip.hoon
 
+
 ## concepts & behavior
 
 The gossip library uses the "wrapper agent" pattern. You call a function from
@@ -218,6 +219,7 @@ something like this:
   ^-  agent:gall
   |_  =bowl:gall
   +*  this  *
+  ::
   ++  on-poke
     |=  [=mark =vase]
     ?>  =(src our):bowl

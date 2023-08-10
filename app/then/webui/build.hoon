@@ -6,7 +6,6 @@
 /+  *then  ::TODO  changing the lib doesn't rebuild this file???
 /+  rudder
 ::
-::
 ^-  (page:rudder xxxx task)
 ::
 |_  [=bowl:gall order:rudder xxxx]
@@ -223,8 +222,8 @@
     :_  ~
     ?-  -.make
       %when  ~
-      %fold  take.made.make
-      %then  (till made.make)
+      %fold  take.easy.make
+      %then  (till easy.make)
     ==
   ::
   ++  edit-when
@@ -238,8 +237,8 @@
   ++  edit-fold
     =/  =bill
       ?~  fold.draft
-        (will form:(need made.when.draft))
-      give.form:(need made:(rear fold.draft))
+        (will form:(need have.when.draft))
+      give.form:(need have:(rear fold.draft))
     ;form.fold(method "post")
       ;input(type "submit", name "back", value "back");
       ;br;
@@ -253,8 +252,8 @@
   ++  edit-then
     =/  =bill
       ?~  fold.draft
-        (will form:(need made.when.draft))
-      give.form:(need made:(rear fold.draft))
+        (will form:(need have.when.draft))
+      give.form:(need have:(rear fold.draft))
     ;form.then(method "post")
       ;input(type "submit", name "back", value "back");
       ;br;

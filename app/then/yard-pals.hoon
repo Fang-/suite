@@ -66,10 +66,10 @@
   ?>  ?=(%peer -.fact)
   ?.  ?=(%pals-effect -.cage.fact)  ~
   =+  !<(fec=effect +.cage.fact)
-  =*  out  `[%p ship.fec]~
-  ?+  kind    out
-    %added    ?:(?=(?(%meet %near) -.fec) out ~)
-    %removed  ?:(?=(?(%part %away) -.fec) out ~)
+  :: =*  out  `[%cash [%p ship.fec]~]
+  ?+  kind    `[%cash [%p ship.fec]~]
+    %added    ?:(?=(?(%meet %near) -.fec) `[%cash [%p ship.fec]~] ~)
+    %removed  ?:(?=(?(%part %away) -.fec) `[%cash [%p ship.fec]~] ~)
   ==
 ::
   :-  'mutuals-only'

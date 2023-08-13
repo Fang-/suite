@@ -243,7 +243,7 @@
   ^+  this
   ::  if we get any result, always request the next result
   ::
-  =/  =case:clay  ?~(riot da+now.bowl q.p.u.riot)
+  =/  =case       ?~(riot da+now.bowl q.p.u.riot)
   =/  =rave:clay  [%next %a case /app/then/yard/hoon]
   =/  =wire       /clay/yard/[desk]
   =.  emit        (emit %pass wire %arvo %c %warp our.bowl desk `rave)
@@ -545,7 +545,7 @@
       =/  felt=(unit ^fact)  (gait.fold fo-self fact)
       ?~  felt
         fo  ::TODO  may want to store metadata about how far we got
-      ?.  (pays fact give.fold)
+      ?.  (pays u.felt give.fold)
         (fo-fail 'unexpected output by fold')  ::TODO  more deets
       $(fols t.fols, fact u.felt)
     ::  run all the actions for which the final fact matches
@@ -733,7 +733,6 @@
 ++  on-fail
   |=  [=term =tang]
   %-  (slog leaf+"{(trip dap.bowl)}: on-fail" term tang)
-  ~&  xx+tang  ::TODO  parse out on-arvo-wire, kill responsible flow?
   [~ this]
 ::
 ++  on-leave  on-leave:def

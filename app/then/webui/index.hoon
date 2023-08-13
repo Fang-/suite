@@ -52,6 +52,7 @@
         ;style:"{(trip style)}"
       ==
       ;body
+        ;h3:"auto prototype 2: %then"
         ;h2:"when, then"
         ;+  ?~  msg  ;/("")
             ;/("[[ {(trip t.u.msg)} ]]")

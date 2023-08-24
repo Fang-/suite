@@ -8,6 +8,9 @@ group-store.hoon
 group.hoon
 metadata-store.hoon
 resource.hoon
+> mar
+< urbit/pkg/arvo/mar
+json.hoon
 # what's up with this straggler?
 < urbit/pkg/landscape/sur
 metadata-store.hoon

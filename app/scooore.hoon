@@ -72,6 +72,7 @@
   ::
   ~>  %bout.[0 'scooore: init']
   =/  chad=(list [=flag:chat =chat:chat])
+    ?.  .^(? %gu (peel /$))  ~
     %~  tap  by
     .^((map flag:chat chat:chat) %gx (peel /chats/chats))
   ::  for every chat channel, subscribe to updates,

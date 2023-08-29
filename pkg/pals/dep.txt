@@ -12,5 +12,6 @@ resource.hoon
 < urbit/pkg/arvo/mar
 json.hoon
 # what's up with this straggler?
-< urbit/pkg/landscape/sur
+> sur
+< landscape/desk/sur
 metadata-store.hoon

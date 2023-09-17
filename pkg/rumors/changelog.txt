@@ -1,5 +1,8 @@
 rumors
 
+v1.2.2, ~2023.09.17
+- fix a bug that prevented adding new entries to the wordfilter.
+
 v1.2.1, ~2023.03.31
 - fix a bug with false filter positives from an empty wordfilter.
 

@@ -99,7 +99,7 @@
       %noun
     ?+  q.vase  !!
       [%avoid ~]  [~ this(avoid ~)]
-      [%avoid @]  [~ this(avoid [+>.q.vase avoid])]
+      [%avoid @]  [~ this(avoid [+.q.vase avoid])]
     ==
   ::
     ::  %handle-http-request: incoming from eyre

@@ -1,0 +1,1 @@
+../../../lib/assembly-2023.hoon

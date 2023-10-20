@@ -1,0 +1,9 @@
+:~  title+'Assembly 2023'
+    info+'Companion app with schedule and attendance tracker.'
+    color+0xfe.d107
+    site+/assembly-2023
+    base+'assembly-2023'
+    version+[0 0 0]
+    website+'https://assembly.urbit.org/'
+    license+'MIT'
+==

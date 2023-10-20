@@ -19,7 +19,6 @@
 ::
 ++  final
   |=  [done=? =brief:rudder]
-  ~?  !=(~ brief)  [%a23 %event brief]
   [%next url.request ~]
 ::
 ++  build
@@ -108,6 +107,8 @@
                 =/  num=@ud
                   =+  (~(gut by crowding) vid |+0)
                   ?-(-< %& ~(wyt in `(set)`->), %| ->)
+                =?  num  &(!=(0 num) (~(has ju b.groupies) vid our))
+                  (dec num)
                 ?:  =(~ pals)
                   ?:  =(0 num)  ~
                   `"{(a-co:co num)} others"

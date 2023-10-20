@@ -102,9 +102,6 @@
       height: 2rem;
       vertical-align: middle;
       margin-right: 1rem;
-      background-color: var(--black);
-    }
-    .index a:hover div {
       background-color: var(--yellow);
     }
 

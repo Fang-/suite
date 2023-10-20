@@ -2,6 +2,8 @@
 ::
 ::    within the app, all date-times are in the local (lisbon) timezone
 ::
+::NOTE  rushjob code herein, pls don't use as reference material
+::
 /+  *assembly-2023,  events=assembly-2023-events,
     gossip, rudder,
     dbug, verb

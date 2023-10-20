@@ -1,9 +1,10 @@
 :~  title+'Assembly 2023'
-    info+'Companion app with schedule and attendance tracker.'
+    info+'Assemly & Urbit Week companion app'
     color+0xfe.d107
+    image+'https://pal.dev/props/assembly-2023/tile.png'
     site+/assembly-2023
     base+'assembly-2023'
-    version+[0 0 0]
-    website+'https://assembly.urbit.org/'
+    version+[1 0 0]
+    website+'https://assembly.urbit.org'
     license+'MIT'
 ==

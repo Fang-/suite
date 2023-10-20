@@ -289,6 +289,7 @@
 ++  render-range
   |=  [fro=@dr til=(unit @dr)]
   ^-  tape
+  ?:  =([~h0 ~] [fro til])  "all day"
   ?~  til  "{(render-time fro)} ->"
   "{(render-time fro)} - {(render-time u.til)}"
 ::

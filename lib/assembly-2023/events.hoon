@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit d7d7ba0
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 4a51c18
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/d7d7ba0..master
+::  https://github.com/urbit/assembly2023/compare/4a51c18..master
 ::
 /+  *assembly-2023
 ::
@@ -300,7 +300,7 @@
           'Portal'
           ''
           ''
-          ~2023.10.29..11.30.00  ~m30
+          ~2023.10.29..14.30.00  ~m30
           %second
           ~['~toptyr-bilder']
           %presentation
@@ -488,7 +488,7 @@
           'Join other Catholic Martians at Fatima on All Saints Day.'
           'We\'ll travel to Fatima on All Saints Day to make a pilgrimage and attend Mass. Mass times at the basilica and chapel (https://www.fatima.pt/en/schedule), SSPX low Mass is at 4PM. (https://www.fsspx.es/es/capela-do-imaculado-cora%C3%A7%C3%A3o-de-maria) You will need to arrange your own transport to Fatima. Coordinate meeting up in the Assembly channel in ~darduc-mitfen/catholicism. As a backup join the Signal group (https://signal.group/#CjQKIDShtD1ZzvyUmG5nu3R0hrbv3qrfCAhwGe-xqiPG_EgGEhAjyWizHvWA7D1Q1guAie-h)'
           ~2023.11.1..14.00.00  `~h7
-          ['Location: The Sanctuary of Fátima ' ~]
+          ['The Sanctuary of Fátima ' ~]
           `'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Igreja_Matriz_de_F%C3%A1tima_-_Portugal_%2821418731630%29.jpg/2880px-Igreja_Matriz_de_F%C3%A1tima_-_Portugal_%2821418731630%29.jpg'
           'Pilgrimage'
           ~

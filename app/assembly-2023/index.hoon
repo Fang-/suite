@@ -41,23 +41,23 @@
         ;header
           ;h1:"Assembly Lisboa"
         ==
-        ;a/"/assembly-2023/schedule"
-          ;img@"/assembly-2023/db.svg"(width "40", height "40");
+        ;a/"/assembly/schedule"
+          ;img@"/assembly/db.svg"(width "40", height "40");
           ;    All Events
         ==
-        ;a/"/assembly-2023/calendar"
-          ;img@"/assembly-2023/star.svg"(width "40", height "40");
+        ;a/"/assembly/calendar"
+          ;img@"/assembly/star.svg"(width "40", height "40");
           ;    My Schedule
         ==
-        ;a/"/assembly-2023/messages"
-          ;img@"/assembly-2023/bulb.svg"(width "40", height "40");
+        ;a/"/assembly/messages"
+          ;img@"/assembly/bulb.svg"(width "40", height "40");
           ;    Community Kiosk
         ==
         :: ::TODO  re-enable..
         :: :: ;*  ?.  .^(? %gu /(scot %p our)/pals/(scot %da now)/$)  ~
         :: ::   :_  ~
-        :: ;a/"/assembly-2023/groupies"
-        ::   ;div.pals@"/assembly-2023/p2p.svg";
+        :: ;a/"/assembly/groupies"
+        ::   ;div.pals@"/assembly/p2p.svg";
         ::   ; Pals
         :: ==
       ==

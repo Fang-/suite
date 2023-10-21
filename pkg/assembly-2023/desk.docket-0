@@ -1,8 +1,8 @@
-:~  title+'Assembly 2023'
+:~  title+'Assembly'
     info+'Assemly & Urbit Week companion app'
     color+0xfe.d107
-    image+'https://pal.dev/props/assembly-2023/tile.png'
-    site+/assembly-2023
+    image+'https://pal.dev/props/assembly/tile.png'
+    site+/assembly
     base+'assembly-2023'
     version+[1 0 0]
     website+'https://assembly.urbit.org'

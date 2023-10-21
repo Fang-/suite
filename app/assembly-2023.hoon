@@ -42,7 +42,7 @@
   =.  database
     (~(gas by database) all:events)
   :_  this
-  :-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+  :-  [%pass /eyre/connect %arvo %e %connect [~ /assembly] dap.bowl]
   ?:  =(host-ship our.bowl)  ~
   ::NOTE  technically unnecessary if we're just gonna edit /lib/a23/events...
   ::NOTE  but now also used for message passing
@@ -55,7 +55,8 @@
   ^-  (quip card _this)
   =.  state  !<(state-0 ole)
   =.  database  (~(gas by *(map @ event)) all:events)  ::NOTE  beware
-  [~ this]
+  :_  this
+  [%pass /eyre/connect %arvo %e %connect [~ /assembly] dap.bowl]~
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -146,7 +147,7 @@
     %.  [bowl !<(order:rudder vase) state]
     %-  (steer:rudder _state action)
     :^    pages
-        (point:rudder /[dap.bowl] & ~(key by pages))
+        (point:rudder /assembly & ~(key by pages))
       (fours:rudder state)
     |=  act=action
     ^-  $@  brief:rudder

@@ -169,10 +169,10 @@
       ;div.icons
       ;*  =;  l=(list (unit manx))  (murn l same)
           :~  ?.  (~(has in calendar) vid)  ~
-              (some ;img.mine@"/assembly-2023/star.svg";)
+              (some ;img.mine@"/assembly/star.svg";)
             ::
               ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-              (some ;img.pals@"/assembly-2023/p2p.svg";)
+              (some ;img.pals@"/assembly/p2p.svg";)
           ==
         ==
     ::
@@ -273,10 +273,10 @@
           ;div.icons
             ;*  =;  l=(list (unit manx))  (murn l same)
                 :~  ?.  (~(has in calendar) vid)  ~
-                    (some ;img.mine@"/assembly-2023/star.svg";)
+                    (some ;img.mine@"/assembly/star.svg";)
                   ::
                     ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-                    (some ;img.pals@"/assembly-2023/p2p.svg";)
+                    (some ;img.pals@"/assembly/p2p.svg";)
                 ==
           ==
           ;div.end:"ends at {(render-time (sub til day))}"
@@ -295,7 +295,7 @@
           ;span:"<"
         ==
     ::TODO  maybe icon
-    ;a.title/"/assembly-2023"
+    ;a.title/"/assembly"
       ;h2:"{(trip +:(~(got by dates) day))}"
       ;h3:"{(scow %da day)}"
     ==
@@ -324,7 +324,7 @@
     ;title:"{(trip title)}"
     ;meta(charset "utf-8");
     ;meta(name "viewport", content "width=device-width, initial-scale=1");
-    ;link(rel "stylesheet", type "text/css", href "/assembly-2023/style.css");
+    ;link(rel "stylesheet", type "text/css", href "/assembly/style.css");
   ==
 ::
 ++  main-labels

@@ -34,8 +34,8 @@
       ;+  (head 'Assembly 2023: Community Kiosk')
       ;body.messages
         ;header
-          ;a.left/"/assembly-2023":"<"
-          ;a/"/assembly-2023"
+          ;a.left/"/assembly":"<"
+          ;a/"/assembly"
             ;h2:"Community Kiosk"
             ;h3:"Cartas de Lisboa"
           ==

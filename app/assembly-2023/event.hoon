@@ -37,7 +37,7 @@
     ;body
       ;header
         ;a.left/"#"(onclick "window.history.back();"):"<"
-        ;a/"/assembly-2023"
+        ;a/"/assembly"
           ;h1:"Assembly Lisboa"
         ==
       ==

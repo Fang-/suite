@@ -169,10 +169,10 @@
       ;div.icons
       ;*  =;  l=(list (unit manx))  (murn l same)
           :~  ?.  (~(has in calendar) vid)  ~
-              (some ;div.mine;)
+              (some ;img.mine@"/assembly-2023/star.svg";)
             ::
               ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-              (some ;div.pals;)
+              (some ;img.pals@"/assembly-2023/p2p.svg";)
           ==
         ==
     ::
@@ -185,6 +185,7 @@
   |=  $:  [dab=(map vid event) now=@da]
           [day=@da vez=(list [=vid wen=@da lon=@dr])]
           [our=@p calendar=(set vid) groupies=(jug vid @p)]
+          skip-first=?
       ==
   ^-  marl
   ?>  =(%main -:(~(gut by dates) day %week^''))
@@ -199,12 +200,17 @@
   =+  ros=(mul dif 12)  ::  row for every ~m5
   =+  off=(mul fro.ran 12)  :: missing rows
   %+  snoc  (main-labels day)
-  ;div.schedule.main
-      =style
+  =/  style=tape
+    ?.  skip-first
+      """
+      grid-template-rows: repeat({(a-co:co ros)}, 5.5vh);
+      grid-template-columns: 1em repeat({(a-co:co tot)}, 1fr);
+      """
     """
     grid-template-rows: repeat({(a-co:co 12)}, 0.4em) repeat({(a-co:co (sub ros 12))}, 5.5vh);
     grid-template-columns: 1em repeat({(a-co:co tot)}, 1fr);
     """
+  ;div.schedule.main(style style)
     ;*  (grid-times fro.ran til.ran)
     ;*  (grid-lines dif)
     ;*  ::  if today, add time indicator
@@ -213,7 +219,7 @@
         =+  fro=(add day (mul ~h1 fro.ran))
         =+  til=(add day (mul ~h1 til.ran))
         ?.  &((gth now fro) (lth now til))  ~
-        :: ?:  (lth now (add fro ~h1))
+        :: ?:  &(skip-first (lth now (add fro ~h1)))
         ::   ::  registration
         ::   :: =+
         ::   :: ;div.now(style "top: calc(4.8em + {(scow %ud pec)}%);");
@@ -259,17 +265,18 @@
                   %panel         ~[;div.kind.panel:"panel"]
                   %presentation  ~[;div.kind.presentation:"presentation"]
                 ==
-            ;+  ?:  (lth (met 3 desc) 64)
+            ;+  =+  max=(mul 12 (sub e (min (add s 1) (dec e))))
+                ?:  (lth (met 3 desc) max)
                   ;p:"{(trip desc)}"
-                ;p:"{(trip (end 3^(mul 14 (sub e s)) desc))}..."
+                ;p:"{(trip (end 3^max desc))}..."
           ==
           ;div.icons
             ;*  =;  l=(list (unit manx))  (murn l same)
                 :~  ?.  (~(has in calendar) vid)  ~
-                    (some ;div.mine;)
+                    (some ;img.mine@"/assembly-2023/star.svg";)
                   ::
                     ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-                    (some ;div.pals;)
+                    (some ;img.pals@"/assembly-2023/p2p.svg";)
                 ==
           ==
           ;div.end:"ends at {(render-time (sub til day))}"

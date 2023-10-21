@@ -84,6 +84,7 @@
       vertical-align: middle;
     }
 
+    /* no clue why mobile chrome is weird about this */
     .index a {
       display: block;
       margin: 20px;
@@ -93,17 +94,12 @@
       color: var(--yellow);
       font-size: 20pt;
       text-decoration: none;
+      vertical-align: middle;
     }
-    .index a:hover {
-      color: var(--yellow);
-    }
-    .index a div {
+    .index a img {
       display: inline-block;
-      width: 2rem;
-      height: 2rem;
       vertical-align: middle;
       margin-right: 1rem;
-      background-color: var(--yellow);
     }
 
     .schedule.main {
@@ -170,6 +166,13 @@
     }
     .event.break .start {
       background-color: var(--white);
+    }
+    /* this one's so dumb, but webkit browsers need an explicit height
+       for overflow:hidden to work
+    */
+    .schedule.main .event {
+      height: calc(100% - 12px);
+      box-sizing: border-box;
     }
     .schedule.main .event .start {
       top: 40px;
@@ -249,31 +252,13 @@
       background-color: var(--yellow);
     }
 
-    .grid, .pals, .mine {
-      mask-size: cover;
-    }
-    .grid {
-      mask: url('/assembly-2023/db.svg');
-      background-color: var(--black);
-    }
-    .pals {
-      mask: url('/assembly-2023/p2p.svg');
-      background-color: var(--green);
-    }
-    .mine {
-      mask: url('/assembly-2023/star.svg');
-      background-color: var(--yellow);
-    }
-    .bulb {
-      mask: url('/assembly-2023/bulb.svg');
-      background-color: var(--yellow);
-    }
     .icons {
       position: absolute;
       z-index: 25;
       bottom: 7px;
+      background-color: var(--black);
     }
-    .icons div {
+    .icons img {
       display: inline-block;
       margin-right: 7px;
       height: 1.5em;

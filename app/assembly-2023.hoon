@@ -60,6 +60,20 @@
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?+  mark  ~&([dap.bowl %unexpected-mark mark] !!)
+      %noun
+    ?>  =(src our):bowl
+    ?+  q.vase  !!
+        [%reject @p]
+      =.  ruffians  (~(put in ruffians) +.q.vase)
+      =.  messages  (skip messages |=([who=@p *] =(who +.q.vase)))
+      :_  this
+      [%give %fact [/events]~ %a23-update !>([%reject +.q.vase])]~
+    ::
+        [%revive @p]
+      =.  ruffians  (~(del in ruffians) +.q.vase)
+      [~ this]
+    ==
+  ::
       %a23-action
     ?>  =(src our):bowl
     =+  !<(act=action vase)
@@ -87,6 +101,12 @@
       :~  [%pass /rsvp %agent [host-ship dap.bowl] %poke cage]
           (invent:gossip %a23-rsvp !>([vid.act yes.act]))
       ==
+    ::
+        %advice
+      =.  messages  [[our.bowl (ut-to-pt now.bowl) wat.act] messages]
+      :_  this
+      =/  =cage  [%a23-command !>(act)]
+      [%pass /message %agent [host-ship dap.bowl] %poke cage]~
     ==
   ::
       %a23-command
@@ -107,6 +127,18 @@
       :_  this
       =/  =update  [%coming vid.cmd ~(wyt in new)]
       [%give %fact [/events]~ %a23-update !>(update)]~
+    ::
+        %advice
+      ?:  (~(has in ruffians) src.bowl)
+        [~ this]
+      ?:  =(%pawn (clan:title src.bowl))
+        [~ this]
+      =/  bad=?  (gth (met 3 wat.cmd) 1.024)
+      ?:  bad  [~ this]
+      =/  now=@da  (ut-to-pt now.bowl)
+      =.  messages  [[src.bowl now wat.cmd] messages]
+      :_  this
+      [%give %fact [/events]~ %a23-update !>([src.bowl now wat.cmd]~)]~
     ==
   ::
       %handle-http-request
@@ -136,7 +168,9 @@
     ::NOTE  for now, we're just editing the /lib/a23/events file for this
     :: :-  [%give %fact ~ %a23-update !>([%events &+database])]
     =;  crowds=(map vid @ud)
-      [%give %fact ~ %a23-update !>([%crowds crowds])]~
+      :~  [%give %fact ~ %a23-update !>([%crowds crowds])]
+          [%give %fact ~ %a23-update !>([%advice (scag 50 messages)])]
+      ==
     %-  ~(run by crowding)
     |=  a=(each (set @p) @ud)
     ^-  @ud
@@ -158,6 +192,11 @@
       [%rsvp ~]
     ?>  ?=(%poke-ack -.sign)
     ~?  ?=(^ p.sign)  %rsvp-poke-not-ok
+    [~ this]
+  ::
+      [%message ~]
+    ?>  ?=(%poke-ack -.sign)
+    ~?  ?=(^ p.sign)  %message-poke-not-ok
     [~ this]
   ::
       [%events ~]
@@ -203,6 +242,15 @@
       ::
           %coming
         =.  crowding  (~(put by crowding) [vid |+num]:upd)
+        [~ this]
+      ::
+          %advice
+        =.  vas.upd   (skip vas.upd |=([who=@p *] =(who our.bowl)))
+        =.  messages  (weld vas.upd messages)
+        [~ this]
+      ::
+          %reject
+        =.  messages  (skip messages |=([who=@p *] =(who who.upd)))
         [~ this]
       ==
     ==

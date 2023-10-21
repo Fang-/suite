@@ -256,6 +256,10 @@
       mask: url('/assembly-2023/star.svg');
       background-color: var(--yellow);
     }
+    .bulb {
+      mask: url('/assembly-2023/bulb.svg');
+      background-color: var(--yellow);
+    }
     .icons {
       position: absolute;
       z-index: 25;
@@ -302,7 +306,7 @@
     tr.rsvp a {
       text-decoration: underline;
     }
-    tr button {
+    button {
       display: block;
       background-color: var(--green);
       border: 0px;
@@ -313,6 +317,48 @@
     }
     tr .no button {
       background-color: var(--red);
+    }
+
+    .messages h2 {
+      margin-top: 0.3em;
+    }
+    .messages form {
+      padding: 1em 2em 0;
+    }
+    textarea {
+      margin: 0 auto;
+      width: 100%;
+      border: 2px solid var(--black);
+      border-radius: var(--radius);
+      padding: 1em;
+      font-family: Urbit Sans;
+      font-size: 14pt;
+      background-color: var(--white);
+    }
+    .messages button {
+      margin: 0.5em auto 0;
+      font-size: 14pt;
+    }
+
+    .message {
+      margin: 1em 1em 0.5em;
+      border-radius: var(--radius);
+      background-color: var(--black);
+      color: var(--white);
+      padding: 0.5em;
+    }
+    .message .wen {
+      font-family: Urbit Sans Mono;
+      color: var(--red);
+      font-size: 0.8em;
+    }
+    .message .who {
+      font-family: Urbit Sans Mono;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .message .wat p {
+      margin-top: 0.5em;
     }
     '''
   ::

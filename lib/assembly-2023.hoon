@@ -9,6 +9,9 @@
     ::
       calendar=(set vid)
       groupies=[a=(jug @p vid) b=(jug vid @p)]  ::  pals & us
+    ::
+      messages=(list [who=@p wen=@da wat=@t])
+      ruffians=(set @p)
   ==
 ::
 +$  vid  @
@@ -55,16 +58,21 @@
 +$  from-user
   $%  [%coming =vid yes=?]
       [%enlist =vid yes=?]
+      [%advice wat=@t]
   ==
 ::
 +$  from-host
   $%  [%events dab=(each (map vid event) [=vid ven=(unit event)])]
       [%crowds nus=(map vid @ud)]
       [%coming =vid num=@ud]  ::TODO  collate?
+    ::
+      [%advice vas=(list [who=@p wen=@da wat=@t])]
+      [%reject who=@p]
   ==
 ::
 +$  to-host
   $%  [%coming =vid yes=?]
+      [%advice wat=@t]
   ==
 ::
 ::  datetime wrangling

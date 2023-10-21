@@ -42,12 +42,16 @@
           ;h1:"Assembly Lisboa"
         ==
         ;a/"/assembly-2023/schedule"
-          ;div.grid@"/assembly-2023/db.svg";
+          ;div.grid;
           ; All Events
         ==
         ;a/"/assembly-2023/calendar"
-          ;div.mine@"/assembly-2023/star.svg";
+          ;div.mine;
           ; My Schedule
+        ==
+        ;a/"/assembly-2023/messages"
+          ;div.bulb;
+          ; Community Kiosk
         ==
         :: ::TODO  re-enable..
         :: :: ;*  ?.  .^(? %gu /(scot %p our)/pals/(scot %da now)/$)  ~

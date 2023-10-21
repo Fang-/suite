@@ -242,7 +242,7 @@
       ::  if hops is configured at 0, we don't broadcast at all.
       ::
       =/  =rumor  (en-rumor cage.p.card)
-      =.  memory  (~(put in memory) (en-hash rumor))
+      :: =.  memory  (~(put in memory) (en-hash rumor))
       ?:  =(0 hops.manner)
         [caz state]
       =^  cas  state  (emit-rumor rumor)
@@ -522,12 +522,12 @@
       =+  !<(=rumor vase)
       ::TODO  dedupe with +on-agent %fact
       =/  =hash  (en-hash:up rumor)
-      ?:  (~(has in memory) hash)
-        [~ this]
+      :: ?:  (~(has in memory) hash)
+      ::   [~ this]
       ?.  =(%0 kind.rumor)
         ~&  [gossip+dap.bowl %delaying-unknown-rumor-kind kind.rumor]
         [~ this(future [rumor future])]
-      =.  memory        (~(put in memory) hash)
+      :: =.  memory        (~(put in memory) hash)
       =/  mage=cage     (en-cage:up data.rumor)
       =^  cards  inner  (on-agent:og /~/gossip/gossip %fact mage)
       =^  caz1   state  (play-cards:up cards)
@@ -556,13 +556,13 @@
           ::TODO  de-dupe with +on-poke
           =+  !<(=rumor vase)
           =/  =hash  (en-hash:up rumor)
-          ?:  (~(has in memory) hash)
-            =^  cards  state  (jump-rumor:up rumor)
-            [cards this]
+          :: ?:  (~(has in memory) hash)
+          ::   =^  cards  state  (jump-rumor:up rumor)
+          ::   [cards this]
           ?.  =(%0 kind.rumor)
             ~&  [gossip+dap.bowl %delaying-unknown-rumor-kind kind.rumor]
             [~ this(future [rumor future])]
-          =.  memory        (~(put in memory) hash)
+          :: =.  memory        (~(put in memory) hash)
           =/  mage=cage     (en-cage:up data.rumor)
           =^  cards  inner  (on-agent:og /~/gossip/gossip sign(cage mage))
           =^  caz1   state  (play-cards:up cards)

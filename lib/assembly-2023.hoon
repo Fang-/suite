@@ -57,7 +57,6 @@
 ::
 +$  from-user
   $%  [%coming =vid yes=?]
-      [%enlist =vid yes=?]
       [%advice wat=@t]
   ==
 ::

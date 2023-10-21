@@ -11,10 +11,8 @@
   =/  args=(map @t @t)
     (frisk:rudder q.u.body)
   =/  vid=@  (slav %uv (~(got by args) 'vid'))
-  ?:  (~(has by args) 'save')     [%enlist vid &]
-  ?:  (~(has by args) 'unsave')   [%enlist vid |]
-  ?:  (~(has by args) 'going')    [%coming vid &]
-  ?:  (~(has by args) 'ungoing')  [%coming vid |]
+  ?:  (~(has by args) 'save')     [%coming vid &]
+  ?:  (~(has by args) 'unsave')   [%coming vid |]
   !!
 ::
 ++  final
@@ -137,23 +135,6 @@
                     ; Add this to your personal schedule:
                     ;input(type "hidden", name "vid", value "{(scow %uv vid)}");
                     ;button(type "submit", name "save"):"Save"
-                  ==
-            ==
-          ==
-          ::TODO  unify with save action?
-          ;tr
-            ;td:"Going"
-            ;td
-              ;+  ?:  (~(has ju b.groupies) vid our)
-                    ;form.no(method "post")
-                      ; Your pals know you will be there.
-                      ;input(type "hidden", name "vid", value "{(scow %uv vid)}");
-                      ;button(type "submit", name "ungoing"):"I'm not going."
-                    ==
-                  ;form.yes(method "post")
-                    ; Tell your pals you will be there:
-                    ;input(type "hidden", name "vid", value "{(scow %uv vid)}");
-                    ;button(type "submit", name "going"):"I'm going!"
                   ==
             ==
           ==

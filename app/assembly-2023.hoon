@@ -79,16 +79,13 @@
     ?>  =(src our):bowl
     =+  !<(act=action vase)
     ?-  -.act
-        %enlist
+        %coming
       ?>  (~(has by database) vid.act)
       =.  calendar
         ?:  yes.act
           (~(put in calendar) vid.act)
         (~(del in calendar) vid.act)
-      [~ this]
-    ::
-        %coming
-      ?>  (~(has by database) vid.act)
+      ::
       =?  groupies  yes.act
         =.  a.groupies  (~(put ju a.groupies) our.bowl vid.act)
         =.  b.groupies  (~(put ju b.groupies) vid.act our.bowl)
@@ -97,6 +94,7 @@
         =.  a.groupies  (~(del ju a.groupies) our.bowl vid.act)
         =.  b.groupies  (~(del ju b.groupies) vid.act our.bowl)
         groupies
+      ::
       :_  this
       =/  =cage  [%a23-command !>(act)]
       :~  [%pass /rsvp %agent [host-ship dap.bowl] %poke cage]
@@ -192,7 +190,7 @@
   ?+  wire  ~|([dap.bowl %unexpected-wire wire] !!)
       [%rsvp ~]
     ?>  ?=(%poke-ack -.sign)
-    ~?  ?=(^ p.sign)  %rsvp-poke-not-ok
+    ?:  ?=(^ p.sign)  ((slog 'rsvp-poke-not-ok' u.p.sign) [~ this])
     [~ this]
   ::
       [%message ~]

@@ -43,7 +43,7 @@
   =.  day  (min (max ~2023.10.28 day) ~2023.11.3)
   ::
   =/  kind=?(%main %week)  -:(~(gut by dates) day %week^'')
-  =/  schedule=manx
+  =/  schedule=marl
     ?-  kind
         %main
       =;  strips=(list [=vid wen=@da lon=@dr])
@@ -61,6 +61,7 @@
     ::
         %week
       =;  strips=(list [=vid wen=@da lon=(unit @dr)])
+        :_  ~
         (build-schedule-week [database now] [day strips] [our calendar b.groupies])
       %+  sort
         %+  murn  ~(tap by database)
@@ -85,7 +86,7 @@
       ;+  (head 'Assembly 2023: schedule')
       ;body
         ;+  (cal-nav now day)
-        ;+  schedule
+        ;*  schedule
       ==
     ==
   ::

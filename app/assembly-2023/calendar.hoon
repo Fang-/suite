@@ -31,7 +31,7 @@
   =/  kind=?(%main %week)  -:(~(gut by dates) day %week^'')
   ::
   ::TODO  partially shared with /schedule, dedupe
-  =/  schedule=manx
+  =/  schedule=marl
     ?-  kind
         %main
       =;  strips=(list [=vid wen=@da lon=@dr])
@@ -52,6 +52,7 @@
     ::
         %week
       =;  strips=(list [=vid wen=@da lon=(unit @dr)])
+        :_  ~
         (build-schedule-week [database now] [day strips] [our calendar b.groupies])
       %+  sort
         %+  murn  ~(tap in calendar)
@@ -78,7 +79,7 @@
       ;+  (head 'Assembly 2023: my calendar')
       ;body
         ;+  (cal-nav now day)
-        ;+  schedule
+        ;*  schedule
       ==
     ==
   --

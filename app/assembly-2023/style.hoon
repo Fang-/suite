@@ -56,6 +56,7 @@
     }
     nav {
       font-size: 13pt;
+      margin-bottom: 1em;
     }
     nav .title, header h1 {
       grid-row: 1;
@@ -107,15 +108,13 @@
 
     .schedule.main {
       position: relative;
+      margin-top: 2em;
       display: grid;
-      margin-top: -50vh;
-      /* margin-top: -180%;  /*NOTE  hack, borks on pages with just 1 short event */
-      grid-template-rows: repeat(288, 5.5vh); /* 1 row is ~m5 */ /*TODO  1fr -> 5.5vh? */
       /*NOTE  we don't do a row per minute, because of rachelandrew/gridbugs#28 */
     }
     .schedule.week {
       position: relative;
-      padding: 1em;
+      padding: 0 1em 1em;
     }
 
     .schedule .time {
@@ -135,7 +134,7 @@
     .schedule .now {
       position: absolute;
       left: 0; right: 0;
-      z-index: 3;
+      z-index: 4;
       border-top: 3px solid var(--green);
     }
 
@@ -154,6 +153,9 @@
     .event.break {
       background-color: var(--white);
       color: var(--black);
+      z-index: 3;
+      opacity: 0.5;
+      border-radius: 0;
     }
     .event .start {
       position: sticky;
@@ -223,16 +225,22 @@
     }
     .label {
       position: sticky;
-      top: 0;
+      top: 5px;
       z-index: 10;
       display: block;
-      height: 0; /* important, somehow */
+      height: 0;
+      width: calc(50% - 1em + 1px);
     }
     .label div {
-      margin: 4px;
       padding: 4px;
       color: var(--black);
       border-radius: var(--radius);
+    }
+    .label.main {
+      margin-left: calc(1em + 4px);
+    }
+    .label.second {
+      margin-left: calc(50% + 1em - 5px);
     }
     .label.main div {
       background-color: var(--green);

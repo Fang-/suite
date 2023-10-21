@@ -186,24 +186,25 @@
           [day=@da vez=(list [=vid wen=@da lon=@dr])]
           [our=@p calendar=(set vid) groupies=(jug vid @p)]
       ==
-  ^-  manx
+  ^-  marl
   ?>  =(%main -:(~(gut by dates) day %week^''))
   ?:  =(~ vez)
+    :_  ~
     ;div.schedule(style "text-align: center; margin-top: 2em;"):"Calm Day..."
   =+  (events-into-cols dab vez)
   =/  ran=[fro=@ud til=@ud]
-    :-  (div (sub (max day (sub wen:(snag 0 vez) ~h1)) day) ~h1)
+    :-  (div (sub (max day (sub wen:(snag 0 vez) ~h0)) day) ~h1)
     (div (sub (min (add day ~d1) (add =+((rear vez) (add wen lon)) ~h1)) day) ~h1)
   =+  dif=(sub til.ran fro.ran)
   =+  ros=(mul dif 12)  ::  row for every ~m5
   =+  off=(mul fro.ran 12)  :: missing rows
+  %+  snoc  (main-labels day)
   ;div.schedule.main
       =style
     """
-    grid-template-rows: repeat({(a-co:co ros)}, 5.5vh);
+    grid-template-rows: repeat({(a-co:co 12)}, 0.4em) repeat({(a-co:co (sub ros 12))}, 5.5vh);
     grid-template-columns: 1em repeat({(a-co:co tot)}, 1fr);
     """
-    ;*  (main-labels day)
     ;*  (grid-times fro.ran til.ran)
     ;*  (grid-lines dif)
     ;*  ::  if today, add time indicator
@@ -212,10 +213,19 @@
         =+  fro=(add day (mul ~h1 fro.ran))
         =+  til=(add day (mul ~h1 til.ran))
         ?.  &((gth now fro) (lth now til))  ~
-        =+  dif=(sub til fro)
-        =+  pec=(div (mul 100 (sub now fro)) dif)
+        :: ?:  (lth now (add fro ~h1))
+        ::   ::  registration
+        ::   :: =+
+        ::   :: ;div.now(style "top: calc(4.8em + {(scow %ud pec)}%);");
+        ::   ~
+        =+  row=+((div (sub now fro) ~m5))
+        =+  pec=(div (mul 100 (mod now ~m5)) ~m5)
         :_  ~
-        ;div.now(style "top: {(a-co:co pec)}%;");
+        ;div.now(style "grid-row: {(a-co:co row)};");
+        :: =+  dif=(sub til fro)
+        :: =+  pec=(div (mul 100.000 (sub now (add fro ~h1))) dif)
+        :: :_  ~
+        :: ;div.now(style "top: calc(4.8em + {(scow %ud pec)}%);");
     ;*  ^-  marl
         %-  zing
         %+  turn  (sort ~(tap by coz) aor)
@@ -251,7 +261,7 @@
                 ==
             ;+  ?:  (lth (met 3 desc) 64)
                   ;p:"{(trip desc)}"
-                ;p:"{(trip (end 3^64 desc))}..."
+                ;p:"{(trip (end 3^(mul 14 (sub e s)) desc))}..."
           ==
           ;div.icons
             ;*  =;  l=(list (unit manx))  (murn l same)

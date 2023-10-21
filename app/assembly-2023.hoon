@@ -45,6 +45,7 @@
   :-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
   ?:  =(host-ship our.bowl)  ~
   ::NOTE  technically unnecessary if we're just gonna edit /lib/a23/events...
+  ::NOTE  but now also used for message passing
   [%pass /events %agent [host-ship dap.bowl] %watch /events]~
 ::
 ++  on-save  !>(state)
@@ -53,7 +54,7 @@
   |=  ole=vase
   ^-  (quip card _this)
   =.  state  !<(state-0 ole)
-  =.  database  (~(gas by *(map @ event)) all:events)  ::TODO  only on-init
+  =.  database  (~(gas by *(map @ event)) all:events)  ::NOTE  beware
   [~ this]
 ::
 ++  on-poke

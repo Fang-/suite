@@ -78,7 +78,8 @@
     ;html
       ;+  (head 'Assembly 2023: my calendar')
       ;body
-        ;+  (cal-nav now day)
+        ;+  (cal-nav day)
+        ;+  (cal-head day)
         ;*  schedule
       ==
     ==

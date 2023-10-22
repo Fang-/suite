@@ -33,12 +33,10 @@
     ;html
       ;+  (head 'Assembly 2023: Community Kiosk')
       ;body.messages
-        ;header
-          ;a.left/"/assembly":"<"
-          ;a/"/assembly"
-            ;h2:"Community Kiosk"
-            ;h3:"Cartas de Lisboa"
-          ==
+        ;+  (top-nav ~ `['↑ Home' '/assembly'] ~)
+        ;div.title
+          ;h2:"Community Kiosk"
+          ;h3:"Cartas de Lisboa"
         ==
         ;*  ?:  =(%pawn (clan:title our))  ~
             :_  ~

@@ -42,46 +42,44 @@
     }
 
     header, nav {
-      display: grid;
-      grid-template-rows: 1;
-      grid-template-columns: [left] 20% [center] 60% [right] 20%;
-      padding: 0;
       position: relative;
       z-index: 50;
       background-color: var(--red);
       color: var(--yellow);
       text-align: center;
-      font-family: Urbit Serif Italic, Times;
+      font-family: Urbit Sans;
       font-weight: 300;
     }
+    header h1 {
+      font-size: 25pt;
+      font-family: Urbit Serif Italic;
+      padding: 0.5em 0;
+    }
     nav {
-      font-size: 13pt;
+      display: grid;
+      grid-template-rows: 1;
+      grid-template-columns: [left] 1fr [center] 1fr [right] 1fr;
+      padding: 0;
       margin-bottom: 1em;
     }
-    nav .title, header h1 {
-      grid-row: 1;
-      grid-column: center;
-      padding: 1em;
-    }
-    header h1 {
-      font-size: 18pt;
-    }
-    header .left, nav .left, nav .right {
+    nav a {
       text-decoration: none;
       text-align: center;
-      font-family: Urbit Sans Mono;
-      color: var(--red);
-      font-size: 25pt;
-      font-weight: bold;
+      font-family: Urbit Sans;
+      color: var(--yellow);
+      font-size: 18pt;
       grid-row: 1;
-      background-color: var(--yellow);
-      margin: 20px;
-      border-radius: var(--radius);
+      margin: 10px;
     }
-    nav .left, header .left { grid-column: left; }
-    nav .right { grid-column: right; }
-    nav a span {
-      vertical-align: middle;
+    nav .left   { grid-column: left; }
+    nav .middle { grid-column: center; }
+    nav .right  { grid-column: right; }
+
+    .title {
+      color: var(--green);
+      font-family: Urbit Serif Italic, Times;
+      text-align: center;
+      margin-bottom: 1em;
     }
 
     /* no clue why mobile chrome is weird about this */
@@ -316,7 +314,7 @@
       margin-top: 0.3em;
     }
     .messages form {
-      padding: 1em 2em 0;
+      padding: 0 2em;
     }
     textarea {
       margin: 0 auto;

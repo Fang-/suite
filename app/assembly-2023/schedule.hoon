@@ -85,7 +85,8 @@
     ;html
       ;+  (head 'Assembly 2023: schedule')
       ;body
-        ;+  (cal-nav now day)
+        ;+  (cal-nav day)
+        ;+  (cal-head day)
         ;*  schedule
       ==
     ==

@@ -283,27 +283,37 @@
         ==
   ==
 ::
-++  cal-nav
-  |=  [now=@da day=@da]
+++  top-nav
+  |=  [let=(unit [t=@t u=@t]) mid=(unit [t=@t u=@t]) ryt=(unit [t=@t u=@t])]
   ^-  manx
-  ?.  (~(has by dates) day)  ;nav:"it's so over..."
-  ::TODO  just date instead if no entry
   ;nav
-    ;*  ?.  (~(has by dates) (sub day ~d1))  ~
+    ;*  ?~  let  ~
         :_  ~
-        ;a.left/"?day={(scow %da (sub day ~d1))}"
-          ;span:"<"
-        ==
-    ::TODO  maybe icon
-    ;a.title/"/assembly"
-      ;h2:"{(trip +:(~(got by dates) day))}"
-      ;h3:"{(scow %da day)}"
-    ==
-    ;*  ?.  (~(has by dates) (add day ~d1))  ~
+        ;a.left/"{(trip u.u.let)}":"{(trip t.u.let)}"
+    ;*  ?~  mid  ~
         :_  ~
-        ;a.right/"?day={(scow %da (add day ~d1))}"
-          ;span:">"
-        ==
+        ;a.middle/"{(trip u.u.mid)}":"{(trip t.u.mid)}"
+    ;*  ?~  ryt  ~
+        :_  ~
+        ;a.right/"{(trip u.u.ryt)}":"{(trip t.u.ryt)}"
+  ==
+::
+++  cal-nav
+  |=  day=@da
+  ^-  manx
+  =/  let=(unit [@t @t])
+    ?.  (~(has by dates) (sub day ~d1))  ~
+    `['← Previous' (cat 3 '?day=' (scot %da (sub day ~d1)))]
+  =/  ryt=(unit [@t @t])
+    ?.  (~(has by dates) (add day ~d1))  ~
+    `['Next →' (cat 3 '?day=' (scot %da (add day ~d1)))]
+  (top-nav let `['↑ Home' '/assembly'] ryt)
+::
+++  cal-head
+  |=  day=@da
+  ;div.title
+    ;h2:"{(trip +:(~(got by dates) day))}"
+    ;h3:"{(scow %da day)}"
   ==
 ::
 ++  render-time

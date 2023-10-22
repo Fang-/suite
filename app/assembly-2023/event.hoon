@@ -35,11 +35,9 @@
   ;html
     ;+  (head (cat 3 'Assembly 2023: ' name))
     ;body
-      ;header
-        ;a.left/"#"(onclick "window.history.back();"):"<"
-        ;a/"/assembly"
-          ;h1:"Assembly Lisboa"
-        ==
+      ;nav
+        ;a.left/"#"(onclick "window.history.back();"):"← Back"
+        ;a.middle/"/assembly":"↑ Home"
       ==
       ;article.event
         ;h2:"{(trip name)}"

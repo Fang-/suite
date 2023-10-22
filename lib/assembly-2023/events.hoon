@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 4a51c18
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 6995c80
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/4a51c18..master
+::  https://github.com/urbit/assembly2023/compare/6995c80..master
 ::
 /+  *assembly-2023
 ::
@@ -40,11 +40,11 @@
       ==
       :*  'a103'  %main
           'The Future of Sovereign AI'
-          'We still don\'t know just how important and disruptive artificial intelligence will be, but one thing seems clear: the power of AI should not remained cordoned off by centralized companies. Our panelists—Cody Wilson of Defense Distributed, Native Planet\'s ~mopfel-winrux, Tlon\'s Lukas Buhler, along with @mogmachine from Bittensor and David Capone from Harmless AI—are the perfect team to explore the possibilities unlocked by more sovereign, decentralized, and open AI.'
+          'We still don\'t know just how important and disruptive artificial intelligence will be, but one thing seems clear: the power of AI should not remained cordoned off by centralized companies. Our panelists—Cody Wilson of Defense Distributed, Native Planet\'s ~mopfel-winrux, Tlon\'s Lukas Buhler, along with @mogmachine from Bittensor and David Clarity from Harmless AI—are the perfect team to explore the possibilities unlocked by more sovereign, decentralized, and open AI.'
           ''
           ~2023.10.28..11.00.00  ~h1.m10
           %main
-          ~['~mopfel-winrux' 'Cody Wilson' 'Lukas Buhler' 'David Capone' 'mogmachine']
+          ~['~mopfel-winrux' 'Cody Wilson' 'Lukas Buhler' 'David Clarity' 'mogmachine']
           %panel
       ==
       :*  'a104'  %main
@@ -368,7 +368,7 @@
           '~fabryx and Urmetica present the CyberHermetic Float Tank, ARGO, 10/30 - 11/3'
           'Urmetica invites you to transcend the limits of space and time in this float tank experience brought to you by the mysterious minds of ~fabryx. Float tank times will be raffled off in the Urmetica Urbit group starting 2 weeks before, DM ~todset-partug for admission.'
           ~2023.10.30  ~  ::TODO  by appointment
-          ['Downtown Lisboa' ~]
+          ['Play Nice Playground' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.26..22.50.24-230922_ARGO-Urbit-Assembly_flyer-A4_purple.png'
           'Float Tank'
           ~
@@ -414,7 +414,7 @@
           '~fabryx and Urmetica present the CyberHermetic Float Tank, ARGO, 10/30 - 11/3'
           'Urmetica invites you to transcend the limits of space and time in this float tank experience brought to you by the mysterious minds of ~fabryx. Float tank times will be raffled off in the Urmetica Urbit group starting 2 weeks before, DM ~todset-partug for admission.'
           ~2023.10.31  ~  ::TODO  by appointment
-          ['Downtown Lisboa' ~]
+          ['Play Nice Playground' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.26..22.50.24-230922_ARGO-Urbit-Assembly_flyer-A4_purple.png'
           'Float Tank'
           ~
@@ -468,7 +468,7 @@
           '~fabryx and Urmetica present the CyberHermetic Float Tank, ARGO, 10/30 - 11/3'
           'Urmetica invites you to transcend the limits of space and time in this float tank experience brought to you by the mysterious minds of ~fabryx. Float tank times will be raffled off in the Urmetica Urbit group starting 2 weeks before, DM ~todset-partug for admission.'
           ~2023.11.1  ~  ::TODO  by appointment
-          ['Downtown Lisboa' ~]
+          ['Play Nice Playground' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.26..22.50.24-230922_ARGO-Urbit-Assembly_flyer-A4_purple.png'
           'Float Tank'
           ~
@@ -512,7 +512,7 @@
           '~fabryx and Urmetica present the CyberHermetic Float Tank, ARGO, 10/30 - 11/3'
           'Urmetica invites you to transcend the limits of space and time in this float tank experience brought to you by the mysterious minds of ~fabryx. Float tank times will be raffled off in the Urmetica Urbit group starting 2 weeks before, DM ~todset-partug for admission.'
           ~2023.11.2  ~  ::TODO "By Appointment",
-          ['Downtown Lisboa' ~]
+          ['Play Nice Playground' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.26..22.50.24-230922_ARGO-Urbit-Assembly_flyer-A4_purple.png'
           'Float Tank'
           ~
@@ -566,7 +566,7 @@
           '~fabryx and Urmetica present the CyberHermetic Float Tank, ARGO, 10/30 - 11/3'
           'Urmetica invites you to transcend the limits of space and time in this float tank experience brought to you by the mysterious minds of ~fabryx. Float tank times will be raffled off in the Urmetica Urbit group starting 2 weeks before, DM ~todset-partug for admission.'
           ~2023.11.3  ~  ::TODO "By Appointment",
-          ['Downtown Lisboa' ~]
+          ['Play Nice Playground' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.26..22.50.24-230922_ARGO-Urbit-Assembly_flyer-A4_purple.png'
           'Float Tank'
           ~

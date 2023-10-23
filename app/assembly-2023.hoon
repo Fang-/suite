@@ -8,7 +8,7 @@
     gossip, rudder,
     dbug, verb
 ::
-/~  pages   (page:rudder state-0 action)  /app/assembly-2023
+/~  pages   (page:rudder state action)  /app/assembly-2023
 ::
 |%
 ++  host-ship  ~bitdeg
@@ -26,7 +26,7 @@
 ::       [[%a23 0] ~ ~]
 ::     [[%assembly-2023 [[%a23 0] ~ ~]] ~ ~]
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -52,11 +52,37 @@
 ::
 ++  on-load
   |=  ole=vase
-  ^-  (quip card _this)
-  =.  state  !<(state-0 ole)
-  =.  database  (~(gas by *(map @ event)) all:events)  ::NOTE  beware
-  :_  this
-  [%pass /eyre/connect %arvo %e %connect [~ /assembly] dap.bowl]~
+  |^  ^-  (quip card _this)
+      =/  old  !<(state-any ole)
+      =?  old  ?=(%0 -.old)  (state-0-to-1 old)
+      ?>  ?=(%1 -.old)
+      =.  state  old
+      =.  database  (~(gas by *(map @ event)) all:events)  ::NOTE  beware
+      [~ this]
+  ::
+  +$  state-any  $%(state-0 state-1)
+  ::
+  ++  state-0-to-1
+    |=  s=state-0
+    ^-  state-1
+    =-  s(- %1, messages -)
+    %+  sort
+      ~(tap in (~(gas in *(set [@p @da @t])) messages.s))
+    |=  [[@p a=@da @t] [@p b=@da @t]]
+    (gth a b)
+  ::
+  +$  state-0
+    $:  %0
+        database=(map vid event)
+        crowding=(map vid (each (set @p) @ud))  :: %&: host-only
+      ::
+        calendar=(set vid)
+        groupies=[a=(jug @p vid) b=(jug vid @p)]  ::  pals & us
+      ::
+        messages=(list [who=@p wen=@da wat=@t])
+        ruffians=(set @p)
+    ==
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -136,9 +162,12 @@
       =/  bad=?  (gth (met 3 wat.cmd) 1.024)
       ?:  bad  [~ this]
       =/  now=@da  (ut-to-pt now.bowl)
-      =.  messages  [[src.bowl now wat.cmd] messages]
+      =/  new      [src.bowl now wat.cmd]
+      ?:  ?=(^ (find [new]~ messages))
+        [~ this]
+      =.  messages  [new messages]
       :_  this
-      [%give %fact [/events]~ %a23-update !>([src.bowl now wat.cmd]~)]~
+      [%give %fact [/events]~ %a23-update !>([new]~)]~
     ==
   ::
       %handle-http-request
@@ -245,7 +274,13 @@
         [~ this]
       ::
           %advice
-        =.  vas.upd   (skip vas.upd |=([who=@p *] =(who our.bowl)))
+        =.  vas.upd
+          %+  skip  vas.upd
+          |=  m=[who=@p @da @t]
+          ?|  =(who.m our.bowl)
+              ::  unclear why we were ending up with dupes but this should help
+              ?=(^ (find [m]~ messages))
+          ==
         =.  messages  (weld vas.upd messages)
         [~ this]
       ::

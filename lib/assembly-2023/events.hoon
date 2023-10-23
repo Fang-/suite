@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 6995c80
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 3a79d41
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/6995c80..master
+::  https://github.com/urbit/assembly2023/compare/3a79d41..master
 ::
 /+  *assembly-2023
 ::
@@ -148,7 +148,7 @@
           %talk
       ==
       :*  'a115'  %main
-          'Building a Proof-of-Authority Chain on Urbit'
+          'Imagining an Urbit-native Blockchain'
           ''
           ''
           ~2023.10.28..15.00.00  ~m30
@@ -373,7 +373,7 @@
           'Float Tank'
           ~
       ==
-      ^-  [@ event]  :*  'w102'  %week
+      :*  'w102'  %week
           'UF Demo Day'
           'Demo Day is where our Assembly Hackathon and the u/acc accelerator culminate, giving you the first glance at community projects.'
           'This is an official side-event organized by the Urbit Foundation. The day will start with presentations from our Hackathon contestants. After lunch our committee of judges will announce the winners and present prizes. The u/acc pitches will be given in the afternoon to an invite-only group of qualified investors, but open areas for hanging out, networking, and giving lightning talks will be available throughout the afternoon.'
@@ -385,7 +385,7 @@
           :-  'If you want to present at Demo Day, please fill out the form via the register button or reach out to ~dalweb-donfun.'
           ['Register ↗' 'https://docs.google.com/forms/d/e/1FAIpQLSfOg70Rf1GqBjPIHJ0ZhgKJbpbWsL4Nixlgd7tMOAspUcajBg/viewform?usp=sf_link']
       ==
-      ^-  [@ event]  :*  'w103'  %week
+      :*  'w103'  %week
           'SovHouse Lisboa'
           'Sovereign House NY comes to Lisboa, 10/30 - 11/3'
           'The minds behind Sovereign House NY are coming to Portugal. Located in the heart of historic Lisbon, you\'ll find SovHouse Lisboa; a daytime clubhouse to reconnoiter, grab an espresso and a cigarette and scheme.'
@@ -395,7 +395,7 @@
           'Lounge'
           ~
       ==
-      ^-  [@ event]  :*  'w104'  %week
+      :*  'w104'  %week
           'MRB: Portuguese Nights'
           'Mingle with literary superstars from across the Urbit extended universe and celebrate the release of a new issue of the finest magazine on Mars.'
           ''
@@ -404,6 +404,16 @@
           ~
           'Reading/Party'
           ~
+      ==
+      :*  'w105'  %week
+          'Hamzat Collects Faces'
+          'Hamzat is on a mission to collect 1,000 faces for an immersive, monumental sculpture project called \'Stone with 1,000 Faces.\''
+          '\'Stone with 1,000 Faces\' explores the notion of identity and human connections. The collection sessions are described by 150+ participants as a meditative yet spa like sensory deprivation experience.'
+          ~2023.10.30..12.00.00  `~h5
+          ['Play Nice Playground' ~]
+          `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
+          'Installation'
+          `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
       ==
   ==
 ::
@@ -459,6 +469,16 @@
           'Lounge'
           ~
       ==
+      :*  'w206'  %week
+          'Hamzat Collects Faces'
+          'Hamzat is on a mission to collect 1,000 faces for an immersive, monumental sculpture project called \'Stone with 1,000 Faces.\''
+          '\'Stone with 1,000 Faces\' explores the notion of identity and human connections. The collection sessions are described by 150+ participants as a meditative yet spa like sensory deprivation experience.'
+          ~2023.10.31..12.00.00  `~h5
+          ['Play Nice Playground' ~]
+          `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
+          'Installation'
+          `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
+      ==
   ==
 ::
 ++  week-3  ::  nov 1st
@@ -503,6 +523,16 @@
           'Lounge'
           ~
       ==
+      :*  'w305'  %week
+          'Hamzat Collects Faces'
+          'Hamzat is on a mission to collect 1,000 faces for an immersive, monumental sculpture project called \'Stone with 1,000 Faces.\''
+          '\'Stone with 1,000 Faces\' explores the notion of identity and human connections. The collection sessions are described by 150+ participants as a meditative yet spa like sensory deprivation experience.'
+          ~2023.11.1..12.00.00  `~h5
+          ['Play Nice Playground' ~]
+          `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
+          'Installation'
+          `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
+      ==
   ==
 ::
 ++  week-4  ::  nov 2nd
@@ -546,6 +576,16 @@
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.19..02.28.55-galaxy%20brain.png'
           'Chess'
           ~
+      ==
+      :*  'w405'  %week
+          'Hamzat Collects Faces'
+          'Hamzat is on a mission to collect 1,000 faces for an immersive, monumental sculpture project called \'Stone with 1,000 Faces.\''
+          '\'Stone with 1,000 Faces\' explores the notion of identity and human connections. The collection sessions are described by 150+ participants as a meditative yet spa like sensory deprivation experience.'
+          ~2023.11.2..12.00.00  `~h5
+          ['Play Nice Playground' ~]
+          `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
+          'Installation'
+          `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
       ==
   ==
 ::

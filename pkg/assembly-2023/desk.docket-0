@@ -1,5 +1,5 @@
 :~  title+'Assembly'
-    info+'Assemly & Urbit Week companion app'
+    info+'Assembly & Urbit Week companion app'
     color+0xfe.d107
     image+'https://pal.dev/props/assembly/tile.png'
     site+/assembly

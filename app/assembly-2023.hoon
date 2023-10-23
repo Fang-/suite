@@ -163,8 +163,6 @@
       ?:  bad  [~ this]
       =/  now=@da  (ut-to-pt now.bowl)
       =/  new      [src.bowl now wat.cmd]
-      ?:  ?=(^ (find [new]~ messages))
-        [~ this]
       =.  messages  [new messages]
       :_  this
       [%give %fact [/events]~ %a23-update !>([%advice [new]~])]~
@@ -278,7 +276,7 @@
           %+  skip  vas.upd
           |=  m=[who=@p @da @t]
           ?|  =(who.m our.bowl)
-              ::  unclear why we were ending up with dupes but this should help
+              ::  we might get dupes in resubscribe scenarios
               ?=(^ (find [m]~ messages))
           ==
         =.  messages  (weld vas.upd messages)

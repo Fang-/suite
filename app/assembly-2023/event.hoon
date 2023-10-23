@@ -92,7 +92,7 @@
                   ;tr.rsvp.act
                     ;td:"RSVP"
                     ;td
-                      ;a/"{(trip url.u.rsvp)}":"{(trip act.u.rsvp)}"
+                      ;a/"{(trip url.u.rsvp)}"(target "_blank"):"{(trip act.u.rsvp)}"
                     ==
                   ==
               ==
@@ -140,7 +140,9 @@
         ;*  ?.  &(?=(%week -.u.vet) ?=(^ show.u.vet))  ~
             :_  ~
             ;img@"{(trip u.show)}";
-        ;p:"{(trip desc)}"
+        ;+  ?:  =('' full)
+              ;p:"{(trip desc)}"
+            ;p.short:"{(trip desc)}"
         ;*  %+  murn  (to-wain:format full)
             |=  p=@t
             ?:  =('' p)  ~

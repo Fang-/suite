@@ -274,6 +274,9 @@
     article p {
       margin-top: 1em;
     }
+    article p.short {
+      font-style: italic;
+    }
     article img {
       display: block;
       max-width: 90%;

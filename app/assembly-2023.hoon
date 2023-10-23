@@ -167,7 +167,7 @@
         [~ this]
       =.  messages  [new messages]
       :_  this
-      [%give %fact [/events]~ %a23-update !>([new]~)]~
+      [%give %fact [/events]~ %a23-update !>([%advice [new]~])]~
     ==
   ::
       %handle-http-request

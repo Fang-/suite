@@ -42,7 +42,7 @@
           'The Future of Sovereign AI'
           'We still don\'t know just how important and disruptive artificial intelligence will be, but one thing seems clear: the power of AI should not remained cordoned off by centralized companies. Our panelists—Cody Wilson of Defense Distributed, Native Planet\'s ~mopfel-winrux, Tlon\'s Lukas Buhler, along with @mogmachine from Bittensor and David Clarity from Harmless AI—are the perfect team to explore the possibilities unlocked by more sovereign, decentralized, and open AI.'
           ''
-          ~2023.10.28..11.00.00  ~h1.m10
+          ~2023.10.28..11.00.00  ~h1
           %main
           ~['~mopfel-winrux' 'Cody Wilson' 'Lukas Buhler' 'David Clarity' 'mogmachine']
           %panel

@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 21c192b
+::NOTE  data from the assembly.js & urbitWeek.js as of commit d2df10a
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/21c192b..master
+::  https://github.com/urbit/assembly2023/compare/d2df10a..master
 ::
 /+  *assembly-2023
 ::
@@ -359,15 +359,7 @@
           ~['mogmachine']
           %talk
       ==
-      :*  'a220'  %main
-          'No Agency – Book presentation'
-          ''
-          ''
-          ~2023.10.29..17.15.00  ~m30
-          %second
-          ~['Alex Tsebelis' 'Chloe Mackey']
-          %panel
-      ==
+      ::  rip 'a220' no agency book presentation
     ::
       :*  'a299'  %main
           'Closing drinks at Convento do Beato'
@@ -433,6 +425,16 @@
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
           'Installation'
           `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
+      ==
+      :*  'w106'  %week
+          'Death Athletic: A dissident architecture'
+          'A techno-political documentary featuring Cody Wilson'
+          'Death Athletic is an intimate portrait and chronicle of a techno-political war challenging how information is created and shared in the digital age. A 7 year document trailing the Federal battles, personal struggles, growing 3D gun community, and illicit criminal case plaguing Cody Wilson\'s fight for the 1st Amendment freedom to share code online. Code that happens to engineer guns.'
+          ~2023.10.30..11.00.00  `~h2.m30
+          ['Cinema Ideal, Rua do Loreto 15, 1200-241 Lisboa, Portugal' ~]
+          `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.24..16.27.31-9C241F36-70F5-47AD-8126-D83C3AD2D99D.jpeg'
+          'Film and Q&A'
+          ~
       ==
   ==
 ::

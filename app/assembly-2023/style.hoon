@@ -262,6 +262,14 @@
       height: 1.5em;
       width: 1.5em;
     }
+    .icons span {
+      position: absolute;
+      right: 0; bottom: -0.2em;
+      font-size: 10pt;
+      color: var(--green);
+      text-shadow: 0.5px 0.5px 1px var(--black), -0.5px -0.5px 1px var(--black), -0.5px 0.5px 1px var(--black), 0.5px -0.5px 1px var(--black);
+      /* text-shadow: 0px 0px 2px var(--black), -0px -0px 2px var(--black), -0px 0px 2px var(--black), 0px -0px 2px var(--black); */
+    }
 
     article.event {
       position: relative;

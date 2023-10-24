@@ -168,12 +168,14 @@
     ::
       ;div.icons
       ;*  =;  l=(list (unit manx))  (murn l same)
-          :~  ?.  (~(has in calendar) vid)  ~
+          :-  ?.  (~(has in calendar) vid)  ~
               (some ;img.mine@"/assembly/star.svg";)
-            ::
-              ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-              (some ;img.pals@"/assembly/p2p.svg";)
-          ==
+          =/  pals=@ud
+            ~(wyt in (~(del in (~(get ju groupies) vid)) our))
+          ?.  (gth pals 0)  ~
+          :-  (some ;img.pals@"/assembly/p2p.svg";)
+          ?.  (gth pals 1)  ~
+          [(some ;span.count:"{(a-co:co pals)}")]~
         ==
     ::
       ;div.kind:"{(trip kind)}"
@@ -272,12 +274,14 @@
           ==
           ;div.icons
             ;*  =;  l=(list (unit manx))  (murn l same)
-                :~  ?.  (~(has in calendar) vid)  ~
+                :-  ?.  (~(has in calendar) vid)  ~
                     (some ;img.mine@"/assembly/star.svg";)
-                  ::
-                    ?:  =(~ (~(del in (~(get ju groupies) vid)) our))  ~
-                    (some ;img.pals@"/assembly/p2p.svg";)
-                ==
+                =/  pals=@ud
+                  ~(wyt in (~(del in (~(get ju groupies) vid)) our))
+                ?.  (gth pals 0)  ~
+                :-  (some ;img.pals@"/assembly/p2p.svg";)
+                ?.  (gth pals 1)  ~
+                [(some ;span.count:"{(a-co:co pals)}")]~
           ==
           ;div.end:"ends at {(render-time (sub til day))}"
         ==

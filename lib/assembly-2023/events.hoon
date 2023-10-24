@@ -1,14 +1,14 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 3a79d41
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 21c192b
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/3a79d41..master
+::  https://github.com/urbit/assembly2023/compare/21c192b..master
 ::
 /+  *assembly-2023
 ::
 |%
 ++  all  ^~(:(weld assembly-1 assembly-2 week-1 week-2 week-3 week-4 week-5))
-++  assembly-1
+++  assembly-1  ::  28th
   ^~  ^-  (list [@ event])
   :~  :*  'a100'  %main
           'Registration & Coffee'
@@ -185,7 +185,7 @@
       ==
   ==
 ::
-++  assembly-2
+++  assembly-2  ::  29th
   ^~  ^-  (list [@ event])
   :~  :*  'a200'  %main
           'Registration & Coffee'
@@ -296,15 +296,6 @@
           ~['Christopher Colby' '~solsup-soplyd']
           %presentation
       ==
-      :*  'a212'  %main
-          'Portal'
-          ''
-          ''
-          ~2023.10.29..14.30.00  ~m30
-          %second
-          ~['~toptyr-bilder']
-          %presentation
-      ==
       :*  'a213'  %main
           'Remilia Black Ops Division: The Art of Psyops'
           'An unveiling of secret internal operations in the Remilia Corporation and a discussion about information warfare, culture building, and the necessity of psyops in the age of the Network.'
@@ -354,10 +345,38 @@
           'The Vietnam Thesis and El Salvador Method'
           'A discussion on the game theory and outcome behind Western hostility to DeFi, and how Network States manifest and coordinate.'
           ''
-          ~2023.10.29..17.15.00  ~m30
+          ~2023.10.29..14.30.00  ~m30
           %second
           ~['Dmitry (@BacktheBunny)']
           %talk
+      ==
+      :*  'a219'  %main
+          'Bittensor'
+          'Incentivised distributed machine learning explained'
+          ''
+          ~2023.10.29..10.30.00  ~m30
+          %second
+          ~['mogmachine']
+          %talk
+      ==
+      :*  'a220'  %main
+          'No Agency – Book presentation'
+          ''
+          ''
+          ~2023.10.29..17.15.00  ~m30
+          %second
+          ~['Alex Tsebelis' 'Chloe Mackey']
+          %panel
+      ==
+    ::
+      :*  'a299'  %main
+          'Closing drinks at Convento do Beato'
+          ''
+          ''
+          ~2023.10.29..18.45.00  ~h2.m15
+          ~
+          ~['Assembly Lisboa']
+          ~
       ==
   ==
 ::

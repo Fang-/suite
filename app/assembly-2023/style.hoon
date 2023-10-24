@@ -10,7 +10,7 @@
   :+  %full
     :-  200
     :~  ['content-type' 'image/svg+xml']
-        ['cache-control' 'public, max-age=604800, immutable']
+        ['cache-control' 'public, max-age=900, immutable']
     ==
   %-  some
   %-  as-octs:mimes:html

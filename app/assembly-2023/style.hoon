@@ -67,7 +67,7 @@
       text-align: center;
       font-family: Urbit Sans;
       color: var(--yellow);
-      font-size: 18pt;
+      font-size: 17pt;
       grid-row: 1;
       margin: 10px;
     }

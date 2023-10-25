@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit d2df10a
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 992e401
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/d2df10a..master
+::  https://github.com/urbit/assembly2023/compare/992e401..master
 ::
 /+  *assembly-2023
 ::
@@ -112,7 +112,7 @@
       ==
       :*  'a111'  %main
           'Archetype'
-          ''
+          'Scaling trust: a secure software supply chain for the sovereign web. Security, privacy, composability, censorship resistance. Good stuff right? All memes without a secure software supply chain and scalabale trust. ~doplyr-harbur will dive into the need for new infrastructure, incentives, and tooling - and present a path forward with a new stack for the sovereign web, including Archetype’s decentralized package management infra.'
           ''
           ~2023.10.28..11.30.00  ~m30
           %second
@@ -229,7 +229,7 @@
           ''
           ~2023.10.29..14.00.00  ~h1
           %main
-          ~['Isaac Simpson' 'Elena Velez' 'Sean Monahan' 'David Sley' 'Daniel Lisi']
+          ~['Isaac Simpson' 'Elena Velez' 'David Sley' 'Daniel Lisi']
           %panel
       ==
       :*  'a205'  %main
@@ -433,8 +433,8 @@
           ~2023.10.30..11.00.00  `~h2.m30
           ['Cinema Ideal, Rua do Loreto 15, 1200-241 Lisboa, Portugal' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.24..16.27.31-9C241F36-70F5-47AD-8126-D83C3AD2D99D.jpeg'
-          'Film and Q&A'
-          ~
+          'Screening and Q&A'
+          `['' 'Link ↗' 'https://lu.ma/death-athletic']
       ==
   ==
 ::

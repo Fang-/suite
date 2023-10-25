@@ -634,4 +634,255 @@
       ==
   ==
 ::
+++  demo-day  ::  30th
+  ^~  ^-  (list [@ event])
+  :~  :*  'd000'  %main  ::  demo day!
+          'Registration & Coffee'
+          ''
+          ''
+          ~2023.10.30..09.00.00  ~h1
+          ~
+          ~
+          ''
+      ==
+      :*  'd001'  %main  ::  demo day!
+          'Break'
+          ''
+          ''
+          ~2023.10.30..11.05.00  ~m10
+          ~
+          ~
+          ''
+      ==
+      :*  'd002'  %main  ::  demo day!
+          'Lunch Break (not provided)'
+          ''
+          ''
+          ~2023.10.30..12.30.00  ~h1
+          ~
+          ~
+          ''
+      ==
+      :*  'd004'  %main  ::  demo day!
+          'Demo Day Closing'
+          ''
+          ''
+          ~2023.10.30..16.45.00  ~m15
+          ~
+          ~
+          ''
+      ==
+    ::
+      :*  'd101'  %main  ::  demo day!
+          'Opening Demo Day'
+          ''
+          ''
+          ~2023.10.30..10.00.00  ~m5
+          %main
+          ~['Thomas Kroes' 'Jack Wang']
+          ''
+      ==
+      :*  'd102'  %main  ::  demo day!
+          'Team 1'
+          ''
+          ''
+          ~2023.10.30..10.05.00  ~m15
+          %main
+          ~['~racfer-hattes' '~dopnyr-figbud']
+          'presentation'
+      ==
+      :*  'd103'  %main  ::  demo day!
+          'Team 3'
+          ''
+          ''
+          ~2023.10.30..10.20.00  ~m15
+          %main
+          ~['~lomped-firser' '~wolfun-solnym' '~radbus-tactyl' '~nismut-tamwep' '~mocmex-pollen']
+          'presentation'
+      ==
+      :*  'd104'  %main  ::  demo day!
+          'Team 8'
+          ''
+          ''
+          ~2023.10.30..10.35.00  ~m15
+          %main
+          ~['~normul-postem' '~lonhep-tamfeb' '~dannul-bortux']
+          'presentation'
+      ==
+      :*  'd105'  %main  ::  demo day!
+          'Team 9'
+          ''
+          ''
+          ~2023.10.30..10.50.00  ~m15
+          %main
+          ~['~dibmet-narren' '~talsyx-talsud']
+          'presentation'
+      ==
+      :*  'd106'  %main  ::  demo day!
+          'Team 13'
+          ''
+          ''
+          ~2023.10.30..11.15.00  ~m15
+          %main
+          ~['~migrev-dolseg']
+          'presentation'
+      ==
+      :*  'd107'  %main  ::  demo day!
+          'Team 15'
+          ''
+          ''
+          ~2023.10.30..11.30.00  ~m15
+          %main
+          ~['~natfex-nilfep' '~masmut-folhex']
+          'presentation'
+      ==
+      :*  'd108'  %main  ::  demo day!
+          'Team 16'
+          ''
+          ''
+          ~2023.10.30..11.45.00  ~m15
+          %main
+          ~['paglud-nodsyn' '~padtes-hidsyn' '~namful-mocwen']
+          'presentation'
+      ==
+      :*  'd109'  %main  ::  demo day!
+          'Team 14'
+          ''
+          ''
+          ~2023.10.30..12.00.00  ~m15
+          %main
+          ~['~hodreb-racdem' '~pontus-fadpun']
+          'presentation'
+      ==
+      :*  'd110'  %main  ::  demo day!
+          'Team 4'
+          ''
+          ''
+          ~2023.10.30..12.15.00  ~m15
+          %main
+          ~['~dozreg-toplud' '~wanref-rappet' '~motdeg-bintul' '~datful-samned']
+          'virtual presentation'
+      ==
+      :*  'd111'  %main  ::  demo day!
+          'Hackathon Prize Ceremony'
+          'The committee of judges will present the winners of the Hackathon'
+          ''
+          ~2023.10.30..13.30.00  ~m30
+          %main
+          ~['Ted Blackman' 'Lane Rettig' 'Logan Allen' 'Neal Davis' 'Liam Fitgerald' 'Édouard U.' 'Marisa Rowland']
+          'presentation'
+      ==
+      :*  'd112'  %main  ::  demo day!
+          '%lick tutorial'
+          ''
+          ''
+          ~2023.10.30..14.00.00  ~h1
+          %main
+          ~['~mopfel-winrux']
+          'tutorial'
+      ==
+      :*  'd113'  %main  ::  demo day!
+          'Ares Tutorial'
+          ''
+          ''
+          ~2023.10.30..15.00.00  ~h1
+          %main
+          ~['Edward Amsden' 'Alex Shelkovnykov']
+          'tutorial'
+      ==
+      :*  'd114'  %main  ::  demo day!
+          '+abet & rudder in Gall'
+          'Working with the +abet Pattern and /lib/rudder in Gall'
+          ''
+          ~2023.10.30..16.30.00  ~m30
+          %main
+          ~['Neal Davis']
+          'tutorial'
+      ==
+    ::
+      :*  'd201'  %main  ::  demo day!
+          'Better Developer Tooling for Urbit'
+          ''
+          ''
+          ~2023.10.30..10.15.00  ~m30
+          %second
+          ~['William Sky']
+          'talk'
+      ==
+      :*  'd202'  %main  ::  demo day!
+          '%phoenix - agent backup & restore'
+          'Breaching your ship doesn\'t have to mean losing your data.'
+          ''
+          ~2023.10.30..10.45.00  ~m30
+          %second
+          ~['~midden-fabler']
+          'talk'
+      ==
+      :*  'd203'  %main  ::  demo day!
+          'Global P2P Securities Markets via Urbit'
+          'Trillions in securities will be tokenized over the coming years. In this talk, we present a proof of concept for compliant global P2P transactions of these assets using Urbit.'
+          ''
+          ~2023.10.30..11.30.00  ~m30
+          %second
+          ~['Eric Arsenault']
+          'talk'
+      ==
+      :*  'd204'  %main  ::  demo day!
+          '%quiz: property testing for bug-free Hoon code.'
+          ''
+          ''
+          ~2023.10.30..12.00.00  ~m30
+          %second
+          ~['~bithex-topnym']
+          'talk'
+      ==
+      :*  'd205'  %main  ::  demo day!
+          'Remilia Black Ops Division: The Art of Psyops'
+          'An unveiling of secret internal operations in the Remilia Corporation and a discussion about information warfare, culture building, and the necessity of psyops in the age of the Network.'
+          ''
+          ~2023.10.30..14.00.00  ~m30
+          %second
+          ~['Lukas (computer)' 'Michael Dragovic']
+          'talk'
+      ==
+      :*  'd206'  %main  ::  demo day!
+          '%wiki: Who needs Wikipedia?'
+          ''
+          ''
+          ~2023.10.30..14.00.00  ~m30
+          %second
+          ~['John Rillos']
+          'talk'
+      ==
+      :*  'd207'  %main  ::  demo day!
+          'Quorum Postmortem: An Overview of Urbit App Building in 2023'
+          ''
+          ''
+          ~2023.10.30..14.30.00  ~m30
+          %second
+          ~['Joseph Ciurej']
+          'talk'
+      ==
+      :*  'd208'  %main  ::  demo day!
+          'Innovation in Digital Art and Online Communities'
+          ''
+          ''
+          ~2023.10.30..15.15.00  ~m45
+          %second
+          ~['~rallup-wicsec']
+          'talk'
+      ==
+      :*  'd209'  %main  ::  demo day!
+          'Git on Urbit'
+          ''
+          ''
+          ~2023.10.30..16.00.00  ~m30
+          %second
+          ~['Mikołaj Paraniak']
+          'presentation'
+      ==
+  ==
+
+
+::
 --

@@ -35,7 +35,7 @@
     ?-  kind
         %main
       =;  strips=(list [=vid wen=@da lon=@dr])
-        (build-schedule-main [database now] [day strips] [our calendar b.groupies] |)
+        (build-schedule-main [database now] [day strips] [our calendar b.groupies] [| |])
       %+  sort
         %+  murn  ~(tap in calendar)
         |=  =vid

@@ -28,7 +28,7 @@
       long=@dr
       area=?(~ %main %second)
       host=(list @t)
-      kind=?(~ %talk %presentation %panel)
+      kind=?(~ %talk %presentation %panel @t)
   ==
 ::
 +$  week-event
@@ -187,10 +187,10 @@
   |=  $:  [dab=(map vid event) now=@da]
           [day=@da vez=(list [=vid wen=@da lon=@dr])]
           [our=@p calendar=(set vid) groupies=(jug vid @p)]
-          skip-first=?
+          [skip-first=? demo-day=?]
       ==
   ^-  marl
-  ?>  =(%main -:(~(gut by dates) day %week^''))
+  :: ?>  =(%main -:(~(gut by dates) day %week^''))
   ?:  =(~ vez)
     :_  ~
     ;div.schedule(style "text-align: center; margin-top: 2em;"):"Calm Day..."
@@ -251,17 +251,20 @@
             %2  "event main"
             %3  "event second"
           ==
+        =/  special=?  |(demo-day =(0 col))
         ;a(class class)
-            =href  ?:(=(0 col) "#" "event?id={(scow %uv vid)}")
+            =href  ?:(special "#" "event?id={(scow %uv vid)}")
+            =onclick  ?:(special "return false;" "")
             =style
           """
+          {?:(special "cursor: default;" "")}
           grid-column: {?:(=(0 col) "2 / 4" (a-co:co col))};
           grid-row: {(a-co:co s)} / {(a-co:co e)};
           """
           ;div.start
             ;b.time:"{(render-range (sub fro day) `(sub til day))}"
             ;h4:"{(trip name)}"
-            ;*  ?-  kind
+            ;*  ?+  kind  ~[;div.kind:"{(trip kind)}"]
                   ~  ~
                   %talk          ~[;div.kind.talk:"talk"]
                   %panel         ~[;div.kind.panel:"panel"]

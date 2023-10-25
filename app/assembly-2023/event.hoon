@@ -41,6 +41,20 @@
       ==
       ;article.event
         ;h2:"{(trip name)}"
+        :: ;*  ?.  =('w102' vid)  ~
+        ::     :_  ~
+        ::     ;a/"demo-day"
+        ::       =style
+        ::       """
+        ::       display: inline-block;
+        ::       background-color: var(--red);
+        ::       color: var(--yellow);
+        ::       padding: 4px;
+        ::       margin: 0.5em 0 0;
+        ::       border-radius: var(--radius);
+        ::       """
+        ::       ; Demo Day Schedule →
+        ::     ==
         ;table
           ;tr
             ;td:"When?"

@@ -1,18 +1,5 @@
 ::  assembly-2023: public schedule page
 ::
-::TODO
-::  - full schedule
-::    - if no date specified, load today, bounded to earliest or latest date at which there are events
-::    - render "today", "tomorow", "yesterday" headers, but always subtitle with date
-::    - show mutual icon/count if any
-::    - show star icon if attending
-::
-::TODO  priority:
-::  - individual event page
-::  - straight list for urbit week
-::  - test personal calendar & pals listing
-::  - pals page?? or maybe not, just through global schedule
-::
 /+  *assembly-2023, rudder
 ::
 ^-  (page:rudder state action)
@@ -76,8 +63,6 @@
       ?~  bb  |
       (gth u.aa u.bb)  ::  longer events first
     ==
-  :: =/  [tot=@ud coz=(jar @ud [=vid fro=@da til=@da])]
-  ::   (events-into-cols database strips)
   |^  [%page page]
   ::
   ++  page

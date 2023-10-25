@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 0509058
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 1c71a7f
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/0509058..master
+::  https://github.com/urbit/assembly2023/compare/1c71a7f..master
 ::
 /+  *assembly-2023
 ::
@@ -650,11 +650,20 @@
           ''
           ''
           ~2023.10.30..11.05.00  ~m10
-          ~
+          %main
           ~
           ''
       ==
       :*  'd002'  %main  ::  demo day!
+          'Break'
+          ''
+          ''
+          ~2023.10.30..11.15.00  ~m15
+          %second
+          ~
+          ''
+      ==
+      :*  'd003'  %main  ::  demo day!
           'Lunch Break (not provided)'
           ''
           ''
@@ -667,7 +676,7 @@
           'Demo Day Closing'
           ''
           ''
-          ~2023.10.30..16.45.00  ~m15
+          ~2023.10.30..17.00.00  ~m15
           ~
           ~
           ''

@@ -43,15 +43,21 @@
         ==
         ;a/"/assembly/schedule"
           ;img@"/assembly/db.svg"(width "40", height "40");
-          ;    All Events
+          ;   All Events
         ==
+        ;*  ?.  =(~2023.10.30 (sub now (mod now ~d1)))  ~
+            :_  ~
+            ;a/"/assembly/demo-day"
+              ;img@"/assembly/db.svg"(width "40", height "40");
+              ;   Demo Day
+            ==
         ;a/"/assembly/calendar"
           ;img@"/assembly/star.svg"(width "40", height "40");
-          ;    My Schedule
+          ;   My Schedule
         ==
         ;a/"/assembly/messages"
           ;img@"/assembly/bulb.svg"(width "40", height "40");
-          ;    Community Kiosk
+          ;   Community Kiosk
         ==
         :: ::TODO  re-enable..
         :: :: ;*  ?.  .^(? %gu /(scot %p our)/pals/(scot %da now)/$)  ~

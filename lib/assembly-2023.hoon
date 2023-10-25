@@ -246,6 +246,8 @@
         =/  s  (sub +((div (sub fro day) ~m5)) off)
         =/  e  (sub +((div (sub til day) ~m5)) off)
         =/  class=tape
+          ?:  |(=('d001' vid) =('d002' vid))
+            "event break"
           ?+  col  !!
             %0  "event break"
             %2  "event main"

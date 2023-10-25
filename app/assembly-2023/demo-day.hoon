@@ -46,7 +46,7 @@
     ^-  manx
     ;html
       ;+  (head 'Assembly 2023: Demo Day')
-      ;body
+      ;body.demo
         ;nav
           ;a.left/"#"(onclick "window.history.back();"):"← Back"
           ;a.middle/"/assembly":"↑ Home"

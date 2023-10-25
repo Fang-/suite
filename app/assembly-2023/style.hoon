@@ -144,6 +144,9 @@
       z-index: 2;
       font-size: 16pt;
     }
+    .demo .event {
+      font-size: 13pt;
+    }
     .event.break {
       background-color: var(--white);
       color: var(--black);
@@ -161,6 +164,9 @@
     }
     .event h4 {
       font-size: 18pt;
+    }
+    .demo .event h4 {
+      font-size: 15pt;
     }
     .event.break .start {
       background-color: var(--white);
@@ -201,6 +207,9 @@
       top: 0.2em;
       right: 0.4em;
       font-size: 14pt;
+    }
+    .demo .schedule.week .event .kind {
+      font-size: 12pt;
     }
     .schedule.week .event h5 {
       color: var(--red);

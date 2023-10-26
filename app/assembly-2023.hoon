@@ -10,7 +10,6 @@
 ::
 /~  pages   (page:rudder state action)  /app/assembly-2023
 ::
-::
 |%
 ++  host-ship  ~bitdeg
 +$  card  $+(card card:agent:gall)

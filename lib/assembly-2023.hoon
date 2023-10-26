@@ -349,7 +349,6 @@
 ++  main-labels
   |=  day=@da
   ^-  marl
-  ?.  =(%main -:(~(gut by dates) day %week^''))  ~
   %+  turn
     :~  [1 "Galaxy Stage" "label main"]
         [2 "Star Stage" "label second"]

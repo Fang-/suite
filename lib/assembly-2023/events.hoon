@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 1c71a7f
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 2d402f4
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/1c71a7f..master
+::  https://github.com/urbit/assembly2023/compare/2d402f4..master
 ::
 /+  *assembly-2023
 ::
@@ -165,20 +165,12 @@
           ~['Chase Van Etten' 'Roy Blackstone' 'Louis' 'Trent Steen' 'John Hyde']
           %panel
       ==
-      :*  'a117'  %main
-          'The Sovereign Stack'
-          'Software is eating the world, but it has made a Faustian bargain in its insatiable hunger. The software stack has become grotesquely centralized, with a minuscule number of players controlling most of the infrastructure. The Sovereign Stack is the stack of technologies that can liberate us, enabling the sovereign individual and communities of the 21 century. Urbit can play a pivotal role in this stack. We need to build them now, so they are ready then.'
-          ''
-          ~2023.10.28..17.00.00  ~m30
-          %second
-          ~['@odysseas']
-          %talk
-      ==
+      ::  rip 'a117' the sovereign stack
       :*  'a118'  %main
           'Decentralized Medicine'
+          'On the heels of part three of his podcast series with Rick Rubin featuring presidential candidate Robert F Kennedy, Jr., renowned neurosurgeon, Bitcoiner and longevity clinician, Dr. Jack Kruse will speak about medical freedom, decentralized medicine and the quantum relationship between health and nature (light, water, magnetism). He will also discuss the groundbreaking legislative framework he is working on to counter what happened during the COVID-19 pandemic.'
           ''
-          ''
-          ~2023.10.28..17.30.00  ~m30
+          ~2023.10.28..17.00.00  ~m30
           %second
           ~['Jack Kruse']
           %talk
@@ -360,6 +352,15 @@
           %talk
       ==
       ::  rip 'a220' no agency book presentation
+      :*  'a221'  %main
+          'BlimpDAO'
+          ''
+          ''
+          ~2023.10.29..17.15.00  ~m30
+          %second
+          ~['~poldec-tonteg']
+          %presentation
+      ==
     ::
       :*  'a299'  %main
           'Closing drinks at Convento do Beato'
@@ -845,15 +846,7 @@
           ~['~bithex-topnym']
           'talk'
       ==
-      :*  'd205'  %main  ::  demo day!
-          'Remilia Black Ops Division: The Art of Psyops'
-          'An unveiling of secret internal operations in the Remilia Corporation and a discussion about information warfare, culture building, and the necessity of psyops in the age of the Network.'
-          ''
-          ~2023.10.30..14.00.00  ~m30
-          %second
-          ~['Lukas (computer)' 'Michael Dragovic']
-          'talk'
-      ==
+      ::  rip 'd205' remilia black ops
       :*  'd206'  %main  ::  demo day!
           '%wiki: Who needs Wikipedia?'
           ''

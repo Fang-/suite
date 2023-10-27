@@ -344,7 +344,7 @@
     ;title:"{(trip title)}"
     ;meta(charset "utf-8");
     ;meta(name "viewport", content "width=device-width, initial-scale=1");
-    ;link(rel "manifest", href "/assembly/manifest.json");
+    ;link(rel "manifest", href "/assembly/manifest.json", crossorigin "use-credentials");
     ;link(rel "icon", type "image/png", sizes "any", href "https://pal.dev/props/assembly/tile.png");
     ;link(rel "stylesheet", type "text/css", href "/assembly/style.css");
   ==

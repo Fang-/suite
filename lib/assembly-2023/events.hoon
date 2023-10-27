@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 2d402f4
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 1a1f73c
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/2d402f4..master
+::  https://github.com/urbit/assembly2023/compare/1a1f73c..master
 ::
 /+  *assembly-2023
 ::
@@ -84,7 +84,7 @@
           %panel
       ==
       :*  'a108'  %main
-          'Holium'
+          'Holium: The First Network State Starts In A Group Chat'
           ''
           ''
           ~2023.10.28..17.00.00  ~m30
@@ -105,7 +105,7 @@
           'The Machine War'
           'Mars Review of Books editor Noah Kumin discusses his book The Machine War, an Urbit-centric history of computing, with publishing veteran Daniel Lisi.'
           ''
-          ~2023.10.28..11.00.00  ~m30
+          ~2023.10.29..15.45.00  ~m30  ::  !
           %second
           ~['Noah Kumin' 'Daniel Lisi']
           %presentation
@@ -319,7 +319,7 @@
           'Turf – The Birth of a New World'
           'Urbit now has its own 2D pixel-art metaverse, where anyone can explore and add to the burgeoning network of turfs. It\'s not just another chat app—it\'s free real estate.'
           ''
-          ~2023.10.29..15.45.00  ~m30
+          ~2023.10.28..11.00.00  ~m30  ::  !
           %second
           ~['John Hyde']
           %presentation
@@ -330,7 +330,7 @@
           ''
           ~2023.10.29..16.30.00  ~m45
           %second
-          ~['Daniel Keller' 'Jon Rafman' 'Milady Sonora Sprite']
+          ~['Daniel Keller' 'Jon Rafman' 'Milady Sonora Sprite' 'Troy Therrien']
           %panel
       ==
       :*  'a218'  %main
@@ -668,7 +668,7 @@
           'Lunch Break (not provided)'
           ''
           ''
-          ~2023.10.30..12.30.00  ~h1
+          ~2023.10.30..12.15.00  ~h1.m15
           ~
           ~
           ''
@@ -693,8 +693,8 @@
           ''
       ==
       :*  'd102'  %main  ::  demo day!
-          'Team 1'
-          ''
+          '%seax'
+          'Search engine for Urbit'
           ''
           ~2023.10.30..10.05.00  ~m15
           %main
@@ -702,8 +702,8 @@
           'presentation'
       ==
       :*  'd103'  %main  ::  demo day!
-          'Team 3'
-          ''
+          '%mentat'
+          'AI personal assistant on Urbit'
           ''
           ~2023.10.30..10.20.00  ~m15
           %main
@@ -711,8 +711,8 @@
           'presentation'
       ==
       :*  'd104'  %main  ::  demo day!
-          'Team 8'
-          ''
+          'Pharos'
+          'Bug reporting for Urbit apps'
           ''
           ~2023.10.30..10.35.00  ~m15
           %main
@@ -720,8 +720,8 @@
           'presentation'
       ==
       :*  'd105'  %main  ::  demo day!
-          'Team 9'
-          ''
+          'BizBaz'
+          'Decentralized marketplace'
           ''
           ~2023.10.30..10.50.00  ~m15
           %main
@@ -729,8 +729,8 @@
           'presentation'
       ==
       :*  'd106'  %main  ::  demo day!
-          'Team 13'
-          ''
+          '%eyas'
+          'Light+capable mobile friendly editor'
           ''
           ~2023.10.30..11.15.00  ~m15
           %main
@@ -738,8 +738,8 @@
           'presentation'
       ==
       :*  'd107'  %main  ::  demo day!
-          'Team 15'
-          ''
+          'Edith'
+          'Code editor for Hoon'
           ''
           ~2023.10.30..11.30.00  ~m15
           %main
@@ -747,28 +747,20 @@
           'presentation'
       ==
       :*  'd108'  %main  ::  demo day!
-          'Team 16'
-          ''
+          '%yijing'
+          'Oracle casting and social divination'
           ''
           ~2023.10.30..11.45.00  ~m15
           %main
           ~['paglud-nodsyn' '~padtes-hidsyn' '~namful-mocwen']
           'presentation'
       ==
-      :*  'd109'  %main  ::  demo day!
-          'Team 14'
-          ''
+      ::  rip 'd109' team 14
+      :*  'd110'  %main  ::  demo day!
+          'UWasm'
+          'Web Assembly interpreter for Urbit'
           ''
           ~2023.10.30..12.00.00  ~m15
-          %main
-          ~['~hodreb-racdem' '~pontus-fadpun']
-          'presentation'
-      ==
-      :*  'd110'  %main  ::  demo day!
-          'Team 4'
-          ''
-          ''
-          ~2023.10.30..12.15.00  ~m15
           %main
           ~['~dozreg-toplud' '~wanref-rappet' '~motdeg-bintul' '~datful-samned']
           'virtual presentation'

@@ -273,6 +273,7 @@
                   %presentation  ~[;div.kind.presentation:"presentation"]
                 ==
             ;+  =+  max=(mul 12 (sub e (min (add s 1) (dec e))))
+                =?  max  demo-day  (mul 2 max)
                 ?:  (lth (met 3 desc) max)
                   ;p:"{(trip desc)}"
                 ;p:"{(trip (end 3^max desc))}..."

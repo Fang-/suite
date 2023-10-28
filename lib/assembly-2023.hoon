@@ -187,7 +187,7 @@
   |=  $:  [dab=(map vid event) now=@da]
           [day=@da vez=(list [=vid wen=@da lon=@dr])]
           [our=@p calendar=(set vid) groupies=(jug vid @p)]
-          [skip-first=? demo-day=?]
+          [skip-first=? demo-day=? prior=?(%schedule %calendar)]
       ==
   ^-  marl
   :: ?>  =(%main -:(~(gut by dates) day %week^''))
@@ -255,7 +255,7 @@
           ==
         =/  special=?  |(demo-day =(0 col))
         ;a(class class)
-            =href  ?:(special "#" "event?id={(scow %uv vid)}")
+            =href  ?:(special "#" "event?id={(scow %uv vid)}&prior={(trip prior)}")
             =onclick  ?:(special "return false;" "")
             =style
           """

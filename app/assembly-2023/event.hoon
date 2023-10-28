@@ -30,13 +30,19 @@
   ?~  vet=(~(get by database) vid)
     [%move '.']
   =,  u.vet
+  =/  prior=tape
+    =+  p=(~(gut by args) 'prior' 'schedule')
+    ?+  p  "/assembly/schedule?day={(scow %da (sub when (mod when ~d1)))}"
+      %schedule  "/assembly/schedule?day={(scow %da (sub when (mod when ~d1)))}"
+      %calendar  "/assembly/calendar?day={(scow %da (sub when (mod when ~d1)))}"
+    ==
   :-  %page
   ^-  manx
   ;html
     ;+  (head (cat 3 'Assembly 2023: ' name))
     ;body
       ;nav
-        ;a.left/"#"(onclick "window.history.back();"):"← Back"
+        ;a.left/"{prior}":"← Back"
         ;a.middle/"/assembly":"↑ Home"
       ==
       ;article.event

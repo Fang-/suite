@@ -30,7 +30,7 @@
   =/  demo-db  (~(gas by *(map @ event)) demo-day:events)
   =/  schedule=marl
     =;  strips=(list [=vid wen=@da lon=@dr])
-      (build-schedule-main [demo-db now] [day strips] [our ~ ~] [& &])
+      (build-schedule-main [demo-db now] [day strips] [our ~ ~] [& & %schedule])
     %+  sort
       %+  murn  ~(tap by demo-db)
       |=  [=vid v=event]

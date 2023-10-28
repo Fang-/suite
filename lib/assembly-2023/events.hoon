@@ -353,8 +353,8 @@
       ==
       ::  rip 'a220' no agency book presentation
       :*  'a221'  %main
-          'BlimpDAO'
-          ''
+          'Meme First Engineering w/ BlimpDAO'
+          'Come learn about the mission of a group of hardened Urbiters to restore the world\'s most kino form of air travel...one meme at a time'
           ''
           ~2023.10.29..17.15.00  ~m30
           %second

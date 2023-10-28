@@ -91,7 +91,7 @@
   |=  ut=@da
   ^-  @da
   ?:  (lth ut ~2023.10.29..02.00.00)  ::  dst
-    (sub ut ~h1)
+    (add ut ~h1)
   ut
 ::
 ::  rendering

@@ -217,7 +217,6 @@
     ;*  (grid-lines dif)
     ;*  ::  if today, add time indicator
         ::
-        ::TODO  update me with javascript too!
         =+  fro=(add day (mul ~h1 fro.ran))
         =+  til=(add day (mul ~h1 til.ran))
         ?.  &((gth now fro) (lth now til))  ~
@@ -229,11 +228,26 @@
         =+  row=+((div (sub now fro) ~m5))
         =+  pec=(div (mul 100 (mod now ~m5)) ~m5)
         :_  ~
-        ;div.now(style "grid-row: {(a-co:co row)};");
+        ;div#now.now(style "grid-row: {(a-co:co row)};");
         :: =+  dif=(sub til fro)
         :: =+  pec=(div (mul 100.000 (sub now (add fro ~h1))) dif)
         :: :_  ~
         :: ;div.now(style "top: calc(4.8em + {(scow %ud pec)}%);");
+    ;+  =-  ;script:"{^~((trip -))}"
+        '''
+        const line = document.getElementById('now');
+        if (line) {
+          const start = Date.now() - (Date.now() % 300000);
+          const first = parseInt(line.style['grid-row']);
+          let upd = () => {
+            const now = Date.now();
+            const dif = Math.floor((now - start) / 300000);
+            line.style['grid-row'] = first + dif;
+            setTimeout(upd, 60000);
+          }
+          setTimeout(upd, 60000);
+        }
+        '''
     ;*  ^-  marl
         %-  zing
         %+  turn  (sort ~(tap by coz) aor)

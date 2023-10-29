@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 1a1f73c
+::NOTE  data from the assembly.js & urbitWeek.js as of commit c500bce
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/1a1f73c..master
+::  https://github.com/urbit/assembly2023/compare/c500bce..master
 ::
 /+  *assembly-2023
 ::
@@ -390,7 +390,7 @@
           'Demo Day is where our Assembly Hackathon and the u/acc accelerator culminate, giving you the first glance at community projects.'
           'This is an official side-event organized by the Urbit Foundation. The day will start with presentations from our Hackathon contestants. After lunch our committee of judges will announce the winners and present prizes. The u/acc pitches will be given in the afternoon to an invite-only group of qualified investors, but open areas for hanging out, networking, and giving lightning talks will be available throughout the afternoon.'
           ~2023.10.30..09.00.00  `~h8
-          ['TBA' ~]
+          ['Palácio de Tancos' `[%url 'https://maps.app.goo.gl/eV5eV9cbh4foSheL7']]
           ~
           'Demo Day'
           %-  some

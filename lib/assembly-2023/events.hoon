@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit c500bce
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 0979706
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/c500bce..master
+::  https://github.com/urbit/assembly2023/compare/0979706..master
 ::
 /+  *assembly-2023
 ::
@@ -366,7 +366,17 @@
           'Closing drinks at Convento do Beato'
           ''
           ''
-          ~2023.10.29..18.45.00  ~h2.m15
+          ~2023.10.29..18.45.00  ~h1
+          ~
+          ~['Assembly Lisboa']
+          ~
+      ==
+    ::
+      :*  'a290'  %main
+          'Official Assembly Afterparty'
+          'Come join us at Palácio de Tancos from 9 for the official Assembly Afterparty. Drinks are cold and ready and two are on us. Free entry for everyone with an Assembly wristband, otherwise €20 fee (available at the ticket page and the door)'
+          ''
+          ~2023.10.29..21.00.00  ~h5
           ~
           ~['Assembly Lisboa']
           ~
@@ -696,7 +706,7 @@
           '%seax'
           'Search engine for Urbit'
           ''
-          ~2023.10.30..10.05.00  ~m15
+          ~2023.10.30..11.45.00  ~m15
           %main
           ~['~racfer-hattes' '~dopnyr-figbud']
           'presentation'
@@ -714,7 +724,7 @@
           'Pharos'
           'Bug reporting for Urbit apps'
           ''
-          ~2023.10.30..10.35.00  ~m15
+          ~2023.10.30..10.05.00  ~m15
           %main
           ~['~normul-postem' '~lonhep-tamfeb' '~dannul-bortux']
           'presentation'
@@ -723,7 +733,7 @@
           'BizBaz'
           'Decentralized marketplace'
           ''
-          ~2023.10.30..10.50.00  ~m15
+          ~2023.10.30..10.35.00  ~m15
           %main
           ~['~dibmet-narren' '~talsyx-talsud']
           'presentation'
@@ -750,7 +760,7 @@
           '%yijing'
           'Oracle casting and social divination'
           ''
-          ~2023.10.30..11.45.00  ~m15
+          ~2023.10.30..10.50.00  ~m15
           %main
           ~['paglud-nodsyn' '~padtes-hidsyn' '~namful-mocwen']
           'presentation'

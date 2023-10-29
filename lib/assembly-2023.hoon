@@ -239,6 +239,11 @@
         if (line) {
           const start = Date.now() - (Date.now() % 300000);
           const first = parseInt(line.style['grid-row']);
+          if ( first > 12 ) {
+            line.style['grid-row'] = first - 3;
+            window.location.href = '#now';
+            line.style['grid-row'] = first;
+          }
           let upd = () => {
             const now = Date.now();
             const dif = Math.floor((now - start) / 300000);

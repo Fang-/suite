@@ -2,7 +2,6 @@
 ::
 /+  *assembly-2023, rudder, events=assembly-2023-events
 ::
-::
 ^-  (page:rudder state action)
 |_  [bowl:gall order:rudder state]
 ++  argue

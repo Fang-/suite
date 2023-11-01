@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit 0979706
+::NOTE  data from the assembly.js & urbitWeek.js as of commit
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/0979706..master
+::  https://github.com/urbit/assembly2023/compare/4d6795e..master
 ::
 /+  *assembly-2023
 ::
@@ -564,6 +564,16 @@
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
           'Installation'
           `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
+      ==
+      :*  'w306'  %week
+          'Urbit Fight Club'
+          'Meet us at he dojo. Fight, practice or compete, or cheer the champions on. Make bets on %alphabet and win big on the underdogs.'
+          ''
+          ~2023.11.1..11.30.00  `~h2.m30
+          ['Barao team, Travessa de Campo de Ourique, 1350-051 Lisboa' ~]
+          ~
+          'Fight Club'
+          ~
       ==
   ==
 ::

@@ -1,8 +1,8 @@
 ::
-::NOTE  data from the assembly.js & urbitWeek.js as of commit
+::NOTE  data from the assembly.js & urbitWeek.js as of commit 6250de2
 ::
 ::TODO  keep track:
-::  https://github.com/urbit/assembly2023/compare/4d6795e..master
+::  https://github.com/urbit/assembly2023/compare/6250de2..master
 ::
 /+  *assembly-2023
 ::
@@ -525,16 +525,6 @@
           'Float Tank'
           ~
       ==
-      :*  'w302'  %week
-          'Excursions'
-          'A day-long workshop, algorithmic rave and live NFT mint. IRL and on Urbit.'
-          'The first half of the day is a hackathon / workshop introducing the Hydra live coding visual environment and the agent we\'ve built to introduce Hydra compatibility on Urbit. The second half of the day is an ambient chill out room in which community members perform their live Hydra sets alongside special musical guests.'
-          ~2023.11.1..14.00.00  `~h7
-          ['Urbit After Hours' ~]
-          `'https://i.giphy.com/media/7nWUjXgFU4OUcR4ErX/giphy-downsized-large.gif'
-          'Wellness Rave'
-          `['' 'Link ↗' 'https://lu.ma/sym4u2hd']
-      ==
       :*  'w303'  %week
           'All Saints Day Fatima Pilgrimage'
           'Join other Catholic Martians at Fatima on All Saints Day.'
@@ -613,10 +603,10 @@
           'Galaxy Brain Chess Tournament'
           'A casual outdoor chess tournament with a view'
           'Come test your skill in the game of kings against fellow Urbiters and unsuspecting bystanders. Winner and runner-up eligible for prizes and bragging rights.'
-          ~2023.11.2..11.00.00  ~
-          ['Jardim Botto Machado' ~]
+          ~2023.11.2..12.00.00  `~h5
+          ['Jardim Constantino' ~]
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.9.19..02.28.55-galaxy%20brain.png'
-          'Chess'
+          'Games'
           ~
       ==
       :*  'w405'  %week
@@ -628,6 +618,16 @@
           `'https://sfo2.digitaloceanspaces.com/poldec-tonteg-content/poldec-tonteg/2023.10.20..22.19.01-C80449E6-EEE2-47A9-A7DD-CC828A63D417.jpeg'
           'Installation'
           `['' 'Register ↗' 'https://lu.ma/lx2gfwq8']
+      ==
+      :*  'w302'  %week
+          'Excursions'
+          'A day-long workshop, algorithmic rave and live NFT mint. IRL and on Urbit.'
+          'The first half of the day is a hackathon / workshop introducing the Hydra live coding visual environment and the agent we\'ve built to introduce Hydra compatibility on Urbit. The second half of the day is an ambient chill out room in which community members perform their live Hydra sets alongside special musical guests.'
+          ~2023.11.1..14.00.00  `~h7
+          ['Urbit After Hours' ~]
+          `'https://i.giphy.com/media/7nWUjXgFU4OUcR4ErX/giphy-downsized-large.gif'
+          'Workshop'
+          `['' 'Link ↗' 'https://lu.ma/sym4u2hd']
       ==
   ==
 ::

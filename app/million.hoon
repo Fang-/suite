@@ -216,10 +216,34 @@
       ?.  &(=(host our.bowl) ?=(%buy -.action))  ~
       ::NOTE  we dont' really want the /sur/chat dependency, and this is
       ::      host-only logic anyway, so keeping this untyped is Fine™
-      =+  ~[ship+ship.action 'wants to buy' code+(crip <~(tap in spos.action)>)]
-      ~&  >  -
-      =+  [aide [our now]:bowl %add ~ our.bowl now.bowl %story ~ -]
-      [%pass /notify %agent [our.bowl %chat] %poke %dm-action !>(-)]~
+      =/  content
+        ~[ship+ship.action 'wants to buy' code+(crip <~(tap in spos.action)>)]
+      ~&  >  content
+      =;  =cage
+        [%pass /notify %agent [our.bowl %chat] %poke cage]~
+      ?.  .^(? %gu /(scot %p our.bowl)/channels/(scot %da now.bowl)/$)
+        ::  interact with the old (pre-2024) chat
+        ::
+        =-  [%dm-action !>(-)]
+        [aide [our now]:bowl %add ~ our.bowl now.bowl %story ~ content]
+      ?:  =-  =(`%0 (~(get by -) ~.chat-dms))
+          .^  (map @ta *)
+              %gx
+              (scot %p our.bowl)
+              %chat
+              (scot %da now.bowl)
+              /~/negotiate/version/noun
+          ==
+        ::  we're post-upgrade, and know the version of chat we're talking to,
+        ::  send a %chat-dm-action with the appropriate content
+        ::
+        =-  [%chat-dm-action !>(-)]
+        [aide [our now]:bowl %add [[%inline content]~ our.bowl now.bowl] ~ ~]
+      ::  we don't know what version chat is running at, and so cannot
+      ::  interact with it reliably
+      ::
+      ~&  >>>  content
+      ~
     ::  local logic (apply as %unacked, send to host)
     ::
     ::XX  below assumed good

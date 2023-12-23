@@ -31,13 +31,20 @@
           msg=(unit [o=? =@t])
       ==
   ^-  reply:rudder
+  =/  title=tape
+    ?:  &((gth now ~2023.12.24..18.00.00) (lth now ~2023.12.27))
+      "tidings and greetings"
+    "rumors and gossip"
   |^  [%page page]
   ::
   ++  style
     =;  s=@t
-      ?.  &((gth now ~2023.4.1) (lth now ~2023.4.2..06.00.00))  s
       %^  cat  3  s
-      'body{background-image:linear-gradient(345deg, #99eaea, #8fdb78, #a0a0e5, #7bdfdf);}'
+      ?:  &((gth now ~2023.4.1) (lth now ~2023.4.2..06.00.00))
+        'body{background-image:linear-gradient(345deg, #99eaea, #8fdb78, #a0a0e5, #7bdfdf);}'
+      ?:  &((gth now ~2023.12.24..18.00.00) (lth now ~2023.12.27))
+        'body{background-image:linear-gradient(345deg, lightgreen, green, red, orange);}'
+      ''
     '''
     * { margin: 0; padding: 0; color: #fff0ff; font-family: sans-serif; }
     .status, .warn { margin: 1em; clear: both; }
@@ -107,13 +114,13 @@
     ^-  manx
     ;html
       ;head
-        ;title:"rumors and gossip"
+        ;title:"{title}"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;style:"{(trip style)}"
       ==
       ;body
-        ;h1:"rumors and gossip"
+        ;h1:"{title}"
 
         ;+  status
 

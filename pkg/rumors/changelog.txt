@@ -1,5 +1,8 @@
 rumors
 
+v1.2.3, ~2023.12.23
+- christmas update.
+
 v1.2.2, ~2023.09.17
 - fix a bug that prevented adding new entries to the wordfilter.
 

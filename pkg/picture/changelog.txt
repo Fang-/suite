@@ -1,5 +1,8 @@
 picture
 
+v1.1.4, ~2023.12.23
+- return of the christmas frame.
+
 v1.1.3, ~2022.10.15
 - prevent other ships from setting your picture.
 

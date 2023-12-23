@@ -204,7 +204,7 @@
   ?:  ?:  =(~ avoid)  |
       %+  levy  avoid
       |=  =@t
-      ?=(^ (find (trip t) (cass (trip what.rumor))))
+      ?=(^ (find (cass (trip t)) (cass (trip what.rumor))))
     [~ this]
   :-  [%give %fact [/rumors]~ %rumor !>(rumor)]~
   =-  this(fresh -)

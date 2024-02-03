@@ -1,10 +1,10 @@
 ::  sc'o're scoreboard page
 ::
-/-  chat
+/-  channels
 /+  *pal, rudder
 ::
-^-  (page:rudder (mip ship feel:chat @ud) ~)
-|_  [=bowl:gall * bits=(mip ship feel:chat @ud)]
+^-  (page:rudder (mip ship react:channels @ud) ~)
+|_  [=bowl:gall * bits=(mip ship react:channels @ud)]
 ++  build
   |=  [args=(list [k=@t v=@t]) msg=(unit [? @t])]
   =?  bits  !(~(has by bits) our.bowl)
@@ -36,10 +36,10 @@
       (entry-to-line our.bowl (~(got by bits) our.bowl))
   ::
   +$  line
-    [who=ship sum=@ud per=(list [f=feel:chat c=@ud])]
+    [who=ship sum=@ud per=(list [f=react:channels c=@ud])]
   ::
   ++  entry-to-line
-    |=  [who=ship all=(map feel:chat @ud)]
+    |=  [who=ship all=(map react:channels @ud)]
     ^-  line
     :+  who
       (~(rep by all) |=([[* a=@ud] s=@ud] (add s a)))
@@ -297,7 +297,7 @@
     ==
   ::
   ++  react
-    |=  [f=feel:chat c=@ud]
+    |=  [f=react:channels c=@ud]
     ^-  manx
     ;div.bit
       ;em-emoji(shortcodes (trip f), fallback "?");

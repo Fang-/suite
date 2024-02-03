@@ -5,144 +5,158 @@
 ::
 ::TODO  could be fun to show "rare gets", reacts that have only been given once
 ::
-/-  chat, groups
-/+  *pal, rudder,
+/-  channels, groups
+/+  *pal, rudder, negotiate,
     dbug, verb, default-agent
 ::
 ::NOTE  rudder a little bit overkill for this, since we only have
 ::      two read-only pages...
-/~  pages  (page:rudder (mip ship feel:chat @ud) ~)  /app/scooore/webui
-::
+/~  pages  (page:rudder (mip ship react:channels @ud) ~)  /app/scooore/webui
 ::
 |%
-+$  state-0
-  $:  %0
-      bits=(mip ship feel:chat @ud)                     ::  react tallies
-      seen=(mip id:chat ship feel:chat)                 ::  known reacts
-      live=(map flag:chat @da)                          ::  chats & last-heard
++$  state-1
+  $:  %1
+      bits=(mip ship react:channels @ud)                ::  react tallies
+      seen=(mip mixed-id ship react:channels)           ::  known reacts
+      live=(map nest:channels @da)  ::NOTE  unused rn   ::  last-heard per chan
+  ==
+::
++$  mixed-id
+  $%  [%post id=id-post:channels]
+      [%reply op=id-post:channels id=id-reply:channels]
   ==
 ::
 +$  card  card:agent:gall
-::
-++  flew
-  |=  [=flag:chat last=(unit @da)]
-  ^-  path
-  =-  [%chat (scot %p p.flag) q.flag %updates -]
-  ?~  last  /
-  /(scot %da u.last)
 --
 ::
-=|  state-0
+%-  %-  agent:negotiate
+    :+  &
+      ~
+    [%channels^[~.channels^%1 ~ ~] ~ ~]
+::
+%-  agent:dbug
+%+  verb  &
+::
+=|  state-1
 =*  state  -
+::
+=>
 ::
 =|  cards=(list card)
 |_  =bowl:gall
 +*  this  .
 ++  peel
-  |=  =path
-  [(scot %p our.bowl) %chat (scot %da now.bowl) path]
+  |=  [=dude:gall =path]
+  [(scot %p our.bowl) dude (scot %da now.bowl) path]
 ::
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card this(cards [card cards]))
 ::
 ++  peer
-  |=  =flag:chat
-  ^+  this
-  =/  =wire  /chat/(scot %p p.flag)/[q.flag]
+  |=  [=wire =dude:gall =path]
   =/  have=?
-    %-  ~(any in ~(key by wex.bowl))
-    |=([w=^wire *] =(w wire))
+    (~(has by wex.bowl) wire our.bowl dude)
   ?:  have  this
-  %-  emit
-  =;  =path
-    [%pass wire %agent [our.bowl %chat] %watch path]
-  =-  [%chat (scot %p p.flag) q.flag %updates -]
-  =/  last=(unit @da)  (~(get by live) flag)
-  ?~  last  /
-  /(scot %da u.last)
+  (emit %pass wire %agent [our.bowl dude] %watch path)
+::
+++  peer-channels
+  (peer /channels %channels /)
 ::
 ++  init
-  ^+  this
   =.  this
     %-  emit
     [%pass /eyre/bind %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
   =.  this
     %-  emit
     [%pass /groups %agent [our.bowl %groups] %watch /groups]
+  ::NOTE  once this subscription gives us an ack, we will call +count-all.
+  ::      that way, we know we're talking to a matching/expected version.
+  peer-channels
+::
+++  count-all
+  ^+  this
   ::
-  ~>  %bout.[0 'scooore: init']
-  =/  chad=(list [=flag:chat =chat:chat])
-    ?.  .^(? %gu (peel /$))  ~
-    %~  tap  by
-    .^((map flag:chat chat:chat) %gx (peel /chats/chats))
-  ::  for every chat channel, subscribe to updates,
-  ::  and accumulate reacts into :new, updating :bits only at the end
+  ~>  %bout.[0 'scooore: counting all reacts']
+  =/  chad=(list nest:channels)
+    ?.  .^(? %gu (peel %channels /$))  ~
+    %~  tap  in
+    %~  key  by
+    .^(channels:channels %gx (peel %channels /channels/channels))
+  ::  for every channel, accumulate reacts into :new,
+  ::  updating :bits only at the end
   ::
-  =|  new=(map [ship feel:chat] @ud)
-  =|  saw=(map [id:chat ship] feel:chat)
+  =|  new=(map [ship react:channels] @ud)
+  =|  saw=(map [mixed-id ship] react:channels)
   |-
   ?~  chad
     %_  this
         bits
       %-  ~(rep by new)
-      |=  [[[s=ship f=feel:chat] c=@ud] =_bits]
+      |=  [[[s=ship f=react:channels] c=@ud] =_bits]
       (~(put bi bits) s f (add c (~(gut bi bits) s f 0)))
     ::
         seen
       %-  ~(rep by saw)
-      |=  [[[i=id:chat s=ship] f=feel:chat] =_seen]
+      |=  [[[i=mixed-id s=ship] f=react:channels] =_seen]
       (~(put bi seen) i s f)
     ==
   ::
-  =*  flag=flag:chat    flag.i.chad
-  =*  writs=writs:chat  wit.pact.chat.i.chad
+  =*  nest=nest:channels  i.chad
+  =/  =posts:channels
+    =<  posts
+    .^  paged-posts:channels
+      %gx  (scot %p our.bowl)  %channels  (scot %da now.bowl)
+      =,  nest
+      ::TODO  tune? could /newer/[gut-by-live]/999.999/post instead, maybe
+      /[kind]/(scot %p ship)/[name]/posts/newest/999.999/post/channel-posts
+    ==
   ::
-  =/  when=@da
-    =;  upd=(unit update:chat)
-      (fall (bind upd head) *@da)
-    (ram:log-on:chat log.chat.i.chad)
-  =.  live  (~(put by live) flag when)
-  =.  this  (peer flag)
+  =.  live  (~(put by live) nest now.bowl)
   ::
   =;  [[nu=_new su=_saw] *]
     $(new nu, saw su, chad t.chad)
-  %^  %-  dip:on:writs:chat
-      $:  new=(map [ship feel:chat] @ud)
-          saw=(map [id:chat ship] feel:chat)
-      ==
-      writs
+  %^    %-  dip:on-posts:channels
+        $:  new=(map [ship react:channels] @ud)
+            saw=(map [mixed-id ship] react:channels)
+        ==
+      posts
     [new saw]
-  |=  [[=_new =_saw] [* =writ:chat]]
-  ^-  [(unit writ:chat) ? [_new _saw]]
-  :+  `writ  |
-  %-  ~(rep by feels.writ)
-  |=  [[s=ship f=feel:chat] [=_new =_saw]]
-  :_  (~(put by saw) [id.writ s] f)
+  |=  [[=_new =_saw] [pid=id-post:channels post=(unit post:channels)]]
+  ^-  [(unit _post) ? [_new _saw]]
+  :+  `post  |
+  ?~  post  [new saw]
+  =/  [nn=_new ss=_saw]
+    %-  ~(rep by reacts.u.post)
+    |=  [[s=ship r=react:channels] [=_new =_saw]]
+    :_  (~(put by saw) [[%post pid] s] r)
+    %+  ~(put by new)
+      [author.u.post r]
+    +((~(gut by new) [author.u.post r] 0))
+  =.  new  nn
+  =.  saw  ss
+  =<  [new saw]
+  %^    %-  dip:on-replies:channels
+        $:(=_new =_saw)
+      replies.u.post
+    [new saw]
+  |=  [[=_new =_saw] [rid=id-reply:channels =reply:channels]]
+  ^-  [(unit _reply) ? [=_new =_saw]]
+  :+  `reply  |
+  %-  ~(rep by reacts.reply)
+  |=  [[s=ship r=react:channels] [=_new =_saw]]
+  :_  (~(put by saw) [[%reply pid rid] s] r)
   %+  ~(put by new)
-    [author.writ f]
-  +((~(gut by new) [author.writ f] 0))
+    [author.reply r]
+  +((~(gut by new) [author.reply r] 0))
 ::
 ++  hear
-  |=  [fal=flag:chat wen=time mid=id:chat fro=ship fel=(unit feel:chat)]
+  |=  [=nest:channels wen=time mid=mixed-id fro=ship fel=(unit react:channels) for=ship]
   ^+  this
-  =/  for=ship
-    =<  author
-    =;  =path  .^([time writ:chat] %gx (peel path))
-    :~  %chat
-        (scot %p p.fal)
-        q.fal
-        %writs
-        %writ
-        %id
-        (scot %p p.mid)
-        (scot %ud q.mid)
-        %writ
-    ==
   ::  do not count reacts given on one's own messages
   ::
   ?:  =(for fro)  this
   ::
-  =/  had=(unit feel:chat)
+  =/  had=(unit react:channels)
     (~(get bi seen) mid fro)
   ?:  =(had fel)  this
   ::  if we had already counted a react from this ship on this msg,
@@ -166,16 +180,70 @@
     ?~  fel  (~(del bi seen) mid fro)
     (~(put bi seen) mid fro u.fel)
   =.  live
-    (~(put by live) fal wen)
+    (~(put by live) nest wen)
   ::
   ::TODO  maybe emit diff %fact?
   this
 ::
-++  kick  peer
+++  hear-many  ::  run +hear for added & removed reacts
+  |=  [=nest:channels wen=time mid=mixed-id for=(unit ship) rez=(map ship react:channels)]
+  ^+  this
+  =/  for=ship
+    ?^  for  u.for
+    (fetch-author nest mid)
+  =;  dif=(list [=ship rec=(unit react:channels)])
+    |-
+    ?~  dif  this
+    =.  this
+      (hear nest wen mid ship.i.dif rec.i.dif for)
+    $(dif t.dif)
+  =/  had=(map ship react:channels)
+    (~(gut by seen) mid ~)
+  %+  murn  ~(tap by (~(uni by had) rez))
+  |=  [s=ship r=react:channels]
+  ^-  (unit [ship (unit react:channels)])
+  ?~  o=(~(get by had) s)  `[s `r]
+  ?.    (~(has by rez) s)  `[s ~]
+  ?.  =(u.o r)             `[s `r]
+  ~
+::
+++  fetch-author
+  |=  [=nest:channels mid=mixed-id]
+  ^-  ship
+  ?-  -.mid
+      %post
+    =<  author
+    =;  =path  .^(post:channels %gx (peel %channels path))
+    :~  kind.nest
+        (scot %p ship.nest)
+        name.nest
+        %posts
+        %post
+        (scot %ud id.mid)
+        %channel-post
+    ==
+  ::
+      %reply
+    =<  author
+    =;  =path  .^(reply:channels %gx (peel %channels path))
+    :~  kind.nest
+        (scot %p ship.nest)
+        name.nest
+        %posts
+        %post
+        %id
+        (scot %ud op.mid)
+        %replies
+        %reply
+        %id
+        (scot %ud id.mid)
+        %channel-reply
+    ==
+  ==
+::
+++  kick  peer-channels
 --
 ::
-%-  agent:dbug
-%+  verb  |
 ^-  agent:gall
 |_  =bowl:gall
 +*  this  .
@@ -192,8 +260,20 @@
 ::
 ++  on-load
   |=  ole=vase
-  ^-  (quip card _this)
-  [~ this(state !<(state-0 ole))]
+  |^  ^-  (quip card _this)
+      =+  !<(old=state-any ole)
+      =|  cards=(list card)
+      ?:  ?=(%0 -.old)
+        ::  fully replace the pre-channels state
+        ::
+        on-init
+      ?>  ?=(%1 -.old)
+      [~ this(state old)]
+  ::
+  +$  state-any  $%(state-1 state-0)
+  ::
+  +$  state-0  [%0 *]
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -231,67 +311,82 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+  wire  (on-agent:def wire sign)
-      [%groups ~]
+      [%groups ~]  ::NOTE  from previous version of scooore
     :_  this
-    ?-  -.sign
-      %poke-ack  !!
-    ::
-        %kick
-      [%pass /groups %agent [our.bowl %groups] %watch /groups]~
-    ::
-        %watch-ack
-      ?~  p.sign  ~
-      ((slog dap.bowl 'failed to open subscription' >wire< u.p.sign) ~)
-    ::
-        %fact
-      ?.  ?=(%group-action-0 p.cage.sign)
-        ~
-      =/  =diff:groups
-        q.q:!<(action:groups q.cage.sign)
-      ?.  ?=([%channel [%chat *] %add *] diff)
-        ~
-      -:abet:(peer:do q.p.diff)
-    ==
+    [%pass wire %agent [our.bowl %groups] %leave ~]~
   ::
-      [%chat @ @ ~]
-    =/  =flag:chat
-      [(slav %p i.t.wire) i.t.t.wire]
+      [%chat @ @ ~]  ::NOTE  from previous version of scooore
+    :_  this
+    [%pass wire %agent [our.bowl %chat] %leave ~]~
+  ::
+      [%channels ~]
     ?-  -.sign
       %poke-ack  !!
       %kick      =^(cards state abet:kick:do [cards this])
     ::
         %watch-ack
-      ?~  p.sign  [~ this]
+      ?~  p.sign
+        ::TODO  could keep the existing state, after tuning +count-all
+        =.  bits  ~
+        =.  seen  ~
+        =.  live  ~
+        =^  cards  state  abet:count-all:do
+        [cards this]
       %.  [~ this]
       (slog dap.bowl 'failed to open subscription' >wire< u.p.sign)
     ::
         %fact
-      ?.  ?=(?(%chat-logs %chat-update-0) p.cage.sign)
+      ?.  ?=(%channel-response p.cage.sign)
         [~ this]
-      =/  logs=(list [=time =diff:chat])
-        ?-  p.cage.sign
-          %chat-logs      (tap:log-on:chat !<(logs:chat q.cage.sign))
-          %chat-update-0  [!<(update:chat q.cage.sign)]~
-        ==
+      =+  !<([=nest:channels res=r-channel:channels] q.cage.sign)
       =/  d  do
-      |-
-      ?~  logs
+      =;  =_d
         =^  cards  state  abet:d
         [cards this]
-      =?  d  ?=(%writs -.diff.i.logs)
-        =/  dif  diff.i.logs
-        =*  mid  p.p.dif
-        ?+  -.q.p.dif  d
-            %add-feel
-          =*  fro  p.q.p.dif
-          =*  new  q.q.p.dif
-          (hear:d flag time.i.logs mid fro `new)
-        ::
-            %del-feel
-          =*  fro  p.q.p.dif
-          (hear:d flag time.i.logs mid fro ~)
-        ==
-      $(logs t.logs)
+      |-  ^+  d
+      ?+  res  d
+          [%posts *]
+        ?~  posts.res  d
+        =.  d  $(posts.res l.posts.res)
+        =.  d  $(posts.res r.posts.res)
+        $(res [%post key %set val]:n.posts.res)
+      ::
+          [%post * %set *]
+        =*  mid     [%post id.res]
+        ?~  post.r-post.res
+          ::  the post was deleted. from the fact, we don't know the author,
+          ::  and we can't scry out the post (or its replies) anymore to
+          ::  retrieve the reacts or author either. it will give a slight(?)
+          ::  inaccuracy, but our only option here is to no-op on deletions.
+          ::
+          d
+        =*  reacts  reacts.u.post.r-post.res
+        =*  author  author.u.post.r-post.res
+        (hear-many:d nest now.bowl mid `author reacts)
+      ::
+          [%post * %reacts *]
+        =*  mid     [%post id.res]
+        =*  reacts  reacts.r-post.res
+        (hear-many:d nest now.bowl mid ~ reacts)
+      ::
+          [%post * %reply * * %set *]
+        =*  mid     [%reply id.res id.r-post.res]
+        ?~  reply.r-reply.r-post.res
+          ::  the reply was deleted. from the fact, we don't know the author,
+          ::  and we can't scry out the reply anymore to retrieve the reacts
+          ::  or author either. it will give a slight inaccuracy, but our only
+          ::  option here is to no-op on deletions.
+          ::
+          d
+        =*  reacts  reacts.u.reply.r-reply.r-post.res
+        =*  author  author.u.reply.r-reply.r-post.res
+        (hear-many:d nest now.bowl mid `author reacts)
+      ::
+          [%post * %reply * * %reacts *]
+        =*  mid     [%reply id.res id.r-post.res]
+        =*  reacts  reacts.r-reply.r-post.res
+        (hear-many:d nest now.bowl mid ~ reacts)
+      ==
     ==
   ==
 ::

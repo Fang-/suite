@@ -107,8 +107,8 @@
     .^  paged-posts:channels
       %gx  (scot %p our.bowl)  %channels  (scot %da now.bowl)
       =,  nest
-      ::TODO  tune? could /newer/[gut-by-live]/999.999/post instead, maybe
-      /[kind]/(scot %p ship)/[name]/posts/newest/999.999/post/channel-posts
+      ::TODO  tune? could /newer/[gut-by-live]/9.999/post instead, maybe
+      /[kind]/(scot %p ship)/[name]/posts/newest/9.999/post/channel-posts
     ==
   ::
   =.  live  (~(put by live) nest now.bowl)

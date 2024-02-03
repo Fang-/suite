@@ -224,8 +224,15 @@
     ==
   ::
       %reply
-    =<  author
-    =;  =path  .^(reply:channels %gx (peel %channels path))
+    =;  =path
+      ::NOTE  stupid hack to account for LAND-1531,
+      ::      channels returns a v-reply at the time of writing,
+      ::      but writing it this way is forward-compatible.
+      =+  +:.^($^(reply:channels v-reply:channels) %gx (peel %channels path))
+      ?-  -
+        [@ * @ @]  author  ::  v-reply
+        [* @ @]    author  ::  reply
+      ==
     :~  kind.nest
         (scot %p ship.nest)
         name.nest

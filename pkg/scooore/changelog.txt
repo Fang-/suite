@@ -1,0 +1,4 @@
+sc'o're
+
+v1.1.0, ~2024.02.05
+- make compatible with latest version of groups/channels.

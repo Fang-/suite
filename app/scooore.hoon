@@ -35,7 +35,7 @@
     [%channels^[~.channels^%1 ~ ~] ~ ~]
 ::
 %-  agent:dbug
-%+  verb  &
+%+  verb  |
 ::
 =|  state-1
 =*  state  -

@@ -18,9 +18,8 @@ these softwares can be installed from ~paldev as landscape tiles:
 
 these softwares are for manual, local installation & configuration:
 
-- **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
 - **chat-stream**: allows unauthenticated randos to partake in chats over http.
-- **emblemish**: provides an http endpoint for emblemish data. (instance powering [@everyemblemish](https://twitter.com/everyemblemish) is deployed [here](http://159.65.204.48:8081/emblemish/random.html).)
+- **emblemish**: provides an http endpoint for emblemish data.
 
 ## for developers
 
@@ -54,3 +53,4 @@ these softwares have not yet been updated for the new world:
 - **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`.
 - **bard**: interactive storyteller for use with `|link`.
 - **djay**: backend for synced viewing of youtube videos, sourced from a chat channel.
+- **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.

@@ -71,6 +71,7 @@
 %+  verb  |
 ^-  agent:gall
 ::
+=<
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
@@ -100,7 +101,8 @@
           (on-poke %noun !>(%resend))
         [[[%pass /jael/pubs %arvo %j %public-keys ~] caz] state]
       ?>  ?=(%1 -.old)
-      [caz this(state old)]
+      :_  this(state old)
+      (weld caz (update-widget bowl +.old))
   ::
   +$  state-n  $%(state-1 state-0)
   +$  state-0  [%0 records]
@@ -149,8 +151,11 @@
         ::  if we're sending a %bye, no need to track the old receipt.
         ::
         (~(del by receipts) ship.cmd)
-      :_  this(outgoing.state outgoing)
+      =.  outgoing.state  outgoing
+      :_  this
       ?.  yow  ~
+      %+  weld  (update-widget bowl +.state)
+      ^-  (list card)
       :~  =/  =gesture  ?-(-.cmd %meet [%hey ~], %part [%bye ~])
           =/  =cage     [%pals-gesture !>(gesture)]
           [%pass /[-.gesture] %agent [ship.cmd dap.bowl] %poke cage]
@@ -198,9 +203,12 @@
         %hey  :-  !has  (~(put in incoming) ship)
         %bye  :-   has  (~(del in incoming) ship)
       ==
-    :_  this(incoming.state incoming)
+    =.  incoming.state  incoming
+    :_  this
     ^-  (list card)
     ?.  yow  ~
+    %+  weld  (update-widget bowl +.state)
+    ^-  (list card)
     :*  =/  =effect  ?-(-.gesture %hey [%near ship], %bye [%away ship])
         =/  =cage    [%pals-effect !>(effect)]
         [%give %fact [/leeches]~ cage]
@@ -262,6 +270,12 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+  wire  ~&([dap.bowl %strange-wire wire] [~ this])
+      [%profile %widget @ ~]
+    ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
+    ?~  p.sign  [~ this]
+    %.  [~ this]
+    (slog (cat 3 'pals: failed to update widget %' i.t.t.wire) u.p.sign)
+  ::
       [%hark ~]
     ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
     ?~  p.sign  [~ this]
@@ -383,4 +397,72 @@
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
 --
-
+::
+|%
+++  update-widget
+  |=  [=bowl:gall records]
+  ^-  (list card)
+  ?.  .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+    ~
+  =;  widget=[%0 desc=@t %marl marl]
+    =/  =cage  noun+!>([%command %update-widget %pals %mutuals widget])
+    [%pass /profile/widget/mutuals %agent [our.bowl %profile] %poke cage]~
+  :^  %0  'Amount of mutual pals'  %marl
+  =/  count=@ud  ~(wyt in (~(int in ~(key by outgoing)) incoming))
+  =;  number=tape
+    =/  s=tape  ?:(=(1 count) "" "s")
+    :_  ~
+    ;div
+      =style  """
+              padding: 10px;
+              padding-right: 20px;
+              border-radius: 40px;
+              background-color: rgb(234, 246, 236);
+              color: rgb(26, 24, 24);
+              """
+      ;div
+        =style  """
+                background-color: rgb(155, 217, 166);
+                border-radius: 50%;
+                padding: 2;
+                margin-right: 1em;
+                display: inline-block;
+                vertical-align: middle;
+                """
+        ;svg
+          =width  "32"
+          =height  "32"
+          =viewBox  "0 0 16 16"
+          =fill  "none"
+          =xmlns  "http://www.w3.org/2000/svg"
+          ;g
+            ;path
+              =fill-rule  "evenodd"
+              =clip-rule  "evenodd"
+              =d  "M6.5 5.5C6.5 5.08579 6.16421 4.75 5.75 4.75C5.33579 4.75 5 5.08579 5 5.5V6.87923C5 7.29345 5.33579 7.62923 5.75 7.62923C6.16421 7.62923 6.5 7.29345 6.5 6.87923V5.5ZM10.2484 4.75C10.6626 4.75 10.9984 5.08579 10.9984 5.5V6.87923C10.9984 7.29345 10.6626 7.62923 10.2484 7.62923C9.83419 7.62923 9.4984 7.29345 9.4984 6.87923V5.5C9.4984 5.08579 9.83419 4.75 10.2484 4.75ZM10.6718 9.70353C10.9766 9.98395 10.9766 10.4386 10.6718 10.719C9.19575 12.0767 6.80265 12.0767 5.32664 10.719C5.02177 10.4386 5.02177 9.98395 5.32664 9.70353C5.6315 9.42312 6.12577 9.42312 6.43063 9.70353C7.29693 10.5004 8.70147 10.5004 9.56777 9.70353C9.87263 9.42312 10.3669 9.42312 10.6718 9.70353Z"
+              =fill  "currentColor";
+          ==
+        ==
+      ==
+      ;span:"{number} friend{s} on Urbit"
+    ==
+  ?:  (gte count 100)  (a-co:co count)
+  |-  ^-  tape
+  ?:  (gte count 20)
+    =;  head=tape
+      =/  rest=@ud  (mod count 10)
+      ?:  =(0 rest)  head
+      (weld head '-' $(count rest))
+    =/  tens=@ud  (div count 10)
+    ?+  tens  !!
+      %2  "twenty"  %3  "thirty"   %4  "forty"   %5  "fifty"
+      %6  "sixty"   %7  "seventy"  %8  "eighty"  %9  "ninety"
+    ==
+  ?+  count  !!
+    %0  "zero"   %5  "five"   %10  "ten"       %15  "fifteen"
+    %1  "one"    %6  "six"    %11  "eleven"    %16  "sixteen"
+    %2  "two"    %7  "seven"  %12  "twelve"    %17  "seventeen"
+    %3  "three"  %8  "eight"  %13  "thirteen"  %18  "eighteen"
+    %4  "four"   %9  "nine"   %14  "fourteen"  %19  "nineteen"
+  ==
+--

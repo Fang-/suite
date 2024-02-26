@@ -40,6 +40,7 @@
     |=(n=* !>((grab-rumor n)))
 ^-  agent:gall
 ::
+=<
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
@@ -60,7 +61,9 @@
       =?  old  ?=(%1 -.old)  (state-1-to-2 old)
       =?  old  ?=(%2 -.old)  (state-2-to-3 old)
       ?>  ?=(%3 -.old)
-      [~ this(state old)]
+      :_  this(state old)
+      ?~  fresh.old  ~
+      (update-widget bowl what.i.fresh.old)
   ::
   +$  state-any  $%(state-0 state-1 state-2 state-3)
   ::
@@ -119,15 +122,15 @@
     ?:  =(ditto new)
       ['your voice echoes...' ~ +.state]
     =/  chance=@ud  (~(rad og eny.bowl) 6)
-    ?:  ?&  (gth now.bowl ~2023.4.1)
-            (lth now.bowl ~2023.4.2..06.00.00)
+    ?:  ?&  (gth now.bowl ~2024.4.1)
+            (lth now.bowl ~2024.4.2..06.00.00)
             (lth chance 3)
             !=('FOOL! ' (end 3^6 new))
         ==
       =;  wat=@t
         =/  =rumor  [now.bowl wat]
         :+  'an anomaly warps and twists your voice...'
-          [(invent:gossip %rumor !>(rumor))]~
+          [(invent:gossip %rumor !>(rumor)) (update-widget bowl new)]
         [[rumor fresh] ditto avoid tokes]
       =+  t=(trip new)
       ?+  chance  !!
@@ -158,7 +161,7 @@
       ==
     =/  =rumor  [now.bowl new]
     :+  'the wind carries along your careless whisper...'
-      [(invent:gossip %rumor !>(rumor))]~
+      [(invent:gossip %rumor !>(rumor)) (update-widget bowl new)]
     [[rumor fresh] new avoid tokes]
   ==
 ::
@@ -184,6 +187,13 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
+  ~|  wire
+  ?:  ?=([%profile %widget @ ~] wire)
+    ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
+    ?~  p.sign  [~ this]
+    %.  [~ this]
+    (slog (cat 3 'rumors: failed to update widget %' i.t.t.wire) u.p.sign)
+  ::
   ?.  ?&  =(/~/gossip/gossip wire)
           ?=(%fact -.sign)
           =(%rumor p.cage.sign)
@@ -206,7 +216,7 @@
       |=  =@t
       ?=(^ (find (cass (trip t)) (cass (trip what.rumor))))
     [~ this]
-  :-  [%give %fact [/rumors]~ %rumor !>(rumor)]~
+  :-  [[%give %fact [/rumors]~ %rumor !>(rumor)] (update-widget bowl what.rumor)]
   =-  this(fresh -)
   |-  ^+  fresh
   ?~  fresh  [rumor ~]
@@ -232,4 +242,74 @@
 ::
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
+--
+::
+|%
+++  update-widget
+  |=  [=bowl:gall rumor=@t]
+  ^-  (list card)
+  ?.  .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+    ~
+  =;  widget=[%0 desc=@t %marl marl]
+    =/  =cage  noun+!>([%command %update-widget %rumors %latest widget])
+    [%pass /profile/widget/latest %agent [our.bowl %profile] %poke cage]~
+  :^  %0  'Most recently overheard rumor'  %marl
+  :~  =;  keyframes=cord
+        ;style:"{(trip keyframes)}"
+      '''
+      #rumors--latest {
+        border-radius: 40px;
+        overflow: hidden;
+      }
+      @-webkit-keyframes rumorsbg {
+        0%{background-position:51% 0%}
+        50%{background-position:50% 100%}
+        100%{background-position:51% 0%}
+      }
+      @-moz-keyframes rumorsbg {
+        0%{background-position:51% 0%}
+        50%{background-position:50% 100%}
+        100%{background-position:51% 0%}
+      }
+      @keyframes rumorsbg {
+        0%{background-position:51% 0%}
+        50%{background-position:50% 100%}
+        100%{background-position:51% 0%}
+      }
+      '''
+    ::
+      ;div
+        =style  """
+                position: absolute;
+                top: 0.5em;
+                width: 100%;
+                text-align: center;
+                color: white;
+                opacity: 0.5;
+                font-size: 0.8em;
+                """
+        ; rumor has it that...
+      ==
+    ::
+      ;div
+        =style  """
+                padding: 30px 30px 15px;
+
+                color: #fff0ff;
+                font-family: sans-serif;
+                text-shadow: 1px 1px 3px rgb(0 0 0 / 15%);
+                letter-spacing: 0.1px;
+                text-align: center;
+
+                background-image: linear-gradient(345deg, #df7bdf, #847bde, #e5a0a0, #8199dc);
+                background-size: 800% 800%;
+                background-attachment: fixed;
+
+                -webkit-animation: rumorsbg 60s ease infinite;
+                -moz-animation: rumorsbg 60s ease infinite;
+                animation: rumorsbg 60s ease infinite;
+                """
+        ;span:"{(trip rumor)}"
+      ==
+  ==
 --

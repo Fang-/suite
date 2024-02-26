@@ -11,8 +11,8 @@
 /~  webui  (webpage ~ (unit mime))  /app/picture/webui
 ::
 |%
-+$  state-1
-  $:  %1
++$  state-2
+  $:  %2
       picture=(unit mime)
       [framing=? caching=(unit octs)]  ::  for seasonal surprises
   ==
@@ -22,13 +22,14 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-1
+=|  state-2
 =*  state  -
 ::
 %-  agent:dbug
 %+  verb  |
 ^-  agent:gall
 ::
+=<
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
@@ -46,10 +47,18 @@
       =/  old=state-any  !<(state-any ole)
       =?  old  ?=(%0 -.old)
         (state-0-to-1 old)
-      ?>  ?=(%1 -.old)
-      [~ this(state old)]
+      =^  caz  old
+        ?.  ?=(%1 -.old)  [~ old]
+        :_  (state-1-to-2 old)
+        (update-widget bowl & picture.old)
+      ?>  ?=(%2 -.old)
+      =?  caz  =(~ caz)  (update-widget bowl | picture.old)
+      [caz this(state old)]
   ::
-  +$  state-any  $%(state-1 state-0)
+  +$  state-any  $%(state-2 state-1 state-0)
+  ::
+  ++  state-1-to-2  |=(s=state-1 s(- %2))
+  +$  state-1       _%*(. *state-2 - %1)
   ::
   ++  state-0-to-1
     |=  state-0
@@ -113,9 +122,6 @@
               (lth now.bowl ~2023.12.24..18.00.00)
           ==
         %-  some
-        =/  dat
-          %+  rap  3
-          ~['data:' (en-mite p.u.picture) ';base64,' (en:base64 q.u.picture)]
         %-  as-octt
         %-  en-xml:html
         ^-  manx
@@ -131,7 +137,7 @@
             =width  "100"
             =height  "100"
             =preserveAspectRatio  "xMidYMid slice"
-            =href  (trip dat);
+            =href  (data-url u.picture);
           ;image
             =x  "-4"
             =y  "-4"
@@ -208,7 +214,7 @@
         %-  some
         %+  build:view  args
         `|^'Something went wrong! Did you provide sane inputs?'
-      :_  [~ state(picture u.new, caching ~)]
+      :_  [(update-widget bowl | u.new) state(picture u.new, caching ~)]
       :-  200
       %-  some
       (build:view args `&^'Processed succesfully.')  ::NOTE  silent?
@@ -243,8 +249,46 @@
     caching  (bind caching |=(octs [p 1.337]))
   ==
 ::
+++  on-agent
+  |=  [=wire =sign:agent:gall]
+  ~|  wire
+  ?>  ?=([%profile %widget @ ~] wire)
+  ?>  ?=(%poke-ack -.sign)
+  ?~  p.sign  [~ this]
+  %.  [~ this]
+  (slog (cat 3 'picture: failed to update widget %' i.t.t.wire) u.p.sign)
+::
 ++  on-leave  on-leave:def
-++  on-agent  on-agent:def
 ++  on-fail   on-fail:def
 --
-
+::
+|%
+++  update-widget
+  |=  [=bowl:gall force=? picture=(unit mime)]
+  ^-  (list card)
+  ?.  |(force .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$))
+    ~
+  :_  ~
+  =;  command
+    :+  %pass  /profile/widget/picture
+    [%agent [our.bowl %profile] %poke %noun !>([%command command])]
+  ?~  picture
+    [%delete-widget %picture %picture]
+  =;  =manx
+    [%update-widget %picture %picture %0 'Picture frame' %marl manx ~]
+  ;img
+    =src  "{(data-url u.picture)}"
+    =style  """
+            width: 345px; max-width: 85vw;
+            aspect-ratio: 1;
+            border-radius: 40px;
+            object-fit: cover;
+            """;
+::
+++  data-url
+  |=  mime
+  %-  trip
+  %+  rap  3
+  =,  mimes:html
+  ~['data:' (en-mite p) ';base64,' (en:base64 q)]
+--

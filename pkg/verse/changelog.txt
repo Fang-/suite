@@ -1,4 +1,7 @@
 verse
 
+v1.1.1, ~2024.02.26
+- add a widget for groups' experimental public profiles.
+
 v1.1.0, ~2022.01.08
 - clicking the tile now redirects to a search of writings by the church fathers, for references to the verse of the day.

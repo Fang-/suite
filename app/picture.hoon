@@ -11,8 +11,8 @@
 /~  webui  (webpage ~ (unit mime))  /app/picture/webui
 ::
 |%
-+$  state-2
-  $:  %2
++$  state-1
+  $:  %1
       picture=(unit mime)
       [framing=? caching=(unit octs)]  ::  for seasonal surprises
   ==
@@ -22,7 +22,7 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-2
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -47,18 +47,10 @@
       =/  old=state-any  !<(state-any ole)
       =?  old  ?=(%0 -.old)
         (state-0-to-1 old)
-      =^  caz  old
-        ?.  ?=(%1 -.old)  [~ old]
-        :_  (state-1-to-2 old)
-        (update-widget bowl & picture.old)
-      ?>  ?=(%2 -.old)
-      =?  caz  =(~ caz)  (update-widget bowl | picture.old)
-      [caz this(state old)]
+      ?>  ?=(%1 -.old)
+      [~ this(state old)]
   ::
-  +$  state-any  $%(state-2 state-1 state-0)
-  ::
-  ++  state-1-to-2  |=(s=state-1 s(- %2))
-  +$  state-1       _%*(. *state-2 - %1)
+  +$  state-any  $%(state-1 state-0)
   ::
   ++  state-0-to-1
     |=  state-0
@@ -77,9 +69,18 @@
   ?>  =(our src):bowl
   ?+  mark  (on-poke:def mark vase)
       %noun
-    =+  f=(? q.vase)
-    =?  caching  !f  ~
-    [~ this(framing f)]
+    ?+  q.vase  !!
+        %update-widget
+      [(update-widget bowl | picture) this]
+    ::
+        %delete-widget
+      [(update-widget bowl | ~) this]
+    ::
+        @
+      =+  f=;;(? q.vase)
+      =?  caching  !f  ~
+      [~ this(framing f)]
+    ==
   ::
     ::  %handle-http-request: incoming from eyre
     ::
@@ -214,7 +215,7 @@
         %-  some
         %+  build:view  args
         `|^'Something went wrong! Did you provide sane inputs?'
-      :_  [(update-widget bowl | u.new) state(picture u.new, caching ~)]
+      :_  [~ state(picture u.new, caching ~)]
       :-  200
       %-  some
       (build:view args `&^'Processed succesfully.')  ::NOTE  silent?

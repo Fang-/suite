@@ -1,7 +1,7 @@
 picture
 
 v1.1.5, ~2024.02.26
-- add a widget for groups' experimental public profiles.
+- add a widget for groups' experimental public profiles. must be triggered manually with :picture %update-widget.
 
 v1.1.4, ~2023.12.23
 - return of the christmas frame.

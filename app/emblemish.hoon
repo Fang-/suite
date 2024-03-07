@@ -58,7 +58,7 @@
   =/  who=(unit @p)
     ?:  =('random' i.t.site)
       `(end 5 eny.bowl)
-    (rush i.t.site ;~(pose fed:ag dum:ag))
+    (rush i.t.site ;~(pose ;~(pfix sig fed:ag) fed:ag dum:ag)))
   ?~  who
     [[404 ~] `(cat 3 i.t.site ' not found')]
   ::

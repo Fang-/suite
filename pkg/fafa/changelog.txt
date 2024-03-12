@@ -1,5 +1,8 @@
 fafa
 
+v1.1.3, ~2024.03.12
+- fix an issue where some valid base32 secrets could not be parsed.
+
 v1.1.2, ~2022.04.16
 - prevent other ships from clobbering app state.
 

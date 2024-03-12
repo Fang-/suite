@@ -59,6 +59,8 @@
   ;~  pose
     (cook |=(a=@ (sub a 65)) (shim 'A' 'Z'))
     (cook |=(a=@ (sub a 24)) (shim '2' '7'))
+    ::NOTE  uncommon, but base32 _is_ meant to be case insensitive (rfc3548)
+    (cook |=(a=@ (sub a 97)) (shim 'a' 'z'))
   ==
 ::
 ++  puri  ::  parse otp uri

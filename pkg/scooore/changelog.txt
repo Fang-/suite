@@ -1,4 +1,7 @@
 sc'o're
 
+v1.1.1, ~2024.03.20
+- make compatible with current and upcoming version of channels.
+
 v1.1.0, ~2024.02.05
 - make compatible with latest version of groups/channels.

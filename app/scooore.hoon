@@ -220,7 +220,7 @@
         %posts
         %post
         (scot %ud id.mid)
-        %channel-post
+        %noun
     ==
   ::
       %reply
@@ -244,7 +244,7 @@
         %reply
         %id
         (scot %ud id.mid)
-        %channel-reply
+        %noun
     ==
   ==
 ::

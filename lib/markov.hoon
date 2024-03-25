@@ -34,6 +34,7 @@
     -:(snag (wild:pal eny (turn c tail)) c)
   ?:  =('' n)
     ?:  (gth (met 3 o) 20)  o
+    ?:  ?=([[%$ @] ~ ~] m)  o  ::  eol only known option
     $(eny +(eny))
   =.  m
     ::  guarantee eventual termination by making eol increasingly likely

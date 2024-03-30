@@ -13,7 +13,7 @@
     (frisk:rudder q.u.body)
   ?~  what=(~(get by args) 'rumor')
     ~
-  ?:  =('' u.what)
+  ?:  (lte (met 3 u.what) 1)
     'like a fart in the wind'
   ?:  (gth (met 3 u.what) 1.024)
     'your tirade falls on deaf ears'

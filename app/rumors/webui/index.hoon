@@ -4,7 +4,7 @@
 /+  rudder
 ::
 ^-  (page:rudder [rumors @t (list @t) (map)] [~ @t])
-|_  [bowl:gall order:rudder =rumors @t (list @t) (map)]
+|_  [bowl:gall order:rudder =rumors @t avoid=(list @t) (map)]
 ++  argue
   |=  [head=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder [~ @t])
@@ -164,9 +164,13 @@
     ;div#listing
       ;*  ?~  rumors  ;+  ;i:"it's been strangely quiet..."
           =/  n=@ud  0
-          |-
+          |-  ^-  marl
           ?:  (gte n 50)  ~
           ?:  (lth when.i.rumors (sub now ~d14))  ~
+          ?:  %+  lien  avoid
+              |=(=@t ?=(^ (find (trip t) (cass (trip what.i.rumors)))))
+            ?~  t.rumors  ~
+            $(rumors t.rumors)
           =*  w  when.i.rumors
           =.  w  (sub w (mod w ~s1))
           :-  ;div.rumor(title (scow %da w)):"{(trip what.i.rumors)}"

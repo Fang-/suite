@@ -102,7 +102,7 @@
       %noun
     ?+  q.vase  !!
       [%avoid ~]  [~ this(avoid ~)]
-      [%avoid @]  [~ this(avoid [+.q.vase avoid])]
+      [%avoid @]  [~ this(avoid [(crip (cass (trip +.q.vase))) avoid])]
     ==
   ::
     ::  %handle-http-request: incoming from eyre
@@ -212,9 +212,9 @@
   ::  ignore rumors that contain content from the avoid-list
   ::
   ?:  ?:  =(~ avoid)  |
-      %+  levy  avoid
+      %+  lien  avoid
       |=  =@t
-      ?=(^ (find (cass (trip t)) (cass (trip what.rumor))))
+      ?=(^ (find (trip t) (cass (trip what.rumor))))
     [~ this]
   :-  [[%give %fact [/rumors]~ %rumor !>(rumor)] (update-widget bowl what.rumor)]
   =-  this(fresh -)

@@ -18,8 +18,8 @@
 /$  grab-rumor  %noun  %rumor
 ::
 |%
-+$  state-3
-  $:  %3
++$  state-4
+  $:  %4
       fresh=rumors  ::TODO  prune
       ditto=@t
       avoid=(list @t)
@@ -30,7 +30,7 @@
 +$  card     card:agent:gall
 --
 ::
-=|  state-3
+=|  state-4
 =*  state  -
 ::
 %-  %+  agent:gossip
@@ -60,12 +60,13 @@
       =?  old  ?=(%0 -.old)  (state-0-to-1 old)
       =?  old  ?=(%1 -.old)  (state-1-to-2 old)
       =?  old  ?=(%2 -.old)  (state-2-to-3 old)
-      ?>  ?=(%3 -.old)
+      =?  old  ?=(%3 -.old)  (state-3-to-4 old)
+      ?>  ?=(%4 -.old)
       :_  this(state old)
       ?~  fresh.old  ~
       (update-widget bowl what.i.fresh.old)
   ::
-  +$  state-any  $%(state-0 state-1 state-2 state-3)
+  +$  state-any  $%(state-0 state-1 state-2 state-3 state-4)
   ::
   +$  state-0  [%0 fresh=rumors]
   ++  state-0-to-1
@@ -87,9 +88,21 @@
     |=  old=state-2
     ^-  state-3
     =/  pos  (skip fresh.old |=([* r=@t] (gth (met 3 r) 1.024)))
-    ::NOTE  if for some reason you run into memory trouble, delete old rumors:
-    ::  =.  pos  (scag 1.000 pos)
-    [%3 pos ditto.old ~ (roll (turn pos tail) tokenize:markov)]
+    ::NOTE  this used to +tokenize:markov in prep for april fools' 2023
+    [%3 pos ditto.old ~ ~]
+  ::
+  +$  state-3  [%3 fresh=rumors ditto=@t avoid=(list @t) tokes=nums:markov]
+  ++  state-3-to-4
+    |=  old=state-3
+    ^-  state-4
+    ::NOTE  if you run into memory trouble, keep only latest n rumors
+    ::  =.  fresh.old  (scag 1.000 pos)
+    =-  old(- %4, tokes -, avoid (turn avoid.old :(cork trip cass crip)))
+    %+  roll  fresh.old
+    |=  [[w=@da r=@t] =_tokes.old]
+    ?:  (lth w ~2023.4.3)  ::  too old, already tokenized by +state-2-to-3
+      tokes
+    (tokenize:markov r tokes)
   --
 ::
 ++  on-poke
@@ -142,7 +155,7 @@
           %1
         =+  p=~(tap in (~(put in ~(leeches pals bowl)) ~zod))
         =+  w=(snag (~(rad og eny.bowl) (lent p)) p)
-        =+  r=(~(rad og eny.bowl) 3)
+        =+  r=(~(rad og +(eny.bowl)) 3)
         %-  crip
         ?+  r  !!
           %0  "{(scow %p w)} here, {t}"

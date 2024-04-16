@@ -345,7 +345,7 @@
         %fact
       ?.  ?=(%channel-response p.cage.sign)
         [~ this]
-      =+  !<([=nest:channels res=r-channel:channels] q.cage.sign)
+      =+  !<([=nest:channels res=$%([%pending *] r-channel:channels)] q.cage.sign)
       =/  d  do
       =;  =_d
         =^  cards  state  abet:d

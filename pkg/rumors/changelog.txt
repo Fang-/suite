@@ -1,5 +1,8 @@
 rumors
 
+v1.2.6, ~2024.05.05
+- disable autocomplete on the input field
+
 v1.2.5, ~2024.03.30
 - fix a bug with false negatives from a larger-than-1 wordfilter.
 - re-run of v1.2.0 features.

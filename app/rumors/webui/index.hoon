@@ -156,7 +156,13 @@
       ?.  ?=([[%rumor @] *] arg)  ""
       (trip v.i.arg)
     ;form(method "post")
-      ;input(type "text", name "rumor", required "", placeholder prompt, value value);
+      ;input
+        =type          "text"
+        =name          "rumor"
+        =required      ""
+        =placeholder   prompt
+        =autocomplete  "off"
+        =value         value;
     ==
   ::
   ++  listing

@@ -1,5 +1,8 @@
 rumors
 
+v1.2.7, ~2024.09.05
+- avoid burdening pals not running rumors with excessive relay requests by using the new /lib/gossip.
+
 v1.2.6, ~2024.05.05
 - disable autocomplete on the input field
 

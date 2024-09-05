@@ -1,4 +1,4 @@
-::  gossip: data sharing with pals
+::  gossip: data sharing with pals (and pals of pals, etc)
 ::
 ::      v1.1.0: sneaky whisper
 ::
@@ -142,7 +142,7 @@
                  ::  (1 hop is pals only, 0 stops exposing data at all)
       hear=whos  ::  who to subscribe to
       tell=whos  ::  who to allow subscriptions from
-      pass=?     ::  whether to (50/50) emit through proxy
+      pass=?     ::  whether to (50/50) emit data through proxy
   ==
 ::
 ++  pass-timeout  ~s30
@@ -169,19 +169,20 @@
   ^-  $-(agent:gall agent:gall)
   |^  agent
   ::
-  +$  state-1
-    $:  %1
+  +$  state-2
+    $:  %2
         manner=config                  ::  latest config
         memory=(set hash)              ::  datums seen (by inner agent)
         shared=(set hash)              ::  datums shared (as fact)
         passed=(map hash [rumor @da])  ::  pending relays & timeouts
+        misses=(set ship)              ::  ships that won't relay
         future=(list rumor)            ::  rumors of unknown kinds
     ==
   ::
   +$  card  card:agent:gall
   ::
   ++  helper
-    |_  [=bowl:gall state-1]
+    |_  [=bowl:gall state-2]
     +*  state  +<+
         pals   ~(. lp bowl)
     ++  en-cage
@@ -269,10 +270,21 @@
       ::  if we're proxying, but there's no reasonable targets, send as fact
       ::
       =/  aides=(set ship)
-        ::  reasonable targets do not include ourselves, or whoever
-        ::  caused us to want to (re)send this rumor
+        ::  reasonable targets do not include ourselves, whoever
+        ::  caused us to want to (re)send this rumor, or ships that failed
+        ::  to proxy for us before.
+        ::  that last one is important because we need to avoid the mistake of
+        ::  occasionally sending them pokes that just linger in our outbound
+        ::  ames flows and keep retrying. (ideally we'd do those all pokes for
+        ::  a target on the same flow, but we really like storing information
+        ::  in the wire and don't want to do per-relay queues in state. we also
+        ::  don't particularly care about ordering guarantees for gossip.)
+        ::  we don't just get the set of ships with active incoming or outgoing
+        ::  subscriptions, because that constrains the set unnecessarily. for
+        ::  some configs, ships in .tell (that aren't in .hear) might be
+        ::  running the agent without actively listening to us.
         ::
-        =-  (~(del in (~(del in -) our.bowl)) src.bowl)
+        =-  (~(dif in (~(del in (~(del in -) our.bowl)) src.bowl)) misses)
         ?-  tell.manner
           %anybody  (~(uni in (targets:pals ~.)) leeches:pals)
           %targets  (targets:pals ~.)
@@ -287,7 +299,7 @@
       =/  =time       (add now.bowl pass-timeout)
       =.  passed      (~(put by passed) hash [rumor time])
       :_  state
-      =/  =wire  /~/gossip/passed/(scot %uv hash)
+      =/  =wire  /~/gossip/passed/(scot %p proxy)/(scot %uv hash)
       =/  =cage  gossip-rumor+!>(rumor)
       :~  [%pass wire %agent [proxy dap.bowl] %poke cage]
           [%pass wire %arvo %b %wait time]
@@ -443,7 +455,7 @@
   ::
   ++  agent
     |=  inner=agent:gall
-    =|  state-1
+    =|  state-2
     =*  state  -
     %+  verb  |
     %-  agent:dbug
@@ -473,14 +485,27 @@
       ::
       |^  =+  !<([[%gossip old=state-any] ile=vase] ole)
           =?  old  ?=(%0 -.old)  (state-0-to-1 old)
-          ?>  ?=(%1 -.old)
+          =?  old  ?=(%1 -.old)  (state-1-to-2 old)
+          ?>  ?=(%2 -.old)
           =.  state  old
           =^  cards  inner  (on-load:og ile)
           =^  cards  state  (play-cards:up cards)
           ::TODO  for later versions, add :future retry logic as needed
           [cards this]
       ::
-      +$  state-any  $%(state-0 state-1)
+      +$  state-any  $%(state-0 state-1 state-2)
+      ::
+      +$  state-1
+        $:  %1
+            manner=config
+            memory=(set hash)
+            shared=(set hash)
+            passed=(map hash [rumor @da])
+            future=(list rumor)
+        ==
+      ++  state-1-to-2
+        |=  state-1
+        [%2 manner memory shared passed ~ future]
       ::
       +$  state-0    [%0 manner=config-0 memory=(set hash) future=(list rumor)]
       +$  config-0   [hops=_1 hear=whos tell=whos]
@@ -519,8 +544,13 @@
         [cards this]
       ?.  (want-target:up src.bowl)
         ~|(%gossip-rejected !!)
-      =+  !<(=rumor vase)
+      ::  we're getting pokes from them, so we should try relaying through
+      ::  them again if we stopped doing so
+      ::NOTE  this only ever cleans out .misses for ships producing content
+      ::
+      =.  misses  (~(del in misses) src.bowl)
       ::TODO  dedupe with +on-agent %fact
+      =+  !<(=rumor vase)
       =/  =hash  (en-hash:up rumor)
       ?:  (~(has in memory) hash)
         [~ this]
@@ -553,6 +583,11 @@
           ?.  =(%gossip-rumor mark)
             ~&  [gossip+dap.bowl %ignoring-unexpected-fact mark=mark]
             [~ this]
+          ::  we're getting facts from them, so we should try relaying through
+          ::  them again if we stopped doing so
+          ::NOTE  this only ever cleans out .misses for ships in .hear
+          ::
+          =.  misses  (~(del in misses) src.bowl)
           ::TODO  de-dupe with +on-poke
           =+  !<(=rumor vase)
           =/  =hash  (en-hash:up rumor)
@@ -595,12 +630,22 @@
           [~ this]
         ==
       ::
-          [%passed @ ~]
+          [%passed ?([@ ~] [@ @ ~])]
         ?.  ?=(%poke-ack -.sign)
           ~&  [gossip+dap.bowl %unexpected-sign wire -.sign]
           [~ this]
         ~|  t.t.wire
-        =/  =hash  (slav %uv i.t.t.t.wire)
+        ::  regardless of anything else: if they acked the poke, they are
+        ::  accepting of relay requests, if they nacked they're unaccepting
+        ::
+        =.  misses
+          ?:  ?=(~ p.sign)
+            (~(del in misses) src.bowl)
+          (~(put in misses) src.bowl)
+        =/  =hash
+          ?:  ?=([@ ~] t.t.t.wire)
+            (slav %uv i.t.t.t.wire)
+          (slav %uv i.t.t.t.t.wire)
         ?~  rum=(~(get by passed) hash)
           [~ this]
         ::NOTE  emitting rest is cute, but doesn't actually work reliably,
@@ -715,10 +760,23 @@
         =^  cards  state  (play-cards:up cards)
         [cards this]
       ?+  t.t.wire  ~|(wire !!)
-          [%passed @ ~]
-        =/  =hash  (slav %uv i.t.t.t.wire)
+          [%passed ?([@ ~] [@ @ ~])]
+        =/  =hash
+          ?:  ?=([@ ~] t.t.t.wire)
+            (slav %uv i.t.t.t.wire)
+          (slav %uv i.t.t.t.t.wire)
         ?~  rum=(~(get by passed) hash)  [~ this]
+        ::  since timer cancellation isn't fully reliable, this timer fire
+        ::  might be from a relay that nacked our poke. if the timer fired
+        ::  earlier than expected, assume that to be the case and no-op.
+        ::
         ?:  (gth +.u.rum now.bowl)       [~ this]
+        ::  they failed to respond to our relay request in time, mark them as
+        ::  unaccepting (if we know who they are from a the new-style wire)
+        ::  and try sending the rumor again
+        ::
+        =?  misses  ?=([@ @ ~] t.t.t.wire)
+          (~(put in misses) (slav %p i.t.t.t.wire))
         =^  cards  state  (emit-rumor:up -.u.rum)
         [cards this]
       ::

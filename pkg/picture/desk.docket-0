@@ -3,7 +3,7 @@
   info+'a picture frame for landscape'
   color+0xdd.dddd
   image+'/picture/image'
-  version+[1 1 5]
+  version+[1 1 6]
   website+'https://pal.dev/suite/picture'
   license+'MIT'
   base+'picture'

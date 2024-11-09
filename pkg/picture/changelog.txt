@@ -1,5 +1,8 @@
 picture
 
+v1.1.6, ~2024.11.09
+- update widget styling for latest public profile page.
+
 v1.1.5, ~2024.02.26
 - add a widget for groups' experimental public profiles. must be triggered manually with :picture %update-widget.
 

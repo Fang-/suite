@@ -273,6 +273,7 @@
       #rumors--latest {
         border-radius: 40px;
         overflow: hidden;
+        background: none; padding: 0;
       }
       @-webkit-keyframes rumorsbg {
         0%{background-position:51% 0%}

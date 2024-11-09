@@ -275,16 +275,20 @@
     [%agent [our.bowl %profile] %poke %noun !>([%command command])]
   ?~  picture
     [%delete-widget %picture %picture]
-  =;  =manx
-    [%update-widget %picture %picture %0 'Picture frame' %marl manx ~]
-  ;img
-    =src  "{(data-url u.picture)}"
-    =style  """
-            width: 345px; max-width: 85vw;
-            aspect-ratio: 1;
-            border-radius: 40px;
-            object-fit: cover;
-            """;
+  =;  =marl
+    [%update-widget %picture %picture %0 'Picture frame' %marl marl]
+  :~
+    ;style:"#picture--picture \{ background: none; text-align: center; padding: 0; }"
+  ::
+    ;img
+      =src  "{(data-url u.picture)}"
+      =style  """
+              width: 345px; max-width: 100%;
+              aspect-ratio: 1;
+              border-radius: 40px;
+              object-fit: cover;
+              """;
+  ==
 ::
 ++  data-url
   |=  mime

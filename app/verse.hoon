@@ -113,7 +113,7 @@
     :^  %0  'Daily Bible verse'  %marl
     ::NOTE  we use a data url in an <img> because something about the <svg>
     ::      makes it unable to scale properly otherwise...
-    [make-img:do]~
+    make-widget:do
   ==
 ::
 ++  on-agent
@@ -183,17 +183,21 @@
 ++  next
   `@da`(add now.bowl (sub ~d1 (mod now.bowl ~d1)))
 ::
-++  make-img
+++  make-widget
   =/  dat=@t
     =,  mimes:html
     (en:base64 (as-octt (en-xml:html make-svg)))
-  ;img
-    =src  "data:image/svg+xml;base64,{(trip dat)}"
-    =style  """
-            width: 346px; max-width: 85.1vw;
-            aspect-ratio: 1;
-            border-radius: 40px;
-            """;
+  :~
+    ;style:"#verse--verse \{ background: none; text-align: center; padding: 0; }"
+  ::
+    ;img
+      =src  "data:image/svg+xml;base64,{(trip dat)}"
+      =style  """
+              width: 346px; max-width: 100%;
+              aspect-ratio: 1;
+              border-radius: 40px;
+              """;
+  ==
 ::
 ++  make-svg
   ;svg

@@ -1,5 +1,8 @@
 pals
 
+v1.0.17, ~2024.11.09
+- update widget styling for latest public profile page.
+
 v1.0.16, ~2024.02.26
 - add a widget for groups' experimental public profiles.
 

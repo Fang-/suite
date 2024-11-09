@@ -1,5 +1,8 @@
 rumors
 
+v1.2.8, ~2024.11.09
+- update widget styling for latest public profile page.
+
 v1.2.7, ~2024.09.05
 - avoid burdening pals not running rumors with excessive relay requests by using the new /lib/gossip.
 

@@ -4,7 +4,7 @@
     image+'/verse/verse'
     site+/verse/study
     base+'verse'
-    version+[1 1 1]
+    version+[1 1 2]
     website+'https://pal.dev/suite/verse'
     license+'MIT'
 ==

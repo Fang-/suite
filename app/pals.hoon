@@ -411,6 +411,7 @@
   =/  count=@ud  ~(wyt in (~(int in ~(key by outgoing)) incoming))
   =;  number=tape
     =/  s=tape  ?:(=(1 count) "" "s")
+    :-  ;style:"#pals--mutuals \{ background: none; padding: 0; }"
     :_  ~
     ;div
       =style  """
@@ -419,19 +420,23 @@
               border-radius: 40px;
               background-color: rgb(234, 246, 236);
               color: rgb(26, 24, 24);
+              border: 1px solid rgb(155, 217, 166);
               """
       ;div
         =style  """
                 background-color: rgb(155, 217, 166);
                 border-radius: 50%;
-                padding: 2;
+                width: 2em;
+                height: 2em;
                 margin-right: 1em;
                 display: inline-block;
                 vertical-align: middle;
+                text-align: center;
                 """
         ;svg
           =width  "32"
           =height  "32"
+          =style  "vertical-align: middle;"
           =viewBox  "0 0 16 16"
           =fill  "none"
           =xmlns  "http://www.w3.org/2000/svg"

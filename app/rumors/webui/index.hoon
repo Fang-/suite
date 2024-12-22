@@ -32,7 +32,7 @@
       ==
   ^-  reply:rudder
   =/  title=tape
-    ?:  &((gth now ~2023.12.24..18.00.00) (lth now ~2023.12.27))
+    ?:  &((gth now ~2024.12.24..18.00.00) (lth now ~2024.12.27))
       "tidings and greetings"
     "rumors and gossip"
   |^  [%page page]
@@ -40,9 +40,9 @@
   ++  style
     =;  s=@t
       %^  cat  3  s
-      ?:  &((gth now ~2023.4.1) (lth now ~2023.4.2..06.00.00))
+      ?:  &((gth now ~2025.4.1) (lth now ~2025.4.2..06.00.00))
         'body{background-image:linear-gradient(345deg, #99eaea, #8fdb78, #a0a0e5, #7bdfdf);}'
-      ?:  &((gth now ~2023.12.24..18.00.00) (lth now ~2023.12.27))
+      ?:  &((gth now ~2024.12.24..18.00.00) (lth now ~2024.12.27))
         'body{background-image:linear-gradient(345deg, lightgreen, green, red, orange);}'
       ''
     '''

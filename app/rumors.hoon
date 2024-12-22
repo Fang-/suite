@@ -135,8 +135,8 @@
     ?:  =(ditto new)
       ['your voice echoes...' ~ +.state]
     =/  chance=@ud  (~(rad og eny.bowl) 6)
-    ?:  ?&  (gth now.bowl ~2024.4.1)
-            (lth now.bowl ~2024.4.2..06.00.00)
+    ?:  ?&  (gth now.bowl ~2025.4.1)
+            (lth now.bowl ~2025.4.2..06.00.00)
             (lth chance 3)
             !=('FOOL! ' (end 3^6 new))
         ==

@@ -272,7 +272,9 @@
   (fall (rush url ;~(plug apat:de-purl:html yque:de-purl:html)) [[~ ~] ~])
 ::
 ++  press  ::  manx to octs
-  (cork en-xml:html as-octt:mimes:html)
+  |=  =manx
+  %-  as-octt:mimes:html
+  (weld "<!doctype html>\0a" (en-xml:html manx))
 ::
 ++  spout  ::  build full response cards
   |=  [eyre-id=@ta simple-payload:http]

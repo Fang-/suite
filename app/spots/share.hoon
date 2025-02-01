@@ -1,4 +1,4 @@
-/-  *loci
+/-  *spots
 /+  rudder
 ::
 |=  [did=@t til=(unit @da) device]
@@ -8,7 +8,7 @@
 ++  page
   ;html
     ;head
-      ;title:"loci: home"
+      ;title:"spots: shared location"
       ;meta(charset "utf-8");
       ;meta(name "viewport", content "width=device-width, initial-scale=1");
       ;link(rel "stylesheet", href "https://pal.dev/props/owntracks/ol/10.3.1/ol.css");

@@ -1,11 +1,11 @@
-::  untrack? loci? locus?: location tracking & sharing
+::  spots: location tracking & sharing
 ::
 ::    because location is sensitive, most foreign-access subscription paths
 ::    contain the subscriber's @p, letting us scope updates to specific
 ::    listeners.
 ::
 ::    /live/[~sampel] gives live location updates for all devices _that ~sampel
-::    has been given access to_. gives %loci-live-update facts.
+::    has been given access to_. gives %spots-live-update facts.
 ::    removing access to a device will send a [did ~ ~] $live-update.
 ::
 ::TODO  scope:
@@ -29,13 +29,13 @@
 ::  - only latest location/$node & battery status, no history tracking
 ::  - respect username field for the card, as long as it's not a valid @p
 ::
-/-  *loci
+/-  *spots
 /+  ot=owntracks, *pal, rudder,
     co=contacts,
     dbug, verb, default-agent
 ::
-:: /~  pages  (page:rudder (map @t device) [%nop ~])  /app/loci
-/=  share  /app/loci/share
+:: /~  pages  (page:rudder (map @t device) [%nop ~])  /app/spots
+/=  share  /app/spots/share
 ::
 |%
 +$  state-0
@@ -78,7 +78,7 @@
 ++  send-live
   |=  [doz=(set @p) upd=live-update]
   :+  %give  %fact
-  :_  [%loci-live-update !>(upd)]
+  :_  [%spots-live-update !>(upd)]
   :-  /live
   (turn ~(tap in doz) |=(=@p /live/(scot %p p)))
 ::
@@ -204,14 +204,14 @@
               line  (~(del ju line) [did who]:q.vase)
             ==
         =/  upd=live-update  [did.q.vase ~ ~]
-        [%give %fact [/live/(scot %p who.q.vase)]~ %loci-live-update !>(upd)]~
+        [%give %fact [/live/(scot %p who.q.vase)]~ %spots-live-update !>(upd)]~
       :_  %_  this
             bait  (~(put ju bait) [who did]:q.vase)
             line  (~(put ju line) [did who]:q.vase)
           ==
       ?~  dev=(~(get by mine) did.q.vase)  ~
       =/  upd=live-update  [did.q.vase ?~(bac.u.dev ~ `i.bac.u.dev) bat.u.dev]
-      [%give %fact [/live/(scot %p who.q.vase)]~ %loci-live-update !>(upd)]~
+      [%give %fact [/live/(scot %p who.q.vase)]~ %spots-live-update !>(upd)]~
     ==
   ::
     ::  %handle-http-request: incoming from eyre
@@ -223,7 +223,7 @@
       =/  =query:rudder  (purse:rudder url.request)
       :_  this
       %+  spout:rudder  id
-      ?.  ?=([%owntracks %share @ ~] site.query)
+      ?.  ?=([%spots %share @ ~] site.query)
         (issue:rudder 404 ~)
       ~&  key=i.t.t.site.query
       ?~  ved=(~(get by open) i.t.t.site.query)
@@ -488,7 +488,7 @@
       :+  did
         ?~(bac.u.dev ~ `i.bac.u.dev)
       bat.u.dev
-    `[%give %fact ~ %loci-live-update !>(upd)]
+    `[%give %fact ~ %spots-live-update !>(upd)]
   ==
 ::
 ++  on-agent
@@ -513,7 +513,7 @@
       [%pass wire %agent [src dap]:bowl %watch /live/(scot %p our.bowl)]~
     ::
         %fact
-      ?.  =(%loci-live-update p.cage.sign)
+      ?.  =(%spots-live-update p.cage.sign)
         ~|  [%strange-fact mark=p.cage.sign]
         !!  ::TODO  or nop?
       =+  !<(live-update q.cage.sign)

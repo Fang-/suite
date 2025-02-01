@@ -1,4 +1,4 @@
-/-  *loci
+/-  *spots
 /+  rudder
 ::
 ^-  (page:rudder (map @t device) [%nop ~])
@@ -19,7 +19,7 @@
   ++  page
     ;html
       ;head
-        ;title:"loci: home"
+        ;title:"spots: home"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;link(rel "stylesheet", href "https://pal.dev/props/owntracks/ol/10.3.1/ol.css");

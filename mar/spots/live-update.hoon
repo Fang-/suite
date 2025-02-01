@@ -1,6 +1,6 @@
-::  loci-live-update: live location update
+::  spots-live-update: live location update
 ::
-/-  *loci
+/-  *spots
 |_  upd=live-update
 ++  grab
   |%

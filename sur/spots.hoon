@@ -1,4 +1,4 @@
-::  loci: location tracking primitives
+::  spots: location tracking primitives
 ::
 |%
 +$  device  ::  tracking object

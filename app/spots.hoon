@@ -22,6 +22,7 @@
 ::  - subscribe to friends' locations over ames (also look into tours?)
 ::  - include friends in responses as well
 ::  - expose trigger zone status w/o location deets
+::  - support one-click setup? https://owntracks.org/booklet/guide/quicksetup/#initial-testing
 ::
 ::TODO  guest locations???
 ::  - let non-urbit-users co-locate on an urbit user's owntracksserver
@@ -35,6 +36,7 @@
     dbug, verb, default-agent
 ::
 :: /~  pages  (page:rudder (map @t device) [%nop ~])  /app/spots
+/=  home   /app/spots/home
 /=  share  /app/spots/share
 ::
 |%
@@ -170,6 +172,7 @@
       [~ this(auth +.q.vase)]
     ::
         [%share did=@t for=(unit @dr)]
+      ::TODO  support revocation
       =/  key=@ta
         |-
         =+  k=(crip ((v-co:^co 12) (end 0^60 eny.bowl)))
@@ -223,49 +226,41 @@
       =/  =query:rudder  (purse:rudder url.request)
       :_  this
       %+  spout:rudder  id
-      ?.  ?=([%spots %share @ ~] site.query)
-        (issue:rudder 404 ~)
-      ~&  key=i.t.t.site.query
-      ?~  ved=(~(get by open) i.t.t.site.query)
-        (issue:rudder 403 'expired')
-      ?:  &(?=(^ til.u.ved) (gth now.bowl u.til.u.ved))
-        (issue:rudder 403 'expired')
-      ?~  dev=(~(get by mine) did.u.ved)
-        (issue:rudder 404 'gone')
-      ?+  ext.query  (issue:rudder 404 ~)
-          ~
-        (paint:rudder (share did.u.ved til.u.ved u.dev))
+      ?+  site.query  (issue:rudder 404 ~)
+          [%spots ~]
+        (paint:rudder (home bowl mine auth open hunt line dogs))
       ::
-          [~ %json]
-        ^-  simple-payload:http
-        :-  [200 ['content-type' 'application/json']~]
-        %-  :(cork en:json:html as-octs:mimes:html some)
-        ?~  bac.u.dev  ~
-        =+  i.bac.u.dev
-        ::TMP
-        :: =.  lat  (add:rd lat (div:rd .~1 (sun:rd (~(rad og +(eny.bowl)) 100))))
-        :: =.  lon  (add:rd lon (div:rd .~1 (sun:rd (~(rad og eny.bowl) 100))))
-        =,  enjs:format
-        %-  pairs
-        :~  'lat'^n+(rsh 3^2 (scot %rd lat))
-            'lon'^n+(rsh 3^2 (scot %rd lon))
-            'acc'^?~(acc ~ (numb u.acc))
-            'bat'^?~(bat.u.dev ~ (numb cen.u.bat.u.dev))
-            'wen'^s+(scot %da msg.wen)
+          [%spots %share @ ~]
+        ~&  key=i.t.t.site.query
+        ?~  ved=(~(get by open) i.t.t.site.query)
+          (issue:rudder 403 'expired')
+        ?:  &(?=(^ til.u.ved) (gth now.bowl u.til.u.ved))
+          (issue:rudder 403 'expired')
+        ?~  dev=(~(get by mine) did.u.ved)
+          (issue:rudder 404 'gone')
+        ?+  ext.query  (issue:rudder 404 ~)
+            ~
+          (paint:rudder (share did.u.ved til.u.ved u.dev))
+        ::
+            [~ %json]
+          ^-  simple-payload:http
+          :-  [200 ['content-type' 'application/json']~]
+          %-  :(cork en:json:html as-octs:mimes:html some)
+          ?~  bac.u.dev  ~
+          =+  i.bac.u.dev
+          ::TMP
+          :: =.  lat  (add:rd lat (div:rd .~1 (sun:rd (~(rad og +(eny.bowl)) 100))))
+          :: =.  lon  (add:rd lon (div:rd .~1 (sun:rd (~(rad og eny.bowl) 100))))
+          =,  enjs:format
+          %-  pairs
+          :~  'lat'^n+(rsh 3^2 (scot %rd lat))
+              'lon'^n+(rsh 3^2 (scot %rd lon))
+              'acc'^?~(acc ~ (numb u.acc))
+              'bat'^?~(bat.u.dev ~ (numb cen.u.bat.u.dev))
+              'wen'^s+(scot %da msg.wen)
+          ==
         ==
       ==
-      :: :: =/  page=$%([%])
-      :: =;  out=(quip card *)
-      ::   ::TODO  support editing state
-      ::   [-.out this]
-      :: %.  [bowl !<(order:rudder vase) mine.state]
-      :: %-  (steer:rudder _mine.state ,[%nop ~])
-      :: :^    pages
-      ::     (point:rudder /[dap.bowl] & ~(key by pages))
-      ::   (fours:rudder mine.state)
-      :: |=  [%nop ~]
-      :: ^-  $@(brief:rudder [brief:rudder (list card) _mine.state])
-      :: 'unimplemented'
     =/  auth-head=@t
       %^  cat  3
         'Basic '

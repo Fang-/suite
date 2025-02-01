@@ -1,5 +1,13 @@
 ::  untrack? loci? locus?: location tracking & sharing
 ::
+::    because location is sensitive, most foreign-access subscription paths
+::    contain the subscriber's @p, letting us scope updates to specific
+::    listeners.
+::
+::    /live/[~sampel] gives live location updates for all devices _that ~sampel
+::    has been given access to_. gives %loci-live-update facts.
+::    removing access to a device will send a [did ~ ~] $live-update.
+::
 ::TODO  scope:
 ::  - per device, store time-ordered list of location reports (_type=location)
 ::  - store user-defined waypoints (_type=waypoint/s)
@@ -22,7 +30,8 @@
 ::  - respect username field for the card, as long as it's not a valid @p
 ::
 /-  *loci
-/+  ot=owntracks, rudder,
+/+  ot=owntracks, *pal, rudder,
+    co=contacts,
     dbug, verb, default-agent
 ::
 :: /~  pages  (page:rudder (map @t device) [%nop ~])  /app/loci
@@ -31,16 +40,87 @@
 |%
 +$  state-0
   $:  %0
-      mine=(map @t device)
-      ::TODO  support current location for guests?
+      ::  mine: personal devices  ::TODO  support guest devices?
+      ::  ways: personal trigger zones
+      ::  news: unsent updates for devices
+      ::
+      mine=(map @t device)  ::TODO  card override
       ways=(map @da region)
-      :: hunt=(mip @p @t [node bat=(unit batt)])
-      news=(list response:ot)  ::TODO  per client device, encode as $%([%hunt @p @t] etc)
+      news=(jug @t news-key)
+      cars=(map @p [name=@t face=[url=@t dat=(unit octs)]])
+      ::TODO  support payload encryption
+      ::  auth: http basic auth password
+      ::  open: clearweb location sharing keys
+      ::
       auth=@t
       open=(map @ta [did=@t fro=@da til=(unit @da)])
+      ::  hunt: foreign devices
+      ::        ::TODO  card override
+      ::        ::TODO  live flag instead of unitized, for displaying "stale" locs
+      ::  bait: per-peer device visibility set, reverse of line
+      ::  line: per-device peer visibility set, reverse of bait
+      ::  dogs: peers known to be tracking us
+      ::
+      hunt=(mip @p @t [now=(unit node) bat=(unit batt)])
+      bait=(jug @p @t)
+      line=(jug @t @p)
+      dogs=(set @p)
+  ==
+::
++$  news-key
+  $%  [%hunt-spot who=@p did=@t]
+      [%hunt-card who=@p did=@t]
   ==
 ::
 +$  card  $+(card card:agent:gall)
+::
+::
+++  send-live
+  |=  [doz=(set @p) upd=live-update]
+  :+  %give  %fact
+  :_  [%loci-live-update !>(upd)]
+  :-  /live
+  (turn ~(tap in doz) |=(=@p /live/(scot %p p)))
+::
+++  put-news
+  |=  $:  news=(jug @t news-key)
+          mine=(set @t)
+      $=  what
+      $%  [%hunt-spot who=@p did=@t]
+          [%hunt-card who=@p dis=(set @t)]
+      ==  ==
+  ^+  news
+  =/  nuz=(list news-key)
+    ?:  ?=(%hunt-spot -.what)  [what]~
+    %+  turn  ~(tap in dis.what)
+    |=  h=@t
+    [%hunt-card who.what h]
+  %-  ~(gas ju news)
+  %-  zing
+  ^-  (list (list [@t news-key]))
+  %+  turn  ~(tap in mine)
+  |=  m=@t
+  ^-  (list [@t news-key])
+  (turn nuz (lead m))
+::
+++  make-ot-location
+  ::TODO  conversions of this kind should probably go into a lib
+  |=  [[who=@p did=@t] node bat=(unit batt)]
+  ^-  location:ot
+  %*  .  *location:ot
+    tid         (make-tid:ot who did)
+    topic       (make-tid:ot who did)  ::TODO  prepend 'owntracks/http/'?  ::NOTE  not respected (yet?)
+    lat         lat
+    lon         lon
+    acc         acc
+    alt         alt
+    vac         vac
+    vel         vel
+    tst         gps.wen
+    created-at  `msg.wen
+    batt        ?~(bat ~ `cen.u.bat)
+    bs          ?~(bat %unknown ?-(sat.u.bat %idk %unknown, %run %unplugged, %cha %charging, %ful %full))
+  ==
 --
 ::
 %-  agent:dbug
@@ -58,18 +138,19 @@
   ::  start out with a random password
   ::
   :_  this(auth (rsh 3^2 (scot %q (end 3^4 eny.bowl))))
-  ::  and set up an eyre binding
+  ::  set up an eyre binding,
+  ::  and the contacts subscription
   ::
-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
+  :~  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+      [%pass /contacts/news %agent [our.bowl %contacts] %watch /v1/news]
+  ==
 ::
 ++  on-save  !>(state)
 ::
 ++  on-load
   |=  ole=vase
   ^-  (quip card _this)
-  =/  old  !<(state-0 ole)
-  =.  state  old
-  [~ this]
+  [~ this(state !<(state-0 ole))]
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -79,9 +160,11 @@
     ::
       %noun
     ?+  q.vase  !!
-        [%queue-response *]
-      =+  !<([%queue-response r=response:ot] vase)
-      [~ this(news (snoc news r))]
+        [%marked mark=@tas data=*]
+      (on-poke mark.q.vase (slot 7 vase))
+    ::
+        [%kill did=@t]
+      [~ this(mine (~(del by mine) did.q.vase))]
     ::
         [%set-auth @t]
       [~ this(auth +.q.vase)]
@@ -89,7 +172,7 @@
         [%share did=@t for=(unit @dr)]
       =/  key=@ta
         |-
-        =+  k=(crip ((v-co:co 12) (end 0^60 eny.bowl)))
+        =+  k=(crip ((v-co:^co 12) (end 0^60 eny.bowl)))
         ?.  (~(has by open) k)  k
         $(eny.bowl (shas %next eny.bowl))
       =.  open
@@ -99,6 +182,36 @@
         `(add now.bowl u.for.q.vase)
       ::TODO  set timer for cleanup?
       [~ this]
+    ::
+        [%hunt who=@p]
+      =.  hunt
+        %+  ~(put by hunt)  who.q.vase
+        (~(gut by hunt) who.q.vase ~)
+      ::  make sure we have latest profile card details. this is potentially
+      ::  redundant, but simplifies the logic. we don't want to add muddy
+      ::  existence check semantics onto .cars entries.
+      ::
+      ::TODO  scry profile deets
+      ::TODO  put into .cars
+      ::TODO  make request for profile picture octs
+      :_  this
+      [%pass /hunt %agent [who.q.vase dap.bowl] %watch /live/(scot %p our.bowl)]~
+    ::
+        [%bait who=@p did=@t show=?]
+      ?.  show.q.vase
+        :_  %_  this
+              bait  (~(del ju bait) [who did]:q.vase)
+              line  (~(del ju line) [did who]:q.vase)
+            ==
+        =/  upd=live-update  [did.q.vase ~ ~]
+        [%give %fact [/live/(scot %p who.q.vase)]~ %loci-live-update !>(upd)]~
+      :_  %_  this
+            bait  (~(put ju bait) [who did]:q.vase)
+            line  (~(put ju line) [did who]:q.vase)
+          ==
+      ?~  dev=(~(get by mine) did.q.vase)  ~
+      =/  upd=live-update  [did.q.vase ?~(bac.u.dev ~ `i.bac.u.dev) bat.u.dev]
+      [%give %fact [/live/(scot %p who.q.vase)]~ %loci-live-update !>(upd)]~
     ==
   ::
     ::  %handle-http-request: incoming from eyre
@@ -178,19 +291,66 @@
       ~&  [%failed-to-parse u.jon]
       :_  this
       (spout:rudder id [400 ['content-type' 'application/json']~] ~)
-    ~&  [%got -.u.mes]
-    ::  for now, always ack, send no updates
+    =/  did=(unit @t)
+      ::TODO  failing this, should get it from topic? or should we just assert
+      ::      that it's here?
+      ::      %location logic gets from the topic...
+      (get-header:http 'x-limit-d' header-list.request)
+    ::  if this device is new, everything is news to it
     ::
-    :-  %+  spout:rudder  id
-        :-  [200 ['content-type' 'application/json']~]
-        `(as-octs:mimes:html (en:json:html (responses:enjs:ot news)))
-    =.  news  ~
+    =?  news  &(?=(^ did) !(~(has by mine) u.did))
+      ::  everything is news to it, generate a set of news-keys for this
+      ::  device based on everything we have in state
+      ::
+      %+  ~(put by news)  u.did
+      ::TODO  also enqueue %send-ways command
+      %+  roll  ~(tap by hunt)
+      |=  [[who=@p des=(map @t [now=(unit) *])] nes=(set news-key)]
+      %+  roll  ~(tap by des)
+      |=  [[did=@t now=(unit) *] =_nes]
+      =?  nes  (~(has by cars) who)
+        (~(put in nes) [%hunt-card who did])
+      =?  nes  ?=(^ now)
+        (~(put in nes) [%hunt-spot who did])
+      nes
+    ::  send (and then forget) updates if we have them for this device
+    ::
+    =/  caz
+      %+  spout:rudder  id
+      :-  [200 ['content-type' 'application/json']~]
+      ?~  did  ~
+      %-  some
+      %-  as-octs:mimes:html
+      %-  en:json:html
+      %-  responses:enjs:ot
+      %+  murn  ~(tap in (~(get ju news) u.did))
+      |=  k=news-key
+      ^-  (unit response:ot)
+      ?-  -.k
+          %hunt-spot
+        ?~  hun=(~(get bi hunt) +.k)  ~
+        ?~  now.u.hun  ~  ::TODO  disappear the node instead? or live flag?
+        (some %location (make-ot-location +.k [u.now bat]:u.hun))
+      ::
+          %hunt-card
+        ?~  car=(~(get by cars) who.k)  ~
+        %-  some
+        :^  %card
+            %-  some
+            %^  rap  3
+              name.u.car
+            ?:  ?=([* ~ ~] (~(gut by hunt) who.k ~))
+              ~  ::  only one device, no need to specify
+            [' (' did.k ')' ~]
+          dat.face.u.car
+        (make-tid:ot +.k)
+      ==
+    =?  news  ?=(^ did)
+      (~(del by news) u.did)
     ~?  &(?=([%o *] u.jon) (~(has by p.u.jon) 'topic'))
       [%with-topic (~(got by p.u.jon) 'topic')]
-    =/  did=(unit @t)
-      (get-header:http 'x-limit-d' header-list.request)
     |-
-    ?+  -.u.mes  this
+    ?+  -.u.mes  [caz this]
         %location
       =/  did=@t
         ::REVIEW
@@ -202,7 +362,12 @@
         =;  p  (fall (rush topic.u.mes p) tid.u.mes)
         ;~(pfix (jest 'owntracks') fas (star ;~(less fas next)) fas (cook crip (star next)))
       ~&  [%location tid=tid.u.mes topic=topic.u.mes did=did tst=tst.u.mes ca=created-at.u.mes]
-      =/  dev  (~(gut by mine) did *device)
+      =/  dev
+        (~(gut by mine) did *device)
+      =/  had=[(unit node) (unit batt)]
+        [?~(bac.dev ~ `i.bac.dev) bat.dev]
+      ::TODO  if it changes, send fact to all device baits
+      ::TODO  add it as news to all our other devices
       =.  bac.dev
         =/  new=node
           =,  u.mes
@@ -240,6 +405,11 @@
           %charging   %cha
           %full       %ful
         ==
+      :-  %+  weld  caz
+          ^-  (list card)
+          =/  new  [`(snag 0 bac.dev) bat.dev]
+          ?:  =(had new)  ~
+          [(send-live (~(get ju line) did) did new)]~
       ::TODO  if we still want this update _here_, should correlate rids with wtst?
       :: =.  now.dev
       ::   ::TODO  emit transitions?
@@ -251,6 +421,7 @@
       this(mine (~(put by mine) did dev))
     ::
         %waypoint
+      :-  caz
       ::TODO  update waypoint state
       ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes) ?=(^ rad.u.mes))
         ~&  [%unsupported-waypoint u.mes]
@@ -258,14 +429,14 @@
       ::TODO  should maybe use tst.u.mes instead? transition also has wtst.
       this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
     ::
-        %waypoints
-      |-
-      ?~  +.u.mes  this
-      =.  this  ^$(u.mes [%waypoint i.u.mes])
-      $(+.u.mes t.u.mes)
+      ::   %waypoints
+      :: |-
+      :: ?~  +.u.mes  this
+      :: =^  this  ^$(u.mes [%waypoint i.u.mes])
+      :: $(+.u.mes t.u.mes)
     ::
         %transition
-      ::TODO  emit transition notification fact?
+      :-  caz  ::TODO  emit transition notification fact?
       =/  did=@t
         ::REVIEW
         ::  get the device id from the request header if we can,
@@ -301,20 +472,210 @@
   ^-  (quip card _this)
   ?+  path  (on-watch:def path)
     [%http-response *]  [~ this]
+  ::
+      [%live ?(~ [@ ~])]
+    =/  for=@p
+      ?^  t.path  (slav %p i.t.path)
+      ?>(=(src our):bowl src.bowl)
+    ?>  =(for src.bowl)
+    =.  dogs  (~(put in dogs) src.bowl)
+    :_  this
+    %+  murn  ~(tap in (~(get ju bait) src.bowl))
+    |=  did=@t
+    ^-  (unit card)
+    ?~  dev=(~(get by mine) did)  ~
+    =/  upd=live-update
+      :+  did
+        ?~(bac.u.dev ~ `i.bac.u.dev)
+      bat.u.dev
+    `[%give %fact ~ %loci-live-update !>(upd)]
+  ==
+::
+++  on-agent
+  |=  [=wire =sign:agent:gall]
+  ^-  (quip card _this)
+  ~|  wire=wire
+  ?+  wire  ~|(%strange-wire !!)
+      [%hunt ~]
+    ?-  -.sign
+      %poke-ack  !!
+    ::
+        %watch-ack
+      ?~  p.sign  [~ this]
+      ::  other legitimate instances of this agent shouldn't nack watches,
+      ::  simply let them sit  silently until we get permission on something.
+      ::  a bit radical, but in light of that we remove user intent on-nack.
+      ::
+      [~ this(hunt (~(del by hunt) src.bowl))]
+    ::
+        %kick
+      :_  this
+      [%pass wire %agent [src dap]:bowl %watch /live/(scot %p our.bowl)]~
+    ::
+        %fact
+      ?.  =(%loci-live-update p.cage.sign)
+        ~|  [%strange-fact mark=p.cage.sign]
+        !!  ::TODO  or nop?
+      =+  !<(live-update q.cage.sign)
+      =.  hunt  (~(put bi hunt) src.bowl did now bat)
+      ::  the data changed, which means there's news for each of our devices
+      ::
+      =?  news  ?=(^ now)  ::TODO  what if deletion?
+        (put-news news ~(key by mine) %hunt-spot src.bowl did)
+      ::TODO  give subscription updates for clients?
+      [~ this]
+    ==
+  ::
+      [%contacts %news ~]
+    ::TODO  carefully re-sub on kick
+    ?.  ?=(%fact -.sign)  [~ this]
+    ?.  ?=(%contact-response-0 p.cage.sign)
+      ~&  [dap.bowl %contacts-strange-mark mark=p.cage.sign]
+      [~ this]
+    =+  !<(res=response:co q.cage.sign)
+    =/  pro=(unit [who=@p con=contact:co])
+      ?-  -.res
+        %self  ~  ::TODO  update our own card too
+        %page  ?^  kip.res  ~
+               `[kip.res (contact-uni:co [con mod]:res)]
+        %wipe  ?^  kip.res  ~
+               `[kip.res ~]
+        %peer  `+.res  ::TODO  does this account for the overlay?
+      ==
+    ?~  pro  [~ this]
+    =/  [nom=@t img=@t]
+      ::  we fetch the avatar not directly but through a pal.dev service,
+      ::  which will downscale and compress the image for us,
+      ::  so that we have a smaller memory footprint.
+      ::
+      :-  =+  def=(scot %p who.u.pro)
+          =+  nom=(fall (~(get cy:co con.u.pro) %nickname %text) def)
+          ?:(=('' nom) def nom)
+      ?^  img=(~(get cy:co con.u.pro) %avatar %look)
+        ::TODO  really should make these requests through paldev as a
+        ::      service provider, to prevent clearweb abuse...
+        %^  cat  3
+          'https://pal.dev/aides/owntracks/avatar?url='
+        =,  mimes:html
+        (en:base64 (as-octs u.img))
+      %+  rap  3
+      :+  'https://pal.dev/aides/owntracks/sigil?ship='
+        (rsh 3 (scot %p who.u.pro))
+      ?~  col=(~(get cy:co con.u.pro) %color %tint)
+        ~
+      =+  r=(cut 3 2^1 u.col)
+      =+  g=(cut 3 1^1 u.col)
+      =+  b=(cut 3 0^1 u.col)
+      =+  x=(div :(add (mul 299 r) (mul 587 g) (mul 114 b)) 1.000)
+      :~  '&bg=rgb('  (scot %ud r)  ','  (scot %ud g)  ','  (scot %ud b)  ')'
+          '&fg='  ?:((lth (sub 255 x) 70) 'black' 'white')
+      ==
+    =/  had=[name=@t face=[url=@t (unit octs)]]
+      (~(gut by cars) who.u.pro (scot %p who.u.pro) ['' ~])
+    ::  always update the entry in .cars
+    ::
+    =.  cars
+      %+  ~(put by cars)  who.u.pro
+      :-  nom
+      ::  only update the url & image data part if it changed
+      ::
+      ?:  =(url.face.had img)
+        face.had
+      [img ~]
+    ::  if anything changed, generate the relevant news and queue it up
+    ::  for all our devices
+    ::
+    =?  news  !&(=(name.had nom) =(url.face.had img))
+      %^  put-news  news
+        ~(key by mine)
+      [%hunt-card who.u.pro ~(key by (~(gut by hunt) who.u.pro ~))]
+    :_  this
+    ::  if the image url changed, we must request the matching octs
+    ::
+    ?:  =(url.face.had img)
+      ~
+    =-  [%pass /card/(scot %p who.u.pro)/face/(scot %t img) %arvo %i -]~
+    [%request [%'GET' img ~ ~] *outbound-config:iris]
   ==
 ::
 ++  on-arvo
-  |=  [=wire =sign-arvo]
+  |=  [=wire sign=sign-arvo]
   ^-  (quip card _this)
-  ?+  sign-arvo  (on-arvo:def wire sign-arvo)
-      [%eyre %bound *]
-    ~?  !accepted.sign-arvo
-      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
+  ~|  [wire=wire sign=[- +<]:sign]
+  ?+  wire  (on-arvo:def wire sign)
+      [%eyre %connect ~]
+    ?>  ?=([%eyre %bound *] sign)
+    ~?  !accepted.sign
+      [dap.bowl 'eyre bind rejected!' binding.sign]
+    [~ this]
+  ::
+      [%card @ %face @ ~]
+    ?>  ?=([%iris %http-response *] sign)
+    =*  res     client-response.sign
+    =/  who=@p  (slav %p i.t.wire)
+    =/  url=@t  (slav %t i.t.t.t.wire)
+    ::  if we don't care about this particular url anymore, just drop it
+    ::
+    ?.  =(url url.face:(~(gut by cars) who ['' face=[url='' ~]]))
+      ~&  %face-dont-care
+      [~ this]
+    ::  %progress responses are unexpected, the runtime doesn't support them
+    ::  right now. if they occur, just treat them as cancels and retry.
+    ::
+    =?  res  ?=(%progress -.res)
+      ~&  [dap.bowl %strange-iris-progress-response]  ::TODO  log properly
+      [%cancel ~]
+    ::  we might get a %cancel if the runtime was restarted during our
+    ::  request. try to pick up where we left off.
+    ::
+    ?:  ?=(%cancel -.res)
+      :_  this
+      ::TODO  de-dupe with +on-agent?
+      =-  [%pass /card/(scot %p who)/face/(scot %t url) %arvo %i -]~
+      [%request [%'GET' url ~ ~] *outbound-config:iris]
+    ::
+    ?>  ?=(%finished -.res)
+    ?:  !=(200 status-code.response-header.res)
+      ~&  [dap.bowl %failed-to-load-image status-code.response-header.res url]
+      [~ this]
+    ?~  full-file.res
+      ::TODO  will hit this for imgur links...
+      ~&  [dap.bowl %strange-no-image-body url]
+      [~ this]
+    ::  put the image into state, update the news
+    ::
+    =.  cars
+      %+  ~(jab by cars)  who
+      |=  [name=@t [url=@t dat=(unit octs)]]
+      ~?  !=(url ^url)  %face-shouldnt-care
+      [name [url `data.u.full-file.res]]
+    ::TODO  de-dupe with +on-agent
+    =.  news
+      =/  nuz=(list news-key)
+        %+  turn  ~(tap in ~(key by (~(gut by hunt) who ~)))
+        |=  h=@t
+        [%hunt-card who h]
+      %-  ~(gas ju news)
+      %-  zing
+      ^-  (list (list [@t news-key]))
+      %+  turn  ~(tap in ~(key by mine))
+      |=  m=@t
+      ^-  (list [@t news-key])
+      (turn nuz (lead m))
+    ::TODO  subscription update?
     [~ this]
   ==
 ::
-++  on-agent  on-agent:def
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?.  =(/x/whey path)  [~ ~]
+  :^  ~  ~  %mass
+  !>  ^-  (list mass)
+  :~  'mine'^&+mine
+      'cars'^&+cars
+  ==
+::
 ++  on-leave  on-leave:def
-++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --

@@ -6,7 +6,7 @@
       ::TODO  last-known monitoring mode?
       bat=(unit batt)
       now=(set region=@da)  ::TODO  ?
-      :: que=(map  response)
+      ::TODO  card overlay
   ==
 ::
 +$  region  ::  radial zone
@@ -30,4 +30,8 @@
 ::
 +$  batt
   [cen=@ud sat=?(%idk %run %cha %ful)]
+::
+::
++$  live-update
+  [did=@t now=(unit node) bat=(unit batt)]
 --

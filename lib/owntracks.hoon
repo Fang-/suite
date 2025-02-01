@@ -33,7 +33,7 @@
       [%waypoints (list waypoint)]
   ==
 ::
-+$  response
++$  response  $+  owntracks-response
   $%  $>(?(%location %card %transition) message)
       [%cmd $>(?(%dump %report-location %report-steps %set-waypoints) cmd)]
   ==
@@ -41,7 +41,7 @@
 +$  card
   $:  name=(unit @t)         ::  display name
       face=(unit octs)       ::  image data
-      :: tid=@t                 ::  tracker id
+      tid=@t                 ::  tracker id
   ==
 ::
 +$  cmd
@@ -108,6 +108,13 @@
       rid=(unit @t)                         ::  region id
   ==
 ::
+++  make-tid
+  |=  [who=@p did=@t]
+  ^-  @t
+  ::TODO  prefix with a and d from ~adcdef-ghijkl
+  ::TODO  '/' infix might give trouble. review once owntracks/android#1966 fixed
+  (rap 3 (scot %p who) '---' did ~)
+::
 ++  dejs
   |%
   ++  message
@@ -136,6 +143,8 @@
     %-  ut
     :~  :+  %|  'name'  so
         :+  %|  'face'  (ci ~(de base64:mimes:html | |) so)
+        :+  %&  'tid'   so
+        ::TODO  topic?
     ==
   ::
   ++  location
@@ -221,8 +230,8 @@
       %-  opts
       :~  'name'^(bind name.res (lead %s))
           'face'^(bind face.res (cork ~(en base64:mimes:html | |) (lead %s)))
-          'tid'^`s+'longtrackerid2'
-          :: 'topic'^`s+'owntracks/http/FB'
+          'tid'^`s+tid.res
+          ::TODO  topic?
       ==
     ::
         %location

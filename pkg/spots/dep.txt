@@ -1,6 +1,5 @@
 > sur
 < landscape-apps/desk/sur
-contacts.hoon
 epic.hoon
 #groups.hoon
 #meta.hoon

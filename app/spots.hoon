@@ -123,6 +123,36 @@
     batt        ?~(bat ~ `cen.u.bat)
     bs          ?~(bat %unknown ?-(sat.u.bat %idk %unknown, %run %unplugged, %cha %charging, %ful %full))
   ==
+::
+++  contact-to-card
+  |=  [who=@p con=contact:co]
+  ^-  [nom=@t img=@t]
+  ::  we fetch the avatar not directly but through a pal.dev service,
+  ::  which will downscale and compress the image for us,
+  ::  so that we have a smaller memory footprint.
+  ::
+  :-  =+  def=(scot %p who)
+      =+  nom=(fall (~(get cy:co con) %nickname %text) def)
+      ?:(=('' nom) def nom)
+  ?^  img=(~(get cy:co con) %avatar %look)
+    ::TODO  really should make these requests through paldev as a
+    ::      service provider, to prevent clearweb abuse...
+    %^  cat  3
+      'https://pal.dev/aides/owntracks/avatar?url='
+    =,  mimes:html
+    (en:base64 (as-octs u.img))
+  %+  rap  3
+  :+  'https://pal.dev/aides/owntracks/sigil?ship='
+    (rsh 3 (scot %p who))
+  ?~  col=(~(get cy:co con) %color %tint)
+    ~
+  =+  r=(cut 3 2^1 u.col)
+  =+  g=(cut 3 1^1 u.col)
+  =+  b=(cut 3 0^1 u.col)
+  =+  x=(div :(add (mul 299 r) (mul 587 g) (mul 114 b)) 1.000)
+  :~  '&bg=rgb('  (scot %ud r)  ','  (scot %ud g)  ','  (scot %ud b)  ')'
+      '&fg='  ?:((lth (sub 255 x) 70) 'black' 'white')
+  ==
 --
 ::
 %-  agent:dbug
@@ -194,11 +224,38 @@
       ::  redundant, but simplifies the logic. we don't want to add muddy
       ::  existence check semantics onto .cars entries.
       ::
-      ::TODO  scry profile deets
-      ::TODO  put into .cars
-      ::TODO  make request for profile picture octs
+      ::TODO  =*  who
+      =/  [nom=@t img=@t]
+        %+  contact-to-card  who.q.vase
+        %-  contact-uni:co
+        .^  =page:co  %gx
+          (scot %p our.bowl)  %contacts  (scot %da now.bowl)
+          /v1/book/(scot %p who.q.vase)/contact-page-0
+        ==
+      =/  had=[name=@t face=[url=@t (unit octs)]]
+        (~(gut by cars) who.q.vase (scot %p who.q.vase) ['' ~])
+      =.  cars
+        ::TODO  dedupe with %contact-response-0 fact handling?
+        %+  ~(put by cars)  who.q.vase
+        :-  nom
+        ?:  =(url.face.had img)
+          face.had
+        [img ~]
+      ::  it's a new addition, always put it into news,
+      ::  and always re-fetch the avatar
+      ::  (see also comment about redundancy & simplicity above)
+      ::
+      =.  news
+        ::TODO  dedupe with %contact-response-0 fact handling?
+        %^  put-news  news
+          ~(key by mine)
+        [%hunt-card who.q.vase ~(key by (~(gut by hunt) who.q.vase ~))]
       :_  this
-      [%pass /hunt %agent [who.q.vase dap.bowl] %watch /live/(scot %p our.bowl)]~
+      :~  [%pass /hunt %agent [who.q.vase dap.bowl] %watch /live/(scot %p our.bowl)]
+        ::
+          =-  [%pass /card/(scot %p who.q.vase)/face/(scot %t img) %arvo %i -]
+          [%request [%'GET' img ~ ~] *outbound-config:iris]
+      ==
     ::
         [%bait who=@p did=@t show=?]
       ?.  show.q.vase
@@ -539,32 +596,7 @@
       ==
     ?~  pro  [~ this]
     =/  [nom=@t img=@t]
-      ::  we fetch the avatar not directly but through a pal.dev service,
-      ::  which will downscale and compress the image for us,
-      ::  so that we have a smaller memory footprint.
-      ::
-      :-  =+  def=(scot %p who.u.pro)
-          =+  nom=(fall (~(get cy:co con.u.pro) %nickname %text) def)
-          ?:(=('' nom) def nom)
-      ?^  img=(~(get cy:co con.u.pro) %avatar %look)
-        ::TODO  really should make these requests through paldev as a
-        ::      service provider, to prevent clearweb abuse...
-        %^  cat  3
-          'https://pal.dev/aides/owntracks/avatar?url='
-        =,  mimes:html
-        (en:base64 (as-octs u.img))
-      %+  rap  3
-      :+  'https://pal.dev/aides/owntracks/sigil?ship='
-        (rsh 3 (scot %p who.u.pro))
-      ?~  col=(~(get cy:co con.u.pro) %color %tint)
-        ~
-      =+  r=(cut 3 2^1 u.col)
-      =+  g=(cut 3 1^1 u.col)
-      =+  b=(cut 3 0^1 u.col)
-      =+  x=(div :(add (mul 299 r) (mul 587 g) (mul 114 b)) 1.000)
-      :~  '&bg=rgb('  (scot %ud r)  ','  (scot %ud g)  ','  (scot %ud b)  ')'
-          '&fg='  ?:((lth (sub 255 x) 70) 'black' 'white')
-      ==
+      (contact-to-card u.pro)
     =/  had=[name=@t face=[url=@t (unit octs)]]
       (~(gut by cars) who.u.pro (scot %p who.u.pro) ['' ~])
     ::  always update the entry in .cars

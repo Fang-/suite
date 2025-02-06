@@ -40,8 +40,8 @@
 /=  share  /app/spots/share
 ::
 |%
-+$  state-0
-  $:  %0
++$  state-1
+  $:  %1
       ::  mine: personal devices  ::TODO  support guest devices?
       ::  ways: personal trigger zones
       ::  news: unsent updates for devices
@@ -158,7 +158,7 @@
 %-  agent:dbug
 %+  verb  |
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 |_  =bowl:gall
@@ -181,8 +181,31 @@
 ::
 ++  on-load
   |=  ole=vase
-  ^-  (quip card _this)
-  [~ this(state !<(state-0 ole))]
+  |^  ^-  (quip card _this)
+      =+  old=!<(state-any ole)
+      =?  old  ?=(%0 -.old)  (state-0-to-1 old)
+      ?>  ?=(%1 -.old)
+      [~ this(state old)]
+  ::
+  +$  state-any  $%(state-0 state-1)
+  ::
+  +$  state-0   $_  %*  .  *state-1  -  %0
+                  mine  *(map @t device-0)
+                  hunt  *(mip @p @t [now=(unit node-0) bat=(unit batt)])
+                ==
+  +$  device-0  _%*(. *device bac *(list node-0))
+  +$  node-0    _%*(. *node alt *(unit @ud))
+  ::
+  ++  state-0-to-1
+    |=  s=state-0
+    ^-  state-1
+    %=  s  -  %1
+      mine  (~(run by mine.s) |=(d=device-0 d(bac (turn bac.d node-0-to-1))))
+      hunt  (~(run bi hunt.s) |=([n=(unit node-0) b=(unit batt)] [(bind n node-0-to-1) b]))
+    ==
+  ++  node-0-to-1
+    |=(n=node-0 `node`n(alt (bind alt.n sun:si)))
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]

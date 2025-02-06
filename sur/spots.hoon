@@ -25,7 +25,7 @@
   $:  lat=@rd
       lon=@rd
       acc=(unit @ud)
-      [alt=(unit @ud) vac=(unit @ud)]  ::TODO  actually alt=(unit $@(@ud [alt=@ud vac=@ud]))
+      [alt=(unit @sd) vac=(unit @ud)]  ::TODO  actually alt=(unit $@(@sd [alt=@sd vac=@ud]))
   ==
 ::
 +$  batt

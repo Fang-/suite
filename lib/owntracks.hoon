@@ -57,7 +57,7 @@
 ::
 +$  location                                ::  _type=location
   $:  acc=(unit @ud)                        ::  accuracy (m) (if >0)
-      alt=(unit @ud)                        ::  altitude (m) (if >0)
+      alt=(unit @sd)                        ::  altitude (m)
       batt=(unit @ud)                       ::  battery %
       bs=?(%unknown %unplugged %charging %full)  :: battery status
       cog=(unit @ud)                        ::  course over ground (deg) (if >0)
@@ -151,7 +151,7 @@
     ^-  $-(json (unit ^location))
     %-  ut
     :~  :+  %|  'acc'         ni
-        :+  %|  'alt'         ni
+        :+  %|  'alt'         ns
         :+  %|  'batt'        ni
         :+  %&  'bs'          ::(cu |=(* %unknown) some) ::TODO  from int, ?(%unknown %unplugged %charging %full
                               =-  (ci - ni)
@@ -243,7 +243,7 @@
       :~  'lat'^`(real lat.res)
           'lon'^`(real lon.res)
           'acc'^`(unit json)`(bind acc.res numb)
-          'alt'^`(unit json)`(bind alt.res numb)
+          'alt'^`(unit json)`(bind alt.res nimb)
           'vac'^`(unit json)`(bind vac.res numb)
           'tst'^`(sect tst.res)
           :: 'created_at'^(bind created-at.res sect)  ::TODO
@@ -298,6 +298,22 @@
   |=  jun=(unit json)
   ?~(jun ~ (f u.jun))
 ::
-++  du  ::  second date  ::TODO  into enjs-soft
+++  du  ::  second date  ::TODO  into dejs-soft
   (cu from-unix:chrono:userlib ni)
+::
+++  ns  ::  number as signed  ::TODO  into dejs-soft
+  |=  jon=json
+  ^-  (unit @s)
+  ?.  ?=([%n *] jon)  ~
+  %+  rush  p.jon
+  %+  cook  new:si
+  ;~(plug ;~(pose (cold %| (jest '-')) (easy %&)) dem)
+::
+++  nimb  ::  number from signed  ::TODO  into enjs
+  |=  n=@sd
+  ^-  json
+  :-  %n
+  %^  cat  3
+    ?:((syn:si n) '' '-')
+  (crip (a-co:co (abs:si n)))
 --

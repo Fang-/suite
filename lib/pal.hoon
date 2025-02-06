@@ -65,6 +65,20 @@
     %~  put  by
     (~(gut by a) b ~)
   ::
+  ++  run
+    |*  b=gate
+    %-  ~(run by a)
+    |*  c=(map)
+    (~(run by c) b)
+  ::
+  ++  urn
+    |*  b=$-([[* *] *] *)
+    %-  ~(urn by a)
+    |*  [c=* d=(map)]
+    %-  ~(urn by d)
+    |*  [e=* f=*]
+    (b [c e] f)
+  ::
   ++  tap
     ::NOTE  naive turn-based implementation find-errors ):
     =<  $

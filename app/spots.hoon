@@ -723,11 +723,21 @@
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
-  ?.  =(/x/whey path)  [~ ~]
-  :^  ~  ~  %mass
-  !>  ^-  (list mass)
-  :~  'mine'^&+mine
-      'cars'^&+cars
+  ?+  path  [~ ~]
+      [%x %dbug %state ~]
+    :^  ~  ~  %noun  !>
+    =-  state(cars (~(run by cars) -))
+    |=  [name=@t face=[url=@t dat=(unit octs)]]
+    :-  name
+    ?~  dat.face  face
+    face(q.u.dat 1.337)
+  ::
+      [%x %whey ~]
+    :^  ~  ~  %mass
+    !>  ^-  (list mass)
+    :~  'mine'^&+mine
+        'cars'^&+cars
+    ==
   ==
 ::
 ++  on-leave  on-leave:def

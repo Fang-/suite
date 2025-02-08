@@ -240,30 +240,30 @@
       [~ this]
     ::
         [%hunt who=@p]
+      =*  who  who.q.vase
       =.  hunt
-        %+  ~(put by hunt)  who.q.vase
-        (~(gut by hunt) who.q.vase ~)
+        %+  ~(put by hunt)  who
+        (~(gut by hunt) who ~)
       ::  make sure we have latest profile card details. this is potentially
       ::  redundant, but simplifies the logic. we don't want to add muddy
       ::  existence check semantics onto .cars entries.
       ::
-      ::TODO  =*  who
       =/  [nom=@t img=@t]
-        %+  contact-to-card  who.q.vase
+        %+  contact-to-card  who
         ?.  .^  ?  %gu
               (scot %p our.bowl)  %contacts  (scot %da now.bowl)
-              /v1/contact/(scot %p who.q.vase)
+              /v1/contact/(scot %p who)
             ==
           *contact:co
         .^  contact:co  %gx
           (scot %p our.bowl)  %contacts  (scot %da now.bowl)
-          /v1/contact/(scot %p who.q.vase)/contact-1
+          /v1/contact/(scot %p who)/contact-1
         ==
       =/  had=[name=@t face=[url=@t (unit octs)]]
-        (~(gut by cars) who.q.vase (scot %p who.q.vase) ['' ~])
+        (~(gut by cars) who (scot %p who) ['' ~])
       =.  cars
         ::TODO  dedupe with %contact-response-0 fact handling?
-        %+  ~(put by cars)  who.q.vase
+        %+  ~(put by cars)  who
         :-  nom
         ?:  =(url.face.had img)
           face.had
@@ -276,11 +276,11 @@
         ::TODO  dedupe with %contact-response-0 fact handling?
         %^  put-news  news
           ~(key by mine)
-        [%hunt-card who.q.vase ~(key by (~(gut by hunt) who.q.vase ~))]
+        [%hunt-card who ~(key by (~(gut by hunt) who ~))]
       :_  this
-      :~  [%pass /hunt %agent [who.q.vase dap.bowl] %watch /live/(scot %p our.bowl)]
+      :~  [%pass /hunt %agent [who dap.bowl] %watch /live/(scot %p our.bowl)]
         ::
-          =-  [%pass /card/(scot %p who.q.vase)/face/(scot %t img) %arvo %i -]
+          =-  [%pass /card/(scot %p who)/face/(scot %t img) %arvo %i -]
           [%request [%'GET' img ~ ~] *outbound-config:iris]
       ==
     ::

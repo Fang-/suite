@@ -250,10 +250,14 @@
       ::TODO  =*  who
       =/  [nom=@t img=@t]
         %+  contact-to-card  who.q.vase
-        %-  contact-uni:co
-        .^  =page:co  %gx
+        ?.  .^  ?  %gu
+              (scot %p our.bowl)  %contacts  (scot %da now.bowl)
+              /v1/contact/(scot %p who.q.vase)
+            ==
+          *contact:co
+        .^  contact:co  %gx
           (scot %p our.bowl)  %contacts  (scot %da now.bowl)
-          /v1/book/(scot %p who.q.vase)/contact-page-0
+          /v1/contact/(scot %p who.q.vase)/contact-1
         ==
       =/  had=[name=@t face=[url=@t (unit octs)]]
         (~(gut by cars) who.q.vase (scot %p who.q.vase) ['' ~])

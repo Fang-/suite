@@ -153,6 +153,37 @@
   :~  '&bg=rgb('  (scot %ud r)  ','  (scot %ud g)  ','  (scot %ud b)  ')'
       '&fg='  ?:((lth (sub 255 x) 70) 'black' 'white')
   ==
+::
+++  put-contact-card
+  |=  $:  cars=(map @p [name=@t face=[url=@t dat=(unit octs)]])
+          [who=@p nom=@t img=@t]
+      ==
+  ^-  [[new=? req=?] _cars]
+  =/  had=[name=@t face=[url=@t dat=(unit octs)]]
+    (~(gut by cars) who '' ['' ~])
+  ::  the change is only news if the name changed, which we can share right
+  ::  away. if the img changed, it must be requested before we can send it
+  ::  out. receiving the matching response will mark it as news.
+  ::
+  :-  :-  new=!=(name.had nom)
+      req=!=(url.face.had img)
+  %+  ~(put by cars)  who
+  :-  nom
+  ::  if the url changed, we will change the url in state, (and caller must
+  ::  make a request,) but keep the old octs for now. this means that the octs
+  ::  in state could be stale/mismatching the url.
+  ::  we do this so that clients connecting while a request is outstanding
+  ::  will still get a display image if we had one previously.
+  ::
+  ?:  =(url.face.had img)
+    face.had
+  [img dat.face.had]
+::
+++  request-face
+  |=  [who=@p img=@t]
+  ^-  card
+  =-  [%pass /card/(scot %p who)/face/(scot %t img) %arvo %i -]
+  [%request [%'GET' img ~ ~] *outbound-config:iris]
 --
 ::
 %-  agent:dbug
@@ -259,18 +290,12 @@
           (scot %p our.bowl)  %contacts  (scot %da now.bowl)
           /v1/contact/(scot %p who)/contact-1
         ==
-      =/  had=[name=@t face=[url=@t (unit octs)]]
-        (~(gut by cars) who (scot %p who) ['' ~])
-      =.  cars
-        ::TODO  dedupe with %contact-response-0 fact handling?
-        %+  ~(put by cars)  who
-        :-  nom
-        ?:  =(url.face.had img)
-          face.had
-        [img ~]
+      =^  [new=? req=?]  cars
+        (put-contact-card cars who nom img)
       ::  it's a new addition, always put it into news,
-      ::  and always re-fetch the avatar
-      ::  (see also comment about redundancy & simplicity above)
+      ::  and always re-fetch the avatar, even if nothing changed.
+      ::  this lets the hunt command be used as a "force re-card" tool.
+      ::  (see also comment about redundancy & simplicity above.)
       ::
       =.  news
         ::TODO  dedupe with %contact-response-0 fact handling?
@@ -279,9 +304,7 @@
         [%hunt-card who ~(key by (~(gut by hunt) who ~))]
       :_  this
       :~  [%pass /hunt %agent [who dap.bowl] %watch /live/(scot %p our.bowl)]
-        ::
-          =-  [%pass /card/(scot %p who)/face/(scot %t img) %arvo %i -]
-          [%request [%'GET' img ~ ~] *outbound-config:iris]
+          (request-face who img)
       ==
     ::
         [%bait who=@p did=@t show=?]
@@ -622,34 +645,26 @@
         %peer  `+.res  ::TODO  does this account for the overlay?
       ==
     ?~  pro  [~ this]
+    =*  who  who.u.pro
     =/  [nom=@t img=@t]
       (contact-to-card u.pro)
-    =/  had=[name=@t face=[url=@t (unit octs)]]
-      (~(gut by cars) who.u.pro (scot %p who.u.pro) ['' ~])
     ::  always update the entry in .cars
     ::
-    =.  cars
-      %+  ~(put by cars)  who.u.pro
-      :-  nom
-      ::  only update the url & image data part if it changed
-      ::
-      ?:  =(url.face.had img)
-        face.had
-      [img ~]
+    =^  [new=? req=?]  cars
+      (put-contact-card cars who nom img)
     ::  if anything changed, generate the relevant news and queue it up
     ::  for all our devices
     ::
-    =?  news  !&(=(name.had nom) =(url.face.had img))
+    =?  news  new
       %^  put-news  news
         ~(key by mine)
-      [%hunt-card who.u.pro ~(key by (~(gut by hunt) who.u.pro ~))]
+      [%hunt-card who ~(key by (~(gut by hunt) who ~))]
     :_  this
-    ::  if the image url changed, we must request the matching octs
+    ::  if we must request a new image, do so
     ::
-    ?:  =(url.face.had img)
+    ?.  req
       ~
-    =-  [%pass /card/(scot %p who.u.pro)/face/(scot %t img) %arvo %i -]~
-    [%request [%'GET' img ~ ~] *outbound-config:iris]
+    [(request-face who img)]~
   ==
 ::
 ++  on-arvo
@@ -683,10 +698,7 @@
     ::  request. try to pick up where we left off.
     ::
     ?:  ?=(%cancel -.res)
-      :_  this
-      ::TODO  de-dupe with +on-agent?
-      =-  [%pass /card/(scot %p who)/face/(scot %t url) %arvo %i -]~
-      [%request [%'GET' url ~ ~] *outbound-config:iris]
+      [[(request-face who url)]~ this]
     ::
     ?>  ?=(%finished -.res)
     ?:  !=(200 status-code.response-header.res)
@@ -697,25 +709,17 @@
       ~&  [dap.bowl %strange-no-image-body url]
       [~ this]
     ::  put the image into state, update the news
+    ::REVIEW  what if octs are the same? still news?
     ::
     =.  cars
       %+  ~(jab by cars)  who
       |=  [name=@t [url=@t dat=(unit octs)]]
       ~?  !=(url ^url)  %face-shouldnt-care
       [name [url `data.u.full-file.res]]
-    ::TODO  de-dupe with +on-agent
     =.  news
-      =/  nuz=(list news-key)
-        %+  turn  ~(tap in ~(key by (~(gut by hunt) who ~)))
-        |=  h=@t
-        [%hunt-card who h]
-      %-  ~(gas ju news)
-      %-  zing
-      ^-  (list (list [@t news-key]))
-      %+  turn  ~(tap in ~(key by mine))
-      |=  m=@t
-      ^-  (list [@t news-key])
-      (turn nuz (lead m))
+      %^  put-news  news
+        ~(key by mine)
+      [%hunt-card who ~(key by (~(gut by hunt) who ~))]
     ::TODO  subscription update?
     [~ this]
   ==

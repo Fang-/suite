@@ -74,6 +74,15 @@
       [%hunt-card who=@p did=@t]
   ==
 ::
++$  action
+  $%  [%auth new=@t]
+      [%kill did=@t]
+      [%open key=(unit @ta) did=@t for=(unit @dr)]
+    ::
+      [%hunt who=@p]
+      [%bait who=@p did=@t show=?]
+  ==
+::
 +$  card  $+(card card:agent:gall)
 ::
 ::
@@ -249,35 +258,49 @@
         [%marked mark=@tas data=*]
       (on-poke mark.q.vase (slot 7 vase))
     ::
-        [%kill did=@t]
-      [~ this(mine (~(del by mine) did.q.vase))]
+    ::TODO  tmp backcompat, removeme
     ::
-        [%set-auth @t]
-      [~ this(auth +.q.vase)]
+      [%kill did=@t]  (on-poke %spots-action !>(`action`q.vase))
+      [%set-auth @t]  (on-poke %spots-action !>(`action`q.vase(- %auth)))
+      [%hunt who=@p]  (on-poke %spots-action !>(`action`q.vase))
     ::
         [%share key=(unit @ta) did=@t for=(unit @dr)]
-      ::TODO  support revocation
+      (on-poke %spots-action !>(`action`q.vase(- %open)))
+    ::
+        [%bait who=@p did=@t show=?]
+      (on-poke %spots-action !>(`action`q.vase))
+    ==
+  ::
+    ::  %spots-action: user actions
+    ::
+      %spots-action
+    =+  !<(act=action vase)
+    ?-  -.act
+      %auth  [~ this(auth new.act)]
+      %kill  [~ this(mine (~(del by mine) did.act))]
+    ::
+        %open
       =/  key=@ta
-        ?^  key.q.vase  u.key.q.vase
+        ?^  key.act  u.key.act
         |-
         =+  k=(crip ((v-co:^co 12) (end 0^60 eny.bowl)))
         ?.  (~(has by open) k)  k
         $(eny.bowl (shas %next eny.bowl))
-      ?:  =(for.q.vase `~s0)
+      ?:  =(for.act `~s0)
         ::NOTE  could un-set the potential timer, but doesn't really matter...
         [~ this(open (~(del by open) key))]
       =.  open
         %+  ~(put by open)  key
-        :+  did.q.vase  now.bowl
-        ?~  for.q.vase  ~
-        `(add now.bowl u.for.q.vase)
+        :+  did.act  now.bowl
+        ?~  for.act  ~
+        `(add now.bowl u.for.act)
       :_  this
-      ?~  for.q.vase  ~
+      ?~  for.act  ~
       ::NOTE  generic expiry wire, +on-arvo just checks all of .open
-      [%pass /open/expire %arvo %b %wait (add now.bowl u.for.q.vase)]~
+      [%pass /open/expire %arvo %b %wait (add now.bowl u.for.act)]~
     ::
-        [%hunt who=@p]
-      =*  who  who.q.vase
+        %hunt
+      =*  who  who.act
       =.  hunt
         %+  ~(put by hunt)  who
         (~(gut by hunt) who ~)
@@ -313,21 +336,21 @@
           (request-face who img)
       ==
     ::
-        [%bait who=@p did=@t show=?]
-      ?.  show.q.vase
+        %bait
+      ?.  show.act
         :_  %_  this
-              bait  (~(del ju bait) [who did]:q.vase)
-              line  (~(del ju line) [did who]:q.vase)
+              bait  (~(del ju bait) [who did]:act)
+              line  (~(del ju line) [did who]:act)
             ==
-        =/  upd=live-update  [did.q.vase ~ ~]
-        [%give %fact [/live/(scot %p who.q.vase)]~ %spots-live-update !>(upd)]~
+        =/  upd=live-update  [did.act ~ ~]
+        [%give %fact [/live/(scot %p who.act)]~ %spots-live-update !>(upd)]~
       :_  %_  this
-            bait  (~(put ju bait) [who did]:q.vase)
-            line  (~(put ju line) [did who]:q.vase)
+            bait  (~(put ju bait) [who did]:act)
+            line  (~(put ju line) [did who]:act)
           ==
-      ?~  dev=(~(get by mine) did.q.vase)  ~
-      =/  upd=live-update  [did.q.vase ?~(bac.u.dev ~ `i.bac.u.dev) bat.u.dev]
-      [%give %fact [/live/(scot %p who.q.vase)]~ %spots-live-update !>(upd)]~
+      ?~  dev=(~(get by mine) did.act)  ~
+      =/  upd=live-update  [did.act ?~(bac.u.dev ~ `i.bac.u.dev) bat.u.dev]
+      [%give %fact [/live/(scot %p who.act)]~ %spots-live-update !>(upd)]~
     ==
   ::
     ::  %handle-http-request: incoming from eyre

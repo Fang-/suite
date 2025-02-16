@@ -255,20 +255,26 @@
         [%set-auth @t]
       [~ this(auth +.q.vase)]
     ::
-        [%share did=@t for=(unit @dr)]
+        [%share key=(unit @ta) did=@t for=(unit @dr)]
       ::TODO  support revocation
       =/  key=@ta
+        ?^  key.q.vase  u.key.q.vase
         |-
         =+  k=(crip ((v-co:^co 12) (end 0^60 eny.bowl)))
         ?.  (~(has by open) k)  k
         $(eny.bowl (shas %next eny.bowl))
+      ?:  =(for.q.vase `~s0)
+        ::NOTE  could un-set the potential timer, but doesn't really matter...
+        [~ this(open (~(del by open) key))]
       =.  open
         %+  ~(put by open)  key
         :+  did.q.vase  now.bowl
         ?~  for.q.vase  ~
         `(add now.bowl u.for.q.vase)
-      ::TODO  set timer for cleanup?
-      [~ this]
+      :_  this
+      ?~  for.q.vase  ~
+      ::NOTE  generic expiry wire, +on-arvo just checks all of .open
+      [%pass /open/expire %arvo %b %wait (add now.bowl u.for.q.vase)]~
     ::
         [%hunt who=@p]
       =*  who  who.q.vase
@@ -677,6 +683,23 @@
     ~?  !accepted.sign
       [dap.bowl 'eyre bind rejected!' binding.sign]
     [~ this]
+  ::
+      [%open %expire ~]
+    ::  presumably, some .open entry just expired,
+    ::  clean up _all_ .open entries that are past their expiry date.
+    ::
+    ?>  ?=([%behn %wake *] sign)
+    ?^  error.sign
+      ::  we're fine to just defer to the next activation,
+      ::  stale entries aren't the end of the world
+      ::
+      %-  (slog 'spots: failed to expire .open' u.error.sign)
+      [~ this]
+    =-  [~ this(open -)]
+    %-  my
+    %+  skip  ~(tap by open)
+    |=  [* @t @da til=(unit @da)]
+    ?~(til | (gth now.bowl u.til))
   ::
       [%card @ %face @ ~]
     ?>  ?=([%iris %http-response *] sign)

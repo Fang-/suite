@@ -10,7 +10,6 @@ these softwares can be installed from ~paldev as landscape tiles:
 - **rumors**: gossip among pals-of-pals.
 - **fafa**: 2fa otp authenticator.
 - **cliff**: filesystem explorer & editor.
-- **scooore**: local scoreboard for chat reacts.
 - **picture**: a picture frame for the homescreen.
 - **verse**: daily random bible verse for the homescreen.
 
@@ -54,3 +53,4 @@ these softwares are outdated, unmaintained, or unused, but remain in the reposit
 - **bard**: interactive storyteller for use with `|link`. (2020.07 - 2021.11)
 - **djay**: backend for synced viewing of youtube videos, sourced from a chat channel. (2020.04)
 - **biblebot**: watches (chat) graphs for mention of bible verses, then posts them. (2021.01 - 2023.01)
+- **scooore**: local scoreboard for chat reacts. (2023.01 - 2025.02)

@@ -1,6 +1,6 @@
 ::  pals index
 ::
-/-  *pals, contact=contacts
+/-  *pals, contact=contacts-0
 /+  rudder, sigil-svg=sigil
 ::
 ^-  (page:rudder records command)

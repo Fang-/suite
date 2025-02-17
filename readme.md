@@ -45,12 +45,12 @@ these softwares are for manual, local installation & configuration:
 - **ppm**: mark and utilities for using `.ppm` image files.
 - **pal**: miscellaneous bits and pieces.
 
-## for later
+## freezer
 
-these softwares have not yet been updated for the new world:
+these softwares are outdated, unmaintained, or unused, but remain in the repository for reference:
 
-- **serval**: a torrent tracker: implements the bittorrent http tracker protocol.
-- **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`.
-- **bard**: interactive storyteller for use with `|link`.
-- **djay**: backend for synced viewing of youtube videos, sourced from a chat channel.
-- **biblebot**: watches (chat) graphs for mention of bible verses, then posts them.
+- **serval**: a torrent tracker: implements the bittorrent http tracker protocol. (2020.09 - 2021.11)
+- **duiker**: a torrent "tracker": enables sharing/discovery of bittorrent magnet links, for use through `|link`. (2020.09 - 2021.11)
+- **bard**: interactive storyteller for use with `|link`. (2020.07 - 2021.11)
+- **djay**: backend for synced viewing of youtube videos, sourced from a chat channel. (2020.04)
+- **biblebot**: watches (chat) graphs for mention of bible verses, then posts them. (2021.01 - 2023.01)

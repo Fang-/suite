@@ -9,18 +9,11 @@
 ::    removing access to a device will send a [did ~ ~] $live-update.
 ::
 ::TODO  scope:
-::  - per device, store time-ordered list of location reports (_type=location)
-::  - store user-defined waypoints (_type=waypoint/s)
 ::  - devices' presence at waypoints (_type=transition)
 ::  - user-defined device-timeranges that describe stored routes/tracks
-::  - http Basic authentication
 ::
 ::TODO  later:
 ::  - send other device locations in POST response bodies
-::  - serve http pages with map view so you can share your own device's location
-::    for the next n minutes, entropy secret in url
-::  - subscribe to friends' locations over ames (also look into tours?)
-::  - include friends in responses as well
 ::  - expose trigger zone status w/o location deets
 ::  - support one-click setup? https://owntracks.org/booklet/guide/quicksetup/#initial-testing
 ::
@@ -497,7 +490,6 @@
         (~(gut by mine) did *device)
       =/  had=[(unit node) (unit batt)]
         [?~(bac.dev ~ `i.bac.dev) bat.dev]
-      ::TODO  if it changes, send fact to all device baits
       ::TODO  add it as news to all our other devices
       =.  bac.dev
         =/  new=node
@@ -751,7 +743,6 @@
       ~&  [dap.bowl %failed-to-load-image status-code.response-header.res url]
       [~ this]
     ?~  full-file.res
-      ::TODO  will hit this for imgur links...
       ~&  [dap.bowl %strange-no-image-body url]
       [~ this]
     ::  put the image into state, update the news

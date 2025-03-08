@@ -136,13 +136,14 @@
   :-  =+  def=(scot %p who)
       =+  nom=(fall (~(get cy:co con) %nickname %text) def)
       ?:(=('' nom) def nom)
-  ?^  img=(~(get cy:co con) %avatar %look)
+  =+  img=(fall (~(get cy:co con) %avatar %look) '')
+  ?.  =('' img)
     ::TODO  really should make these requests through paldev as a
     ::      service provider, to prevent clearweb abuse...
     %^  cat  3
       'https://pal.dev/aides/owntracks/avatar?url='
     =,  mimes:html
-    (en:base64 (as-octs u.img))
+    (en:base64 (as-octs img))
   %+  rap  3
   :+  'https://pal.dev/aides/owntracks/sigil?ship='
     (rsh 3 (scot %p who))

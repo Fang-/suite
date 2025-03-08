@@ -33,8 +33,8 @@
 /=  share  /app/spots/share
 ::
 |%
-+$  state-1
-  $:  %1
++$  state-2
+  $:  %2
       ::  mine: personal devices  ::TODO  support guest devices?
       ::  ways: personal trigger zones
       ::  news: unsent updates for devices
@@ -191,7 +191,7 @@
 %-  agent:dbug
 %+  verb  |
 ::
-=|  state-1
+=|  state-2
 =*  state  -
 ::
 |_  =bowl:gall
@@ -217,10 +217,22 @@
   |^  ^-  (quip card _this)
       =+  old=!<(state-any ole)
       =?  old  ?=(%0 -.old)  (state-0-to-1 old)
-      ?>  ?=(%1 -.old)
+      =?  old  ?=(%1 -.old)  (state-1-to-2 old)
+      ?>  ?=(%2 -.old)
       [~ this(state old)]
   ::
-  +$  state-any  $%(state-0 state-1)
+  +$  state-any  $%(state-0 state-1 state-2)
+  ::
+  +$  state-1  _%*(. *state-2 - %1)
+  ::
+  ++  state-1-to-2
+    |=  s=state-1
+    ^-  state-2
+    ::  clean up erroneously acquired cards
+    ::
+    %=  s  -  %2
+      cars  (my (skim ~(tap by cars.s) |=([who=@p *] (~(has by hunt.s) who))))
+    ==
   ::
   +$  state-0   $_  %*  .  *state-1  -  %0
                   mine  *(map @t device-0)
@@ -667,6 +679,10 @@
       ==
     ?~  pro  [~ this]
     =*  who  who.u.pro
+    ::  if we aren't tracking this peer, we don't need to generate a card
+    ::
+    ?.  (~(has by hunt) who)
+      [~ this]
     =/  [nom=@t img=@t]
       (contact-to-card u.pro)
     ::  always update the entry in .cars

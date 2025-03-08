@@ -143,7 +143,7 @@
     %^  cat  3
       'https://pal.dev/aides/owntracks/avatar?url='
     =,  mimes:html
-    (en:base64 (as-octs img))
+    (~(en base64 pad=| url=&) (as-octs img))
   %+  rap  3
   :+  'https://pal.dev/aides/owntracks/sigil?ship='
     (rsh 3 (scot %p who))

@@ -79,7 +79,7 @@
       ssid=(unit @t)                        ::  wlan name
       bssid=(unit @t)                       ::  wlan mac
       created-at=(unit @da)                 ::  message creation timestamp
-      m=(unit ?(%significant %move))        ::  monitoring mode
+      m=(unit ?(%quiet %significant %move)) ::  monitoring mode
       id=(unit @t)                          ::  message identifier
   ==
 ::
@@ -175,8 +175,9 @@
         :+  %|  'ssid'        so
         :+  %|  'bssid'       so
         :+  %|  'created_at'  du
-        :+  %r  'm'           =-  (curr biff (cu - ni))
-                              ~(get by (my 1^%significant 2^%move ~))
+        :+  %r  'm'           =-  (curr biff (cu - ns))
+                              %~  get  by
+                              (my -1^%quiet --1^%significant --2^%move ~)
         :+  %|  'id'          so
     ==
   ::

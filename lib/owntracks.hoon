@@ -129,6 +129,15 @@
       wot  '---'  did
   ==
 ::
+++  config-url
+  |=  config=(map @t json)  ::TODO  configuration type?
+  %^  cat  3
+    'owntracks:///config?inline='
+  %-  en:base64:mimes:html
+  %-  as-octs:mimes:html
+  %-  en:json:html
+  o+(~(put by config) '_type' s+'configuration')
+::
 ++  dejs
   |%
   ++  message

@@ -368,6 +368,8 @@
       =/  =query:rudder  (purse:rudder url.request)
       :_  this
       %+  spout:rudder  id
+      ?.  |(=(src our):bowl ?=([%spots %share *] site.query))
+        (paint:rudder %auth url.request)
       ?+  site.query  (issue:rudder 404 ~)
           [%spots ~]
         (paint:rudder (home bowl mine auth open hunt line dogs))

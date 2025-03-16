@@ -112,9 +112,22 @@
 ++  make-tid
   |=  [who=@p did=@t]
   ^-  @t
-  ::TODO  prefix with a and d from ~adcdef-ghijkl
-  ::TODO  '/' infix might give trouble. review once owntracks/android#1966 fixed
-  (rap 3 (scot %p who) '---' did ~)
+  =/  wot=@t  (scot %p who)
+  %+  rap  3
+  :~  ::  prefix with either ab from ~abc, or ad from ~adcdef-ghijkl,
+      ::  so that if we accidentally get into the fallback-display case
+      ::  for the tid's picture/contact card, it's at least somewhat
+      ::  uniquely identifiable (as opposed to just ~a)
+      ::
+      ?:  (lte (met 3 wot) 4)
+        (cut 3 1^2 wot)
+      (cat 3 (cut 3 1^1 wot) (cut 3 4^1 wot))
+    ::
+      ::  rest of the tid is guaranteed unique, ~who---what
+      ::REVIEW  want '/' infix but might give trouble. see owntracks/android#1966
+      ::
+      wot  '---'  did
+  ==
 ::
 ++  dejs
   |%

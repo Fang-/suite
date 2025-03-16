@@ -3,7 +3,7 @@
     color+0xcd.5c08
     site+/spots
     base+'spots'
-    version+[0 0 3]
+    version+[0 0 4]
     website+'https://pal.dev/suite/spots'
     license+'MIT'
 ==

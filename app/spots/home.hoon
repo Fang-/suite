@@ -8,6 +8,7 @@
         hunt=(mip @p @t [now=(unit node) bat=(unit batt)])
         line=(jug @t @p)
         dogs=(set @p)
+        setup=@t
     ==
 ^-  reply:rudder
 |^  [%page page]
@@ -56,6 +57,10 @@
             Proceed through its location permission request screens.
           ==
           ;li
+            ;a(href (trip setup)):"Tap here for one-tap setup, then proceed to step 8."
+            (Or set up manually by following the instructions below.)
+          ==
+          ;li
             Once you are presented with the *Preferences* screen (or after going
             into that through the menu), tap *Connection*.
           ==
@@ -86,8 +91,8 @@
           ==
           ;li
             Go into the map view and force the app the publish your location.
-            If you set everything up correctly, your device should appear in
-            the list below!
+            If you set everything up correctly, reload this page, and your
+            device should appear in the list below!
           ==
         ==
       ==

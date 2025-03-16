@@ -372,7 +372,40 @@
         (paint:rudder %auth url.request)
       ?+  site.query  (issue:rudder 404 ~)
           [%spots ~]
-        (paint:rudder (home bowl mine auth open hunt line dogs))
+        =;  setup=@t
+          (paint:rudder (home bowl mine auth open hunt line dogs setup))
+        ::TODO  leverage this to auto-setup encryption?
+        %-  config-url:ot
+        =/  name=@t
+          ?.  (~(has by mine) 'phone')  'phone'
+          =/  n=@ud  2
+          |-
+          =/  t=@t  (cat 3 'phone ' (crip (a-co:^co n)))
+          ?.  (~(has by mine) t)  t
+          $(n +(n))
+        =/  url=@t
+          %+  rap  3
+          :~  ?:(secure 'https://' 'http://')
+              (fall (get-header:http 'host' header-list.request) '')
+              '/spots/post'
+          ==
+        %-  ~(gas by *(map @t json))
+        :~  :-  '_type'         s+'configuration'
+            :-  'auth'          b+&
+            :-  'cmd'           b+&
+            :-  'deviceId'      s+name
+            :-  'extendedData'  b+&
+            :-  'mode'          n+'3'  ::  http mode
+            :-  'password'      s+auth
+            :-  'tid'           :-  %s  ::NOTE  somewhat unnecessary
+                                =+  wot=(scot %p our.bowl)
+                                ?:  (lte (met 3 wot) 4)
+                                  (cut 3 1^2 wot)
+                                (cat 3 (cut 3 1^1 wot) (cut 3 4^1 wot))
+            :-  'url'           s+url
+            :-  'username'      s+(scot %p our.bowl)
+            ::TODO  include waypoints?
+        ==
       ::
           [%spots %share @ ~]
         ~&  key=i.t.t.site.query

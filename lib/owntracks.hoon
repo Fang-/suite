@@ -22,6 +22,7 @@
       [%card card]
       [%cmd json]
       [%configuration json]
+      [%dump json]  ::TODO  wrapper for %configuration?
       [%encrypted json]
       [%location location]
       ::  [%lwt json]  ::NOTE  mqtt only
@@ -128,6 +129,7 @@
       %card           (bind (card json) (lead %card))
       %cmd            `[%cmd json]
       %configuration  `[%configuration json]
+      %dump           `[%dump json]
       %encrypted      `[%encrypted json]
       %location       (bind (location json) (lead %location))
       %request        `[%request json]

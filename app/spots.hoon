@@ -466,21 +466,18 @@
       ~&  [%failed-to-parse u.jon]
       :_  this
       (spout:rudder id [400 ['content-type' 'application/json']~] ~)
-    =/  did=(unit @t)
-      ::TODO  failing this, should get it from topic? or should we just assert
-      ::      that it's here?
-      ::      %location logic gets from the topic...
-      ::TODO  this always get sent by the client unless it's the empty string,
-      ::      which we (should) reject anyway. so, it's fine to block requests
-      ::      without this header
-      (get-header:http 'x-limit-d' header-list.request)
+    ?~  did=(get-header:http 'x-limit-d' header-list.request)
+      ~&  [%no-did-header header-list.request]
+      :_  this
+      (spout:rudder id [400 ['content-type' 'application/json']~] ~)
+    =/  did  u.did
     ::  if this device is new, everything is news to it
     ::
-    =?  news  &(?=(^ did) !(~(has by mine) u.did))
+    =?  news  !(~(has by mine) did)
       ::  everything is news to it, generate a set of news-keys for this
       ::  device based on everything we have in state
       ::
-      %+  ~(put by news)  u.did
+      %+  ~(put by news)  did
       ::TODO  also enqueue %send-ways command
       ::TODO  also enqueue %ways news
       %+  roll  ~(tap by hunt)
@@ -497,12 +494,11 @@
     =/  caz
       %+  spout:rudder  id
       :-  [200 ['content-type' 'application/json']~]
-      ?~  did  ~
       %-  some
       %-  as-octs:mimes:html
       %-  en:json:html
       %-  responses:enjs:ot
-      %+  murn  ~(tap in (~(get ju news) u.did))
+      %+  murn  ~(tap in (~(get ju news) did))
       |=  k=news-key
       ^-  (unit response:ot)
       ?-  -.k
@@ -524,22 +520,13 @@
           dat.face.u.car
         (make-tid:ot +.k)
       ==
-    =?  news  ?=(^ did)
-      (~(del by news) u.did)
+    =.  news
+      (~(del by news) did)
     ~?  &(?=([%o *] u.jon) (~(has by p.u.jon) 'topic'))
       [%with-topic (~(got by p.u.jon) 'topic')]
     |-
     ?+  -.u.mes  [caz this]
         %location
-      =/  did=@t
-        ::REVIEW
-        ::  get the device id from the request header if we can,
-        ::  otherwise try to get it from the topic.
-        ::  as a last resort, just use the tracker id.
-        ::
-        ?^  did  u.did
-        =;  p  (fall (rush topic.u.mes p) tid.u.mes)
-        ;~(pfix (jest 'owntracks') fas (star ;~(less fas next)) fas (cook crip (star next)))
       ~&  [%location tid=tid.u.mes topic=topic.u.mes did=did tst=tst.u.mes ca=created-at.u.mes]
       =/  dev
         (~(gut by mine) did *device)
@@ -615,16 +602,6 @@
     ::
         %transition
       :-  caz  ::TODO  emit transition notification fact?
-      =/  did=@t
-        ::REVIEW
-        ::  get the device id from the request header if we can,
-        :: ::  otherwise try to get it from the topic.
-        ::  as a last resort, just use the tracker id.
-        ::
-        ?^  did  u.did
-        tid.u.mes
-        :: =;  p  (fall (rush topic.u.mes p) tid.u.mes)  ::TODO  do receive topic, right?
-        :: ;~(pfix (jest 'owntracks') fas (star ;~(less fas next)) fas (cook crip (star next)))
       ~&  [%transition did=did]
       =/  dev  (~(gut by mine) did *device)
       =.  now.dev

@@ -10,18 +10,23 @@
 ::
 ::TODO  scope:
 ::  - devices' presence at waypoints (_type=transition)
+::    - transition notifications (even w/o receiving transition event)
+::    - set own location based on waypoint notif, if location is stale
 ::  - user-defined device-timeranges that describe stored routes/tracks
+::    - should be a separate app/agent?
 ::
 ::TODO  later:
-::  - send other device locations in POST response bodies
-::  - expose trigger zone status w/o location deets
-::  - support one-click setup? https://owntracks.org/booklet/guide/quicksetup/#initial-testing
+::  - share/expose trigger zone status w/o location deets
 ::
 ::TODO  guest locations???
 ::  - let non-urbit-users co-locate on an urbit user's owntracksserver
 ::  - urbit user gets control over who can see who, that's just how it is
 ::  - only latest location/$node & battery status, no history tracking
 ::  - respect username field for the card, as long as it's not a valid @p
+::    - username must start with cohort name/prefix
+::    - first password used by "[cohort]/[username]" is respected forever
+::    - single device id per guest?
+::    - certainly just set tid to first 2 chars of username
 ::
 /-  *spots
 /+  ot=owntracks, *pal, rudder,
@@ -467,6 +472,9 @@
       ::TODO  failing this, should get it from topic? or should we just assert
       ::      that it's here?
       ::      %location logic gets from the topic...
+      ::TODO  this always get sent by the client unless it's the empty string,
+      ::      which we (should) reject anyway. so, it's fine to block requests
+      ::      without this header
       (get-header:http 'x-limit-d' header-list.request)
     ::  if this device is new, everything is news to it
     ::
@@ -476,6 +484,7 @@
       ::
       %+  ~(put by news)  u.did
       ::TODO  also enqueue %send-ways command
+      ::TODO  also enqueue %ways news
       %+  roll  ~(tap by hunt)
       |=  [[who=@p des=(map @t [now=(unit) *])] nes=(set news-key)]
       %+  roll  ~(tap by des)
@@ -592,12 +601,11 @@
       this(mine (~(put by mine) did dev))
     ::
         %waypoint
+      ::TODO  enqueue waypoint push to other devices
       :-  caz
-      ::TODO  update waypoint state
       ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes) ?=(^ rad.u.mes))
         ~&  [%unsupported-waypoint u.mes]
         this
-      ::TODO  should maybe use tst.u.mes instead? transition also has wtst.
       this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
     ::
       ::   %waypoints
@@ -674,7 +682,7 @@
         %watch-ack
       ?~  p.sign  [~ this]
       ::  other legitimate instances of this agent shouldn't nack watches,
-      ::  simply let them sit  silently until we get permission on something.
+      ::  simply let them sit silently until we get permission on something.
       ::  a bit radical, but in light of that we remove user intent on-nack.
       ::
       [~ this(hunt (~(del by hunt) src.bowl))]
@@ -686,12 +694,12 @@
         %fact
       ?.  =(%spots-live-update p.cage.sign)
         ~|  [%strange-fact mark=p.cage.sign]
-        !!  ::TODO  or nop?
+        !!  ::TODO  nop, it's safer (prevents resubscribe situations) right?
       =+  !<(live-update q.cage.sign)
       =.  hunt  (~(put bi hunt) src.bowl did now bat)
       ::  the data changed, which means there's news for each of our devices
       ::
-      =?  news  ?=(^ now)  ::TODO  what if deletion?
+      =?  news  ?=(^ now)  ::TODO  should push device deletion?
         (put-news news ~(key by mine) %hunt-spot src.bowl did)
       ::TODO  give subscription updates for clients?
       [~ this]

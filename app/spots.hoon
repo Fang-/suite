@@ -48,7 +48,6 @@
       ways=(map @da region)
       news=(jug @t news-key)
       cars=(map @p [name=@t face=[url=@t dat=(unit octs)]])
-      ::TODO  support payload encryption
       ::  auth: http basic auth password
       ::  open: clearweb location sharing keys
       ::
@@ -379,7 +378,6 @@
           [%spots ~]
         =;  setup=@t
           (paint:rudder (home bowl mine auth open hunt line dogs setup))
-        ::TODO  leverage this to auto-setup encryption?
         %-  config-url:ot
         =/  name=@t
           ?.  (~(has by mine) 'phone')  'phone'

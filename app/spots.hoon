@@ -608,11 +608,12 @@
         this
       this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
     ::
-      ::   %waypoints
-      :: |-
-      :: ?~  +.u.mes  this
-      :: =^  this  ^$(u.mes [%waypoint i.u.mes])
-      :: $(+.u.mes t.u.mes)
+        %waypoints
+      |-  ^+  [caz this]
+      ?~  +.u.mes  [caz this]
+      =^  cas  this  ^$(u.mes [%waypoint i.u.mes])
+      =.  caz  (weld caz cas)
+      $(+.u.mes t.u.mes)
     ::
         %transition
       :-  caz  ::TODO  emit transition notification fact?

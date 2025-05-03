@@ -177,7 +177,9 @@
     :~  :+  %|  'acc'         ni
         :+  %|  'alt'         ns
         :+  %|  'batt'        ni
-        :+  %&  'bs'          ::(cu |=(* %unknown) some) ::TODO  from int, ?(%unknown %unplugged %charging %full
+        :+  %r  'bs'          |=  j=(unit ^json)
+                              ?~  j  `%unknown
+                              %.  u.j
                               =-  (ci - ni)
                               ~(get by (my 0^%unknown 1^%unplugged 2^%charging 3^%full ~))
         :+  %|  'cog'         ni
@@ -199,7 +201,10 @@
         :+  %|  'ssid'        so
         :+  %|  'bssid'       so
         :+  %|  'created_at'  du
-        :+  %r  'm'           =-  (curr biff (cu - ns))
+        :+  %r  'm'           |=  j=(unit ^json)
+                              ?~  j  `~
+                              %.  u.j
+                              =-  (cu - ns)
                               %~  get  by
                               (my -1^%quiet --1^%significant --2^%move ~)
         :+  %|  'id'          so
@@ -293,7 +298,13 @@
 ::
 ::  new json helpers
 ::
-::NOTE
+::  +ut: object as partially unitizable tuple
+::
+::    applies a continuation/transform
+::      %&  required, transform the value
+::      %|  optional, transform the value if present
+::      %r  transform the unit value, producing value or failing
+::
 ++  ut  ::  object as partially unitizable tuple
   |*  wer=(pole [req=?(%& %| %r) cord fist])  ::NOTE  fake fist (;
   |=  jon=json

@@ -177,9 +177,7 @@
     :~  :+  %|  'acc'         ni
         :+  %|  'alt'         ns
         :+  %|  'batt'        ni
-        :+  %r  'bs'          |=  j=(unit ^json)
-                              ?~  j  `%unknown
-                              %.  u.j
+        :+  %r  'bs'          %+  bu  %unknown
                               =-  (ci - ni)
                               ~(get by (my 0^%unknown 1^%unplugged 2^%charging 3^%full ~))
         :+  %|  'cog'         ni
@@ -196,14 +194,12 @@
         :+  %|  'conn'        (ci (soft ?(%w %o %m)) so)
         :+  %|  'tag'         so
         :+  %&  'topic'       so
-        :+  %r  'inregions'   |=(j=(unit ^json) ?~(j `~ ((ar so) u.j)))
-        :+  %r  'inrids'      |=(j=(unit ^json) ?~(j `~ ((ar so) u.j)))
+        :+  %r  'inregions'   (bu ~ (ar so))
+        :+  %r  'inrids'      (bu ~ (ar so))
         :+  %|  'ssid'        so
         :+  %|  'bssid'       so
         :+  %|  'created_at'  du
-        :+  %r  'm'           |=  j=(unit ^json)
-                              ?~  j  `~
-                              %.  u.j
+        :+  %r  'm'           %+  bu  ~
                               =-  (cu - ns)
                               %~  get  by
                               (my -1^%quiet --1^%significant --2^%move ~)
@@ -212,8 +208,7 @@
   ::
   ++  waypoints
     ^-  $-(json (unit (list ^waypoint)))
-    ::TODO  waypoints may be missing instead of empty?
-    (ut %r^'waypoints'^|=(j=(unit ^json) ?~(j `~ ((ar waypoint) u.j))) ~)
+    (ut %r^'waypoints'^(bu ~ (ar waypoint)) ~)
   ::
   ++  waypoint
     ^-  $-(json (unit ^waypoint))
@@ -304,7 +299,7 @@
 ::    applies a continuation/transform
 ::      %&  required, transform the value
 ::      %|  optional, transform the value if present
-::      %r  transform the unit value, producing value or failing
+::      %r  "raw", sear the unit
 ::
 ++  ut  ::  object as partially unitizable tuple
   |*  wer=(pole [req=?(%& %| %r) cord fist])  ::NOTE  fake fist (;
@@ -334,6 +329,11 @@
   |*  f=fist
   |=  jun=(unit json)
   ?~(jun ~ (f u.jun))
+::
+++  bu  ::  bunt if missing, otherwise transform (mainly for use with +ut %r)
+  |*  [b=* f=fist]
+  |=  jun=(unit json)
+  ?~(jun `b (f u.jun))
 ::
 ++  du  ::  second date  ::TODO  into dejs-soft
   (cu from-unix:chrono:userlib ni)

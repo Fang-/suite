@@ -212,7 +212,8 @@
   ::
   ++  waypoints
     ^-  $-(json (unit (list ^waypoint)))
-    (ot 'waypoints'^(ar waypoint) ~)
+    ::TODO  waypoints may be missing instead of empty?
+    (ut %r^'waypoints'^|=(j=(unit ^json) ?~(j `~ ((ar waypoint) u.j))) ~)
   ::
   ++  waypoint
     ^-  $-(json (unit ^waypoint))

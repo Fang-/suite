@@ -36,7 +36,7 @@
 ::
 +$  response  $+  owntracks-response
   $%  $>(?(%location %card %transition) message)
-      [%cmd $>(?(%dump %report-location %report-steps %set-waypoints) cmd)]
+      [%cmd cmd]
   ==
 ::
 +$  card
@@ -241,6 +241,7 @@
   --
 ::
 ++  enjs
+  =,  enjs:format
   |%
   ++  responses
     |=  rez=(list ^response)
@@ -249,7 +250,6 @@
   ++  response
     |=  res=^response
     ^-  json
-    =,  enjs:format
     ?+  -.res  ~&([%todo-encode -.res] ~)
         %card
       %+  pairs  '_type'^s+'card'
@@ -280,9 +280,47 @@
           'tid'^`s+tid.res
           'topic'^`s+topic.res
       ==
+    ::
+        %cmd
+      %+  pairs  '_type'^s+'cmd'
+      ?-  +<.res
+        %report-location  ['action' s+'reportLocation']~
+        %report-steps     ['action' s+'reportSteps']~  ::TODO  args?
+        %dump             ['action' s+'dump']~
+        %status           ['action' s+'status']~
+        %waypoints        ['action' s+'waypoints']~
+        %clear-waypoints  ['action' s+'clearWaypoints']~
+      ::
+          %set-waypoints
+        :~  'action'^s+'setWaypoints'
+            'waypoints'^a+(turn +>.res waypoint)
+        ==
+      ::
+          %set-configuration
+        ~&  %todo-encode-cmd-configuration
+        ~  ::TODO
+      ==
     ==
   ::
-  ++  opts
+  ++  waypoint
+    |=  ^waypoint
+    ^-  json
+    %-  pairs
+    =;  fields=(list (unit [@t json]))
+      (murn fields same)
+    :~  `'_type'^s+'waypoint'
+        `'desc'^s+desc
+        ?~(lat ~ `'lat'^(fumb u.lat))
+        ?~(lon ~ `'lon'^(fumb u.lon))
+        ?~(rad ~ `'rad'^(numb u.rad))
+        `'tst'^(sect tst)
+        ?~(uuid ~ `'uuid'^s+u.uuid)
+        ?~(major ~ `'major'^(numb u.major))
+        ?~(minor ~ `'minor'^(numb u.minor))
+        ?~(rid ~ `'rid'^s+u.rid)
+    ==
+  ::
+  ++  opts  ::  omit optional keys
     %+  curr  murn
     |=  (pair @t (unit json))
     ?~  q  ~
@@ -292,7 +330,7 @@
     :(cork rlyd r-co:co crip (lead %n))
   --
 ::
-::  new json helpers
+::  new de-json helpers
 ::
 ::  +ut: object as partially unitizable tuple
 ::
@@ -346,11 +384,26 @@
   %+  cook  new:si
   ;~(plug ;~(pose (cold %| (jest '-')) (easy %&)) dem)
 ::
+::  new en-json helpers
+::
 ++  nimb  ::  number from signed  ::TODO  into enjs
   |=  n=@sd
   ^-  json
   :-  %n
   %^  cat  3
     ?:((syn:si n) '' '-')
-  (crip (a-co:co (abs:si n)))
+  (aco (abs:si n))
+::
+++  fumb  ::  number from float  ::TODO  into enjs?  ::REVIEW
+  |=  n=@rd
+  ^-  json
+  :-  %n
+  =+  d=(drg:rd n)
+  ?-  -.d
+    %d  (rap 3 ?:(s.d '' '-') (aco a.d) 'e' ?:((syn:si e.d) '' '-') (aco (abs:si e.d)) ~)
+    %i  'Infinity'
+    %n  'NaN'
+  ==
+::
+++  aco  (cork a-co:co crip)
 --

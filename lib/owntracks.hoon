@@ -80,7 +80,7 @@
       ssid=(unit @t)                        ::  wlan name
       bssid=(unit @t)                       ::  wlan mac
       created-at=(unit @da)                 ::  message creation timestamp
-      m=(unit ?(%quiet %significant %move)) ::  monitoring mode
+      m=(unit ?(%quiet %manual %significant %move)) ::  monitoring mode
       id=(unit @t)                          ::  message identifier
   ==
 ::
@@ -196,14 +196,14 @@
         :+  %&  'topic'       so
         :+  %r  'inregions'   (bu ~ (ar so))
         :+  %r  'inrids'      (bu ~ (ar so))
-        :+  %|  'ssid'        so
-        :+  %|  'bssid'       so
+        :+  %|  'SSID'        so
+        :+  %|  'BSSID'       so
         :+  %|  'created_at'  du
         :+  %r  'm'           %+  bu  ~
                               =-  (cu - ns)
                               %~  get  by
-                              (my -1^%quiet --1^%significant --2^%move ~)
-        :+  %|  'id'          so
+                              (my -1^%quiet --0^%manual --1^%significant --2^%move ~)
+        :+  %|  'id'          so  ::TODO  from '_id' key instead? but that's _msg_ id
     ==
   ::
   ++  waypoints

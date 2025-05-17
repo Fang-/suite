@@ -3,7 +3,7 @@
 ::
 |=  [did=@t til=(unit @da) device]
 ^-  reply:rudder
-=+  loc=(snag 0 bac)
+=+  loc=(snag 0 log)
 |^  [%page page]
 ++  page
   ;html

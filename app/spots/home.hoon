@@ -113,7 +113,7 @@
             ;tr
               ;td:"{(trip did)}"
               ;td:"{?~(bat "??" (scow %ud cen.u.bat))}%"
-              ;td:"{?~(bac "~" (scow %da msg.wen.i.bac))}"
+              ;td:"{?~(log "~" (scow %da msg.wen.i.log))}"
               ;td:"{(join ' , ' (turn ~(tap in (~(get ju line) did)) (cury scot %p)))}"
             ==
       ==

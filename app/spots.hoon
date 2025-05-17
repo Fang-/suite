@@ -246,14 +246,14 @@
                   mine  *(map @t device-0)
                   hunt  *(mip @p @t [now=(unit node-0) bat=(unit batt)])
                 ==
-  +$  device-0  _%*(. *device bac *(list node-0))
+  +$  device-0  _%*(. *device log *(list node-0))
   +$  node-0    _%*(. *node alt *(unit @ud))
   ::
   ++  state-0-to-1
     |=  s=state-0
     ^-  state-1
     %=  s  -  %1
-      mine  (~(run by mine.s) |=(d=device-0 d(bac (turn bac.d node-0-to-1))))
+      mine  (~(run by mine.s) |=(d=device-0 d(log (turn log.d node-0-to-1))))
       hunt  (~(run bi hunt.s) |=([n=(unit node-0) b=(unit batt)] [(bind n node-0-to-1) b]))
     ==
   ++  node-0-to-1
@@ -362,7 +362,7 @@
             line  (~(put ju line) [did who]:act)
           ==
       ?~  dev=(~(get by mine) did.act)  ~
-      =/  upd=live-update  [did.act ?~(bac.u.dev ~ `i.bac.u.dev) bat.u.dev]
+      =/  upd=live-update  [did.act ?~(log.u.dev ~ `i.log.u.dev) bat.u.dev]
       [%give %fact [/live/(scot %p who.act)]~ %spots-live-update !>(upd)]~
     ==
   ::
@@ -429,8 +429,8 @@
           ^-  simple-payload:http
           :-  [200 ['content-type' 'application/json']~]
           %-  :(cork en:json:html as-octs:mimes:html some)
-          ?~  bac.u.dev  ~
-          =+  i.bac.u.dev
+          ?~  log.u.dev  ~
+          =+  i.log.u.dev
           ::TMP
           :: =.  lat  (add:rd lat (div:rd .~1 (sun:rd (~(rad og +(eny.bowl)) 100))))
           :: =.  lon  (add:rd lon (div:rd .~1 (sun:rd (~(rad og eny.bowl) 100))))
@@ -562,35 +562,35 @@
       =/  dev
         (~(gut by mine) did *device)
       =/  had=[(unit node) (unit batt)]
-        [?~(bac.dev ~ `i.bac.dev) bat.dev]
+        [?~(log.dev ~ `i.log.dev) bat.dev]
       ::TODO  add it as news to all our other devices
-      =.  bac.dev
+      =.  log.dev
         =/  new=node
           =,  u.mes
           :-  [lat lon acc [alt vac]]
           [[tst (fall created-at tst)] vel]
-        |-  ^+  bac.dev
-        ?~  bac.dev  [new]~
+        |-  ^+  log.dev
+        ?~  log.dev  [new]~
         ::  once we've moved to the right place in history, store the node
         ::
-        ?:  (gte msg.wen.new msg.wen.i.bac.dev)
+        ?:  (gte msg.wen.new msg.wen.i.log.dev)
           ::  if the new node is identical, skip it entirely
           ::
-          ?:  =(new i.bac.dev)  bac.dev  ::NOTE  odd case, but happens in practice
+          ?:  =(new i.log.dev)  log.dev  ::NOTE  odd case, but happens in practice
           ::  if the gps data is different, store as-is
           ::
-          ?.  =(-.new -.i.bac.dev)  [new bac.dev]
+          ?.  =(-.new -.i.log.dev)  [new log.dev]
           ::  if the gps data is the same, only keep oldest & newest
           ::
-          ?~  t.bac.dev  [new bac.dev]
-          ?.  =(-.new -.i.t.bac.dev)  [new bac.dev]
+          ?~  t.log.dev  [new log.dev]
+          ?.  =(-.new -.i.t.log.dev)  [new log.dev]
           ::  so, here, replace latest with this new one
           ::NOTE  assumes most-recently-processed is newer
           ::TODO  should we set velocity in latest to zero? looks like vel
           ::      might be sticky in stale/reused gps fixes
           ::
-          [new t.bac.dev]
-        [i.bac.dev $(bac.dev t.bac.dev)]
+          [new t.log.dev]
+        [i.log.dev $(log.dev t.log.dev)]
       =.  bat.dev
         ?~  batt.u.mes  ~
         %-  some
@@ -603,7 +603,7 @@
         ==
       :-  %+  weld  caz
           ^-  (list card)
-          =/  new  [`(snag 0 bac.dev) bat.dev]
+          =/  new  [`(snag 0 log.dev) bat.dev]
           ?:  =(had new)  ~
           [(send-live (~(get ju line) did) did new)]~
       ::TODO  if we still want this update _here_, should correlate rids with wtst?
@@ -685,7 +685,7 @@
     ?~  dev=(~(get by mine) did)  ~
     =/  upd=live-update
       :+  did
-        ?~(bac.u.dev ~ `i.bac.u.dev)
+        ?~(log.u.dev ~ `i.log.u.dev)
       bat.u.dev
     `[%give %fact ~ %spots-live-update !>(upd)]
   ==

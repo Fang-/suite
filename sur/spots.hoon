@@ -2,7 +2,7 @@
 ::
 |%
 +$  device  ::  tracking object
-  $:  bac=(list node)  ::TODO  .log
+  $:  log=(list node)
       ::TODO  last-known monitoring mode?
       bat=(unit batt)
       now=(set region=@da)  ::TODO  ?

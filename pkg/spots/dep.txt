@@ -1,3 +1,6 @@
+> lib
+< urbit/pkg/arvo/lib
+math.hoon
 > sur
 < landscape-apps/desk/sur
 epic.hoon

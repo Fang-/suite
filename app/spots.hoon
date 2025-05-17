@@ -29,7 +29,7 @@
 ::    - certainly just set tid to first 2 chars of username
 ::
 /-  *spots
-/+  ot=owntracks, *pal, rudder,
+/+  spots, ot=owntracks, *pal, rudder, math,
     co=contacts,
     dbug, verb, default-agent
 ::
@@ -88,10 +88,22 @@
 ::
 ++  send-live
   |=  [doz=(set @p) upd=live-update]
+  ^-  card
   :+  %give  %fact
   :_  [%spots-live-update !>(upd)]
   :-  /live
   (turn ~(tap in doz) |=(=@p /live/(scot %p p)))
+::
+++  send-zone  ::REVIEW  what about /zone? but then, what about zone ids in fact?
+  |=  [wid=@da upd=zone-update]
+  ^-  card
+  :+  %give  %fact
+  :_  [%spots-zone-update !>(upd)]
+  :~  ::TODO  /zone ? but then, need zone ids in the facts
+      /zone/(scot %da wid)
+      ::TODO  /zone/(scot %t nom) ?
+      ::      wouldn't that suggest we should just @ta-key zones in the first place?
+  ==
 ::
 ++  put-news
   |=  $:  news=(jug @t news-key)
@@ -194,6 +206,24 @@
   ^-  card
   =-  [%pass /card/(scot %p who)/face/(scot %t img) %arvo %i -]
   [%request [%'GET' img ~ ~] *outbound-config:iris]
+::
+++  find-regions
+  |=  $:  regions=(map @da region)
+          [lat=@rd lon=@rd]
+      ==
+  ^-  (set @da)
+  %-  sy
+  %+  murn  ~(tap by regions)
+  =/  distance
+    (cury distance:spots [lat lon])
+  |=  [wid=@da reg=region]
+  ^-  (unit _wid)
+  =;  in=?  ?:(in `wid ~)
+  =,  rd:math
+  %+  lte
+    %+  mul  .~1000  ::  km ->  m
+    (distance [lat lon]:reg)  ::  km
+  (sun rad.reg)  ::  m
 --
 ::
 %-  agent:dbug
@@ -601,22 +631,53 @@
           %charging   %cha
           %full       %ful
         ==
-      :-  %+  weld  caz
-          ^-  (list card)
-          =/  new  [`(snag 0 log.dev) bat.dev]
-          ?:  =(had new)  ~
-          [(send-live (~(get ju line) did) did new)]~
-      ::TODO  if we still want this update _here_, should correlate rids with wtst?
-      :: =.  now.dev
-      ::   ::TODO  emit transitions?
-      ::   (sy inrids.u.mes)
-      ::TODO  update ways
-      ::TODO  what if we... updated ways based on received locations?
-      ::      this way devices can be in regions they didn't create themselves.
-      ::      would need to do coordinate overlap calcs, but probably not that hard.
+      ::TODO  want to factor out zone status logic once they support foreign devices too
+      ::  trigger zone diffs
+      ::
+      =/  now-regions
+        (find-regions ways [lat lon]:(snag 0 log.dev))
+      =/  new-regions=(set @da)
+        (~(dif in now-regions) now.dev)
+      =/  gone-regions=(set @da)
+        (~(dif in now.dev) now-regions)
+      ::  update zone state to reflect device change
+      ::
+      =.  now.dev  now-regions
+      =?  ways  |(!=(~ new-regions) !=(~ gone-regions))
+        %-  ~(urn by ways)
+        |=  [wid=@da =region]
+        ?:  (~(has in new-regions) wid)
+          region(now (~(put in now.region) did))
+        ?:  (~(has in gone-regions) wid)
+          region(now (~(del in now.region) did))
+        region
+      ::
+      :-  ;:  weld
+            caz
+            ::  zone leave notifications
+            ::
+            %+  turn  ~(tap in gone-regions)
+            (curr send-zone [[our.bowl did] %leave])
+          ::
+            ::  zone enter notifications
+            ::
+            %+  turn  ~(tap in new-regions)
+            (curr send-zone [[our.bowl did] %enter])
+          ::
+            ::  location update, if location changed
+            ::
+            ^-  (list card)
+            =/  new  [`(snag 0 log.dev) bat.dev]
+            ?:  =(had new)  ~
+            [(send-live (~(get ju line) did) did new)]~
+          ==
+      ::  finalize
+      ::
       this(mine (~(put by mine) did dev))
     ::
         %waypoint
+      ::TODO  if we already have a waypoint with this id, check for changes.
+      ::      if it truly changed, re-run zone-presence checks for devices.
       =.  news
         ::TODO  doesn't dedupe cleanly, ideally want them all in a single %ways,
         ::      but these commands are additive, so nbd
@@ -641,28 +702,14 @@
       $(+.u.mes t.u.mes)
     ::
         %transition
+      ::NOTE  we intentionally don't update state in response to these,
+      ::      instead relying on locally-calculated waypoint presence.
+      ::      this is more reliable and flexible.
       ::TODO  respect the (known) waypoint as a location update, if our
       ::      location is stale: %enter sets the location to the waypoint,
       ::      %leave sends a blank location update to subscribers
-      :-  caz  ::TODO  emit transition notification fact?
       ~&  [%transition did=did]
-      =/  dev  (~(gut by mine) did *device)
-      =.  now.dev
-        ?-  event.u.mes
-          %enter  (~(put in now.dev) wtst.u.mes)
-          %leave  (~(del in now.dev) wtst.u.mes)
-        ==
-      =.  mine  (~(put by mine) did dev)
-      ?~  way=(~(get by ways) wtst.u.mes)
-        ~&  [%transition-for-unknown-region [tid=tid desc=desc]:u.mes]
-        ::TODO  enqueue a %send-waypoints command to retrieve the region
-        this
-      =.  now.u.way
-        ?-  event.u.mes
-          %enter  (~(put in now.u.way) did)
-          %leave  (~(del in now.u.way) did)
-        ==
-      this(ways (~(put by ways) wtst.u.mes u.way))
+      [caz this]
     ==
   ==
 ::
@@ -688,6 +735,16 @@
         ?~(log.u.dev ~ `i.log.u.dev)
       bat.u.dev
     `[%give %fact ~ %spots-live-update !>(upd)]
+  ::
+      [%zone @ ~]
+    ?>  =(our src):bowl
+    =/  wid=@da  (slav %da i.t.path)
+    =/  =region  (~(gut by ways) wid *region)
+    :_  this
+    %+  turn  ~(tap in now.region)
+    |=  did=@t
+    =/  upd=zone-update  [[our.bowl did] %enter]
+    [%give %fact ~ %spots-zone-update !>(upd)]
   ==
 ::
 ++  on-agent

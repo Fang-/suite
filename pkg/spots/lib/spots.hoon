@@ -1,0 +1,1 @@
+../../../lib/spots.hoon

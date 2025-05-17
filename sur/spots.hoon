@@ -5,14 +5,14 @@
   $:  log=(list node)
       ::TODO  last-known monitoring mode?
       bat=(unit batt)
-      now=(set region=@da)  ::TODO  ?
+      now=(set region=@da)
       ::TODO  card overlay
   ==
 ::
-+$  region  ::  radial zone
++$  region  ::  radial zone  ::TODO  $zone
   $:  nom=@t
       [lat=@rd lon=@rd rad=@ud]
-      now=(set device=@t)  ::TODO  ?
+      now=(set device=@t)  ::TODO  support foreign devices?
   ==
 ::
 +$  node  ::  location in time
@@ -34,4 +34,7 @@
 ::
 +$  live-update
   [did=@t now=(unit node) bat=(unit batt)]
+::
++$  zone-update  ::REVIEW
+  [[who=@p did=@t] now=?(%enter %leave)]
 --

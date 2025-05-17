@@ -69,6 +69,9 @@
 +$  news-key
   $%  [%hunt-spot who=@p did=@t]
       [%hunt-card who=@p did=@t]
+      [%ways waz=(set @da)]  ::TODO  this isn't gonna dedupe nicely...
+    ::
+      [%send-ways ~]  ::  'waypoints' cmd to trigger publish
   ==
 ::
 +$  action
@@ -94,12 +97,12 @@
   |=  $:  news=(jug @t news-key)
           mine=(set @t)
       $=  what
-      $%  [%hunt-spot who=@p did=@t]
-          [%hunt-card who=@p dis=(set @t)]
+      $%  $<(%hunt-card news-key)
+          [%hunt-card who=@p dis=(set @t)]  ::  same card for all devices
       ==  ==
   ^+  news
   =/  nuz=(list news-key)
-    ?:  ?=(%hunt-spot -.what)  [what]~
+    ?.  ?=(%hunt-card -.what)  [what]~
     %+  turn  ~(tap in dis.what)
     |=  h=@t
     [%hunt-card who.what h]
@@ -475,11 +478,15 @@
     ::
     =?  news  !(~(has by mine) did)
       ::  everything is news to it, generate a set of news-keys for this
-      ::  device based on everything we have in state
+      ::  device based on everything we have in state, and request that they
+      ::  send us regions if they have any
       ::
       %+  ~(put by news)  did
-      ::TODO  also enqueue %send-ways command
-      ::TODO  also enqueue %ways news
+      =;  nes
+        %-  ~(gas in nes)
+        :~  [%send-ways ~]
+            [%ways ~(key by ways)]
+        ==
       %+  roll  ~(tap by hunt)
       |=  [[who=@p des=(map @t [now=(unit) *])] nes=(set news-key)]
       %+  roll  ~(tap by des)
@@ -519,6 +526,30 @@
             [' (' did.k ')' ~]
           dat.face.u.car
         (make-tid:ot +.k)
+      ::
+          %ways
+        ?:  =(~ waz.k)  ~
+        %-  some
+        :+  %cmd
+          %set-waypoints
+        %+  murn  ~(tap in waz.k)
+        |=  wid=@da
+        ^-  (unit waypoint:ot)
+        ?~  way=(~(get by ways) wid)  ~
+        %-  some
+        :*  desc=nom.u.way
+            `lat.u.way
+            `lon.u.way
+            `rad.u.way
+            tst=wid
+            uuid=~
+            major=~
+            minor=~
+            rid=~
+        ==
+      ::
+          %send-ways
+        `[%cmd %waypoints ~]
       ==
     =.  news
       (~(del by news) did)
@@ -586,11 +617,20 @@
       this(mine (~(put by mine) did dev))
     ::
         %waypoint
-      ::TODO  enqueue waypoint push to other devices
+      =.  news
+        ::TODO  doesn't dedupe cleanly, ideally want them all in a single %ways,
+        ::      but these commands are additive, so nbd
+        (put-news news ~(key by mine) [%ways tst.u.mes ~ ~])
+      ::TODO  do we need to clearWaypoints to propagate deletions?
+      ::      if we don't do that, waypoints might be annoying to delete in
+      ::      multi-device setups...
       :-  caz
       ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes) ?=(^ rad.u.mes))
         ~&  [%unsupported-waypoint u.mes]
         this
+      ::NOTE  we ignore rid.u.mes. it's not consistently set, and we don't
+      ::      care about its presence in inrids (or inregions) in %location
+      ::      messages, since we calculate region presence by hand
       this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
     ::
         %waypoints
@@ -601,6 +641,9 @@
       $(+.u.mes t.u.mes)
     ::
         %transition
+      ::TODO  respect the (known) waypoint as a location update, if our
+      ::      location is stale: %enter sets the location to the waypoint,
+      ::      %leave sends a blank location update to subscribers
       :-  caz  ::TODO  emit transition notification fact?
       ~&  [%transition did=did]
       =/  dev  (~(gut by mine) did *device)
@@ -612,6 +655,7 @@
       =.  mine  (~(put by mine) did dev)
       ?~  way=(~(get by ways) wtst.u.mes)
         ~&  [%transition-for-unknown-region [tid=tid desc=desc]:u.mes]
+        ::TODO  enqueue a %send-waypoints command to retrieve the region
         this
       =.  now.u.way
         ?-  event.u.mes

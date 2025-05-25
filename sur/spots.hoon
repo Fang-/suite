@@ -5,11 +5,11 @@
   $:  log=(list node)
       ::TODO  last-known monitoring mode?
       bat=(unit batt)
-      now=(set region=@da)
+      now=(set zone=@da)
       ::TODO  card overlay
   ==
 ::
-+$  region  ::  radial zone  ::TODO  $zone
++$  zone  ::  radial zone
   $:  nom=@t
       [lat=@rd lon=@rd rad=@ud]
       now=(set device=@t)  ::TODO  support foreign devices?

@@ -50,7 +50,7 @@
       ::  news: unsent updates for devices
       ::
       mine=(map @t device)  ::TODO  card override
-      ways=(map @da region)
+      ways=(map @da zone)
       news=(jug @t news-key)
       cars=(map @p [name=@t face=[url=@t dat=(unit octs)]])
       ::  auth: http basic auth password
@@ -228,23 +228,23 @@
   =-  [%pass /card/(scot %p who)/face/(scot %t img) %arvo %i -]
   [%request [%'GET' img ~ ~] *outbound-config:iris]
 ::
-++  find-regions
-  |=  $:  regions=(map @da region)
+++  find-zones
+  |=  $:  zones=(map @da zone)
           [lat=@rd lon=@rd]
       ==
   ^-  (set @da)
   %-  sy
-  %+  murn  ~(tap by regions)
+  %+  murn  ~(tap by zones)
   =/  distance
     (cury distance:spots [lat lon])
-  |=  [wid=@da reg=region]
+  |=  [wid=@da zon=zone]
   ^-  (unit _wid)
   =;  in=?  ?:(in `wid ~)
   =,  rd:math
   %+  lte
     %+  mul  .~1000  ::  km ->  m
-    (distance [lat lon]:reg)  ::  km
-  (sun rad.reg)  ::  m
+    (distance [lat lon]:zon)  ::  km
+  (sun rad.zon)  ::  m
 --
 ::
 %-  agent:dbug
@@ -530,7 +530,7 @@
     =?  news  !(~(has by mine) did)
       ::  everything is news to it, generate a set of news-keys for this
       ::  device based on everything we have in state, and request that they
-      ::  send us regions if they have any
+      ::  send us waypoints/zones if they have any
       ::
       %+  ~(put by news)  did
       =;  nes
@@ -656,34 +656,34 @@
       ::TODO  want to factor out zone status logic once they support foreign devices too
       ::  trigger zone diffs
       ::
-      =/  now-regions
-        (find-regions ways [lat lon]:(snag 0 log.dev))
-      =/  new-regions=(set @da)
-        (~(dif in now-regions) now.dev)
-      =/  gone-regions=(set @da)
-        (~(dif in now.dev) now-regions)
+      =/  now-zones
+        (find-zones ways [lat lon]:(snag 0 log.dev))
+      =/  new-zones=(set @da)
+        (~(dif in now-zones) now.dev)
+      =/  gone-zones=(set @da)
+        (~(dif in now.dev) now-zones)
       ::  update zone state to reflect device change
       ::
-      =.  now.dev  now-regions
-      =?  ways  |(!=(~ new-regions) !=(~ gone-regions))
+      =.  now.dev  now-zones
+      =?  ways  |(!=(~ new-zones) !=(~ gone-zones))
         %-  ~(urn by ways)
-        |=  [wid=@da =region]
-        ?:  (~(has in new-regions) wid)
-          region(now (~(put in now.region) did))
-        ?:  (~(has in gone-regions) wid)
-          region(now (~(del in now.region) did))
-        region
+        |=  [wid=@da =zone]
+        ?:  (~(has in new-zones) wid)
+          zone(now (~(put in now.zone) did))
+        ?:  (~(has in gone-zones) wid)
+          zone(now (~(del in now.zone) did))
+        zone
       ::
       :-  ;:  weld
             caz
             ::  zone leave notifications
             ::
-            %+  turn  ~(tap in gone-regions)
+            %+  turn  ~(tap in gone-zones)
             (curr send-zone [[our.bowl did] %leave])
           ::
             ::  zone enter notifications
             ::
-            %+  turn  ~(tap in new-regions)
+            %+  turn  ~(tap in new-zones)
             (curr send-zone [[our.bowl did] %enter])
           ::
             ::  location update, if location changed
@@ -713,7 +713,7 @@
         this
       ::NOTE  we ignore rid.u.mes. it's not consistently set, and we don't
       ::      care about its presence in inrids (or inregions) in %location
-      ::      messages, since we calculate region presence by hand
+      ::      messages, since we calculate region/zone presence by hand
       this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
     ::
         %waypoints
@@ -742,15 +742,15 @@
         ::
         ?.  ?&(stale (~(has by ways) wtst.u.mes))
           [caz this]
-        =/  zon=region  (~(got by ways) wtst.u.mes)
+        =/  =zone  (~(got by ways) wtst.u.mes)
         =;  loc=location:ot
           ~&  %pretending-transition-is-location
           $(u.mes [%location loc])
         =,  u.mes
         %:  make-fake-zone-location
-          (fall lat lat.zon)   ::NOTE  this behaves Very Bad if client misbehaves
-          (fall lon lon.zon)   ::NOTE  "
-          ?~(lat rad.zon acc)  ::NOTE  "
+          (fall lat lat.zone)   ::NOTE  this behaves Very Bad if client misbehaves
+          (fall lon lon.zone)   ::NOTE  "
+          ?~(lat rad.zone acc)  ::NOTE  "
           tst
           bat.dev
         ==
@@ -799,9 +799,9 @@
       [%zone @ ~]
     ?>  =(our src):bowl
     =/  wid=@da  (slav %da i.t.path)
-    =/  =region  (~(gut by ways) wid *region)
+    =/  =zone  (~(gut by ways) wid *zone)
     :_  this
-    %+  turn  ~(tap in now.region)
+    %+  turn  ~(tap in now.zone)
     |=  did=@t
     =/  upd=zone-update  [[our.bowl did] %enter]
     [%give %fact ~ %spots-zone-update !>(upd)]

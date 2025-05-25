@@ -38,6 +38,11 @@
 /=  share  /app/spots/share
 ::
 |%
+++  config
+  |%
+  ++  stale  ~m5
+  --
+::
 +$  state-2
   $:  %2
       ::  mine: personal devices  ::TODO  support guest devices?
@@ -143,6 +148,22 @@
     created-at  `msg.wen
     batt        ?~(bat ~ `cen.u.bat)
     bs          ?~(bat %unknown ?-(sat.u.bat %idk %unknown, %run %unplugged, %cha %charging, %ful %full))
+  ==
+::
+++  make-fake-zone-location
+  |=  [lat=@rd lon=@rd acc=@ud tst=@da bat=(unit batt)]
+  ^-  location:ot
+  %*  .  *location:ot
+    acc         `acc
+    batt        ?~(bat ~ `cen.u.bat)
+    bs          ?~(bat %unknown ?-(sat.u.bat %idk %unknown, %run %unplugged, %cha %charging, %ful %full))
+    lat         lat
+    lon         lon
+    t           `%c
+    tid         'should-be-ignored'
+    tst         tst
+    topic       '/should/be/ignored'
+    created-at  `tst
   ==
 ::
 ++  contact-to-card
@@ -585,7 +606,8 @@
       (~(del by news) did)
     ~?  &(?=([%o *] u.jon) (~(has by p.u.jon) 'topic'))
       [%with-topic (~(got by p.u.jon) 'topic')]
-    |-
+    ::NOTE  take care to include .caz in every product!
+    |-  ^+  [caz this]
     ?+  -.u.mes  [caz this]
         %location
       ~&  [%location tid=tid.u.mes topic=topic.u.mes did=did tst=tst.u.mes ca=created-at.u.mes]
@@ -702,14 +724,52 @@
       $(+.u.mes t.u.mes)
     ::
         %transition
-      ::NOTE  we intentionally don't update state in response to these,
-      ::      instead relying on locally-calculated waypoint presence.
+      ::NOTE  we intentionally don't update zone presence state in response
+      ::      to these, instead relying on locally-calculated zone presence.
       ::      this is more reliable and flexible.
-      ::TODO  respect the (known) waypoint as a location update, if our
-      ::      location is stale: %enter sets the location to the waypoint,
-      ::      %leave sends a blank location update to subscribers
       ~&  [%transition did=did]
-      [caz this]
+      =/  dev
+        (~(gut by mine) did *device)
+      =/  stale=?
+        ?|  ?=(~ log.dev)
+            (gth (sub tst.u.mes msg.wen.i.log.dev) stale:config)
+        ==
+      ?-  event.u.mes
+          %enter
+        ::  if the device location is stale, and we know the zone that it
+        ::  entered, treat this as a normal location update (with a potentially
+        ::  large accuracy radius)
+        ::
+        ?.  ?&(stale (~(has by ways) wtst.u.mes))
+          [caz this]
+        =/  zon=region  (~(got by ways) wtst.u.mes)
+        =;  loc=location:ot
+          ~&  %pretending-transition-is-location
+          $(u.mes [%location loc])
+        =,  u.mes
+        %:  make-fake-zone-location
+          (fall lat lat.zon)   ::NOTE  this behaves Very Bad if client misbehaves
+          (fall lon lon.zon)   ::NOTE  "
+          ?~(lat rad.zon acc)  ::NOTE  "
+          tst
+          bat.dev
+        ==
+      ::
+          %leave
+        ::  if the device location is stale, treat this as a location update
+        ::  if the message has coordinates, or simply clear outward-presenting
+        ::  location status if it doesn't
+        ::
+        ?.  stale  [caz this]
+        ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes))
+          ::TODO  update zone presence state even though location didn't change?
+          [[(send-live (~(get ju line) did) did ~ bat.dev) caz] this]
+        =;  loc=location:ot
+          ~&  %pretending-transition-is-location
+          $(u.mes [%location loc])
+        =,  u.mes
+        (make-fake-zone-location u.lat u.lon acc tst bat.dev)
+      ==
     ==
   ==
 ::

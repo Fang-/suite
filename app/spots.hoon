@@ -245,6 +245,33 @@
     %+  mul  .~1000  ::  km ->  m
     (distance [lat lon]:zon)  ::  km
   (sun rad.zon)  ::  m
+::
+++  extract-request
+  |=  [=header-list:http body=(unit octs)]
+  ^-  %+  each
+        ::  valid, containing any of:
+        ::
+        $:  auth=[user=@t pass=@t]
+            did=@t
+            mes=(unit message:ot)
+        ==
+      ::  invalid, due to:
+      ::
+      ?(%no-auth %no-device-id %bad-body)
+  =/  auth
+    %+  biff
+      (get-header:http 'authorization' header-list)
+    extract-basic:header-auth
+  ?~  auth  |+%no-auth
+  ?~  did=(get-header:http 'x-limit-d' header-list)
+    |+%no-device-id
+  =/  mes=(unit (unit message:ot))
+    ?~  body  `~
+    ?~  jon=(de:json:html q.u.body)  ~
+    ?~  mes=(message:dejs:ot u.jon)  ~
+    `mes
+  ?~  mes  |+%bad-body
+  &+[u.auth u.did u.mes]
 --
 ::
 %-  agent:dbug
@@ -495,36 +522,22 @@
           ==
         ==
       ==
-    =/  auth-head=@t
-      %^  cat  3
-        'Basic '
-      =,  mimes:html
-      (en:base64 (as-octs (rap 3 (scot %p our.bowl) ':' auth ~)))
-    =/  have-head=(unit @t)
-      (get-header:http 'authorization' header-list.request)
-    ?.  =(have-head `auth-head)
-      :_  this
-      ~&  [dap.bowl %unauthorized-request]  ::TODO  removeme
-      (spout:rudder id [403 ~] `(as-octs:mimes:html 'unauthorized'))
-    ::TODO  check method?
-    ::  try to parse & add into state as necessary
+    =/  req
+      (extract-request [header-list body]:request)
+    ::  check auth validity
     ::
-    ?~  body.request
+    =?  req  &(?=(%& -.req) !=(auth.p.req [(scot %p our.bowl) auth]))
+      [%| %no-auth]
+    ?:  ?=(%| -.req)
       :_  this
-      (spout:rudder id [200 ['content-type' 'application/json']~] `(as-octs:mimes:html '[]'))
-    ?~  jon=(de:json:html q.u.body.request)
-      ~&  [%body-not-json bod=`@t`q.u.body.request]
-      :_  this
-      (spout:rudder id [400 ['content-type' 'application/json']~] ~)
-    ?~  mes=(message:dejs:ot u.jon)
-      ~&  [%failed-to-parse u.jon]
-      :_  this
-      (spout:rudder id [400 ['content-type' 'application/json']~] ~)
-    ?~  did=(get-header:http 'x-limit-d' header-list.request)
-      ~&  [%no-did-header header-list.request]
-      :_  this
-      (spout:rudder id [400 ['content-type' 'application/json']~] ~)
-    =/  did  u.did
+      %+  spout:rudder  id
+      ?-  p.req
+        %no-auth       [[403 ~] `(as-octs:mimes:html 'unauthorized')]
+        %no-device-id  [[400 ~] `(as-octs:mimes:html 'no device id')]
+        %bad-body      [[400 ~] `(as-octs:mimes:html 'bunk payload')]
+      ==
+    =+  mes=mes.p.req
+    =+  did=did.p.req
     ::  if this device is new, everything is news to it
     ::
     =?  news  !(~(has by mine) did)
@@ -604,8 +617,7 @@
       ==
     =.  news
       (~(del by news) did)
-    ~?  &(?=([%o *] u.jon) (~(has by p.u.jon) 'topic'))
-      [%with-topic (~(got by p.u.jon) 'topic')]
+    ?~  mes  [caz this]
     ::NOTE  take care to include .caz in every product!
     |-  ^+  [caz this]
     ?+  -.u.mes  [caz this]

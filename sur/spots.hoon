@@ -31,6 +31,15 @@
 +$  batt
   [cen=@ud sat=?(%idk %run %cha %ful)]
 ::
++$  bevy  ::  guest locations
+  $:  desc=@t
+      bums=bums
+      news=(jug @t [bum=@t loc=?])
+  ==
++$  bums
+  (map @t [nom=@t pas=@t now=node bat=(unit batt)])
+::
+::  subscription types
 ::
 +$  live-update
   [did=@t now=(unit node) bat=(unit batt)]

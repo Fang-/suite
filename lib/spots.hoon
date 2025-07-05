@@ -1,5 +1,6 @@
 ::  spots: location utilities
 ::
+/-  *spots
 /+  math
 ::
 |%
@@ -22,5 +23,25 @@
   ++  deg2rad
     |=  x=@rd
     (div (mul x pi) .~180)
+  --
+::
+++  enjs
+  =,  enjs:format
+  |%
+  ++  bums
+    |=  =^bums
+    %-  pairs
+    ::TODO  exclude stale/expired bums?
+    %+  turn  ~(tap by bums)
+    |=  [did=@t nom=@t pas=@t node bat=(unit batt)]
+    :-  did
+    %-  pairs
+    :~  'nom'^s+nom
+        'lat'^n+(rsh 3^2 (scot %rd lat))
+        'lon'^n+(rsh 3^2 (scot %rd lon))
+        'acc'^?~(acc ~ (numb u.acc))
+        'bat'^?~(bat ~ (numb cen.u.bat))
+        'wen'^s+(scot %da msg.wen)
+    ==
   --
 --

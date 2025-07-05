@@ -28,6 +28,9 @@
       ::
       auth=@t
       open=(map @ta [did=@t fro=@da til=(unit @da)])
+      ::  pets: guest location groups
+      ::
+      pets=(map @ta bevy)
       ::  hunt: foreign devices
       ::        ::TODO  card override
       ::        ::TODO  live flag instead of unitized, for displaying "stale" locs

@@ -24,18 +24,20 @@
 ::  - only latest location/$node & battery status, no history tracking
 ::  - respect username field for the card, as long as it's not a valid @p
 ::    - username must start with cohort name/prefix
+::      - X-Limit-U header? or is that same as auth creds?
 ::    - first password used by "[cohort]/[username]" is respected forever
 ::    - single device id per guest?
 ::    - certainly just set tid to first 2 chars of username
 ::
 /-  *spots
-/+  spots, ot=owntracks, *pal, rudder, math,
+/+  spots, ot=owntracks, *pal, rudder, math, header-auth,
     co=contacts,
     dbug, verb, default-agent
 ::
 :: /~  pages  (page:rudder (map @t device) [%nop ~])  /app/spots
 /=  home   /app/spots/home
 /=  share  /app/spots/share
+/=  club   /app/spots/club
 ::
 |%
 ++  config
@@ -58,6 +60,9 @@
       ::
       auth=@t
       open=(map @ta [did=@t fro=@da til=(unit @da)])
+      ::  pets: guest location groups
+      ::
+      pets=(map @ta bevy)
       ::  hunt: foreign devices
       ::        ::TODO  card override
       ::        ::TODO  live flag instead of unitized, for displaying "stale" locs
@@ -86,6 +91,8 @@
     ::
       [%hunt who=@p]
       [%bait who=@p did=@t show=?]
+    ::
+      [%pets id=@ta desc=@t]
   ==
 ::
 +$  card  $+(card card:agent:gall)
@@ -442,6 +449,12 @@
       ?~  dev=(~(get by mine) did.act)  ~
       =/  upd=live-update  [did.act ?~(log.u.dev ~ `i.log.u.dev) bat.u.dev]
       [%give %fact [/live/(scot %p who.act)]~ %spots-live-update !>(upd)]~
+    ::
+        %pets
+      =-  [~ this(pets -)]
+      ?.  (~(has by pets) id.act)
+        (~(put by pets) id.act %*(. *bevy desc desc.act))
+      (~(jab by pets) id.act |=(b=bevy b(desc desc.act)))
     ==
   ::
     ::  %handle-http-request: incoming from eyre
@@ -451,6 +464,82 @@
     ~&  [dap.bowl %request url.request]
     ?.  =(url.request (rap 3 '/' dap.bowl '/post' ~))
       =/  =query:rudder  (purse:rudder url.request)
+      ::TODO  integrate club requests properly. probably want to refactor
+      ::      request handling in general.
+      ?:  ?=([%spots ?(%bevy %club) @ *] site.query)
+        =*  bid  i.t.t.site.query
+        =*  fof
+          :_  this
+          (spout:rudder id (issue:rudder 404 ~))
+        ?.  (~(has by pets) bid)  fof
+        =/  =bevy  (~(got by pets) bid)
+        ::
+        ?+  t.t.t.site.query  fof
+            [%post ~]
+          =/  req
+            (extract-request [header-list body]:request)
+          ?:  ?=(%| -.req)
+            :_  this
+            %+  spout:rudder  id
+            %-  issue:rudder
+            ?-  p.req
+              %no-auth       [403 'unauthorized']
+              %no-device-id  [400 'no device id']
+              %bad-body      [400 'bunk payload']
+            ==
+          =,  p.req
+          ::  check provided auth.
+          ::  first usage of a username gets to set the password.
+          ::
+          =*  fot  [(spout:rudder id (issue:rudder 403 'unauthorized')) this]
+          ?~  auth  fot
+          =?  bums.bevy  !(~(has by bums.bevy) user.auth)
+            ::NOTE  ok to bunt node, this request _should_ set it
+            (~(put by bums.bevy) user.auth ['' pass.auth *node ~])
+          =/  bum  (~(got by bums.bevy) user.auth)
+          ?.  =(pass.auth pas.bum)  fot
+          ::  at the end, we must always put the bum/bevy back into state.
+          ::  any code below calling "this" instead of "done" is erroneous!
+          ::
+          =*  done
+            =.  bums.bevy  (~(put by bums.bevy) user.auth bum)
+            =.  pets       (~(put by pets) bid bevy)
+            this
+          ::  set display name from device id
+          ::
+          =.  nom.bum
+            ::TODO  news if it changes?
+            %+  fall
+              (get-header:http 'x-limit-d' header-list.request)
+            user.auth
+          ::
+          :-  %^  spout:rudder  id
+                [200 ['content-type' 'application/json']~]
+              ::TODO  send news
+              `(as-octs:mimes:html '[]')
+          ?~  mes.p.req  done
+          ?.  ?=(%location -.u.mes.p.req)  done
+          =.  now.bum
+            ^-  node
+            ~!  u.mes
+            =,  u.mes
+            :-  [lat lon acc [alt vac]]
+            [[tst (fall created-at tst)] vel]
+          ::TODO  put news if it changes
+          ::TODO  update bevy.json in eyre cache
+          ~&  [%guest-location-update user.auth]
+          done
+        ::
+            [%view ~]
+          :_  this
+          ?:  ?=([~ %json] ext.query)
+            %+  spout:rudder  id
+            :-  [200 ['content-type' 'application/json']~]
+            %.  bums.bevy
+            :(cork bums:enjs:spots en:json:html as-octs:mimes:html some)
+          (spout:rudder id (paint:rudder (club bid bevy)))
+        ==
+      ::
       :_  this
       %+  spout:rudder  id
       ?.  |(=(src our):bowl ?=([%spots %share *] site.query))

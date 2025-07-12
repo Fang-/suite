@@ -115,6 +115,62 @@
   }
   '''
 ::
+++  test-parse-msg-location-no-tid
+  %+  expect-eq:test
+    !>  ^-  (unit message:ot)
+    %-  some
+    :*  %location
+        acc=`13
+        alt=`--52
+        batt=~
+        bs=%unknown
+        cog=`0
+        lat=.~12.345678
+        lon=.~1.2345678
+        rad=~
+        t=`%u
+        tid=''
+        tst=~2025.5.3..19.15.19
+        vac=`0  ::REVIEW  should be ~ if 0? (same q for .vel, .cog)
+        vel=`0
+        p=~
+        poi=~
+        conn=~
+        tag=~
+        topic='owntracks/~zod/phoneee'
+        inregions=~['aavvcc']
+        inrids=~
+        ssid=~
+        bssid=~
+        created-at=`~2025.5.3..19.15.20
+        m=~
+        id=~
+    ==
+  !>  ^-  (unit message:ot)
+  %-  message:dejs:ot
+  %-  need
+  %-  de:json:html
+  '''
+  {
+    "_type": "location",
+    "_id": "03f72725",
+    "acc": 13,
+    "alt": 52,
+    "cog": 0,
+    "created_at": 1746299720,
+    "inregions": [
+      "aavvcc"
+    ],
+    "lat": 12.345678,
+    "lon": 1.2345678,
+    "t": "u",
+    "topic": "owntracks/~zod/phoneee",
+    "tst": 1746299719,
+    "vac": 0,
+    "vel": 0
+  }
+  '''
+::
 ++  test-parse-msg-location-extended
   ::NOTE  capitalized keys, space in topic, odd mode
   %+  expect-eq:test

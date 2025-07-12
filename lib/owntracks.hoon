@@ -185,7 +185,7 @@
         :+  %&  'lon'         ne
         :+  %|  'rad'         ni
         :+  %|  't'           (ci (soft ?(%p %c %'C' %b %r %u %t %v)) so)
-        :+  %&  'tid'         so
+        :+  %r  'tid'         (bu '' so)
         :+  %&  'tst'         du
         :+  %|  'vac'         ni
         :+  %|  'vel'         ni
@@ -232,7 +232,7 @@
         :+  %|  'lon'    ne
         :+  %&  'tst'    du
         :+  %&  'acc'    ni
-        :+  %&  'tid'    so
+        :+  %r  'tid'    (bu '' so)
         :+  %&  'event'  (ci (soft ?(%enter %leave)) so)
         :+  %|  'desc'   so
         :+  %|  't'      (ci (soft ?(%c %b %l)) so)

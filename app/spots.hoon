@@ -577,7 +577,11 @@
             :-  [200 ['content-type' 'application/json']~]
             %.  bums.bevy
             :(cork bums:enjs:spots en:json:html as-octs:mimes:html some)
-          (spout:rudder id (paint:rudder (club bid bevy)))
+          %+  spout:rudder  id
+          %-  paint:rudder
+          %+  club
+            src.bowl
+          [bid bevy]
         ::
             [%setup ~]
           :_  this

@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "esbuild *.ts --bundle --format=esm --outdir=../../pkg/spots/web",
+    "copysh": "cd ../../pkg && ./copy.sh spots",
+    "update": "npm run build && npm run copysh"
+  },
+  "dependencies": {
+    "ol": "^10.6.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5",
+    "tsc": "^2.0.4"
+  }
+}

@@ -525,6 +525,8 @@
             =,  u.mes
             :-  [lat lon acc [alt vac]]
             [[tst (fall created-at tst)] vel]
+          =.  bat.bum
+            (make-batt:spots [batt bs]:u.mes)
           ::TODO  put news if it changes
           ::TODO  update bevy.json in eyre cache
           ~&  [%guest-location-update user.auth]
@@ -745,15 +747,7 @@
           [new t.log.dev]
         [i.log.dev $(log.dev t.log.dev)]
       =.  bat.dev
-        ?~  batt.u.mes  ~
-        %-  some
-        :-  u.batt.u.mes
-        ?-  bs.u.mes
-          %unknown    %idk
-          %unplugged  %run
-          %charging   %cha
-          %full       %ful
-        ==
+        (make-batt:spots [batt bs]:u.mes)
       ::TODO  want to factor out zone status logic once they support foreign devices too
       ::  trigger zone diffs
       ::

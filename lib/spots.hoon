@@ -25,6 +25,19 @@
     (div (mul x pi) .~180)
   --
 ::
+++  make-batt
+  |=  [bat=(unit @ud) sat=?(%unknown %unplugged %charging %full)]
+  ^-  (unit batt)
+  ?~  bat  ~
+  %-  some
+  :-  u.bat
+  ?-  sat
+    %unknown    %idk
+    %unplugged  %run
+    %charging   %cha
+    %full       %ful
+  ==
+::
 ++  enjs
   =,  enjs:format
   |%

@@ -279,6 +279,12 @@
     `mes
   ?~  mes  |+%bad-body
   &+[u.auth u.did u.mes]
+::
+::TODO  systematize
+++  store  ::  set cache entry
+  |=  [url=@t entry=(unit cache-entry:eyre)]
+  ^-  card:agent:gall
+  [%pass /eyre/cache %arvo %e %set-response url entry]
 --
 ::
 %-  agent:dbug
@@ -466,7 +472,7 @@
       =/  =query:rudder  (purse:rudder url.request)
       ::TODO  integrate club requests properly. probably want to refactor
       ::      request handling in general.
-      ?:  ?=([%spots ?(%bevy %club) @ *] site.query)
+      ?:  ?=([%spots %club @ *] site.query)
         =*  bid  i.t.t.site.query
         =*  fof
           :_  this
@@ -498,13 +504,20 @@
             (~(put by bums.bevy) user.auth ['' pass.auth *node ~])
           =/  bum  (~(got by bums.bevy) user.auth)
           ?.  =(pass.auth pas.bum)  fot
+          ::  we will always produce at least a 200 response
+          ::
+          =/  caz=(list card)
+            %^  spout:rudder  id
+              [200 ['content-type' 'application/json']~]
+            ::TODO  send news
+            `(as-octs:mimes:html '[]')
           ::  at the end, we must always put the bum/bevy back into state.
           ::  any code below calling "this" instead of "done" is erroneous!
           ::
           =*  done
             =.  bums.bevy  (~(put by bums.bevy) user.auth bum)
             =.  pets       (~(put by pets) bid bevy)
-            this
+            [caz this]
           ::  set display name from device id
           ::
           =.  nom.bum
@@ -513,10 +526,6 @@
               (get-header:http 'x-limit-d' header-list.request)
             user.auth
           ::
-          :-  %^  spout:rudder  id
-                [200 ['content-type' 'application/json']~]
-              ::TODO  send news
-              `(as-octs:mimes:html '[]')
           ?~  mes.p.req  done
           ?.  ?=(%location -.u.mes.p.req)  done
           =.  now.bum
@@ -528,8 +537,17 @@
           =.  bat.bum
             (make-batt:spots [batt bs]:u.mes)
           ::TODO  put news if it changes
-          ::TODO  update bevy.json in eyre cache
-          ~&  [%guest-location-update user.auth]
+          ::  put the new view.json into cache,
+          ::  since clients will be polling for that
+          ::
+          =.  caz
+            %+  snoc  caz
+            %+  store  (rap 3 '/spots/club/' bid '/view.json' ~)
+            %+  some  |
+            :-  %payload
+            :-  [200 ['content-type' 'application/json']~]
+            %.  (~(put by bums.bevy) user.auth bum)
+            :(cork bums:enjs:spots en:json:html as-octs:mimes:html some)
           done
         ::
             [%view ~]

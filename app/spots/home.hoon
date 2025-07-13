@@ -174,7 +174,7 @@
       To share the location for `phone` for the next twelve hours:
 
       ```
-      :spots [%share 'phone' `~h12]
+      :spots [%share ~ 'phone' `~h12]
       ```
 
       Below are your active clearweb links.

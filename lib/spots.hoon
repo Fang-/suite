@@ -54,7 +54,7 @@
         'lon'^n+(rsh 3^2 (scot %rd lon))
         'acc'^?~(acc ~ (numb u.acc))
         'bat'^?~(bat ~ (numb cen.u.bat))
-        'wen'^s+(scot %da msg.wen)
+        'wen'^s+(scot %da (sub msg.wen (mod msg.wen ~s1)))
     ==
   --
 --

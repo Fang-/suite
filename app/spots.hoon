@@ -457,6 +457,7 @@
           ~(key by mine)
         [%hunt-card who ~(key by (~(gut by hunt) who ~))]
       :_  this
+      ::TODO  %watch-as for future compat?
       :~  [%pass /hunt %agent [who dap.bowl] %watch /live/(scot %p our.bowl)]
           (request-face who img)
       ==
@@ -543,9 +544,7 @@
           ::
           =.  nom.bum
             ::TODO  news if it changes?
-            %+  fall
-              (get-header:http 'x-limit-d' header-list.request)
-            user.auth
+            did
           ::
           ?~  mes.p.req  done
           ?.  ?=(%location -.u.mes.p.req)  done
@@ -601,6 +600,8 @@
       ::
       :_  this
       %+  spout:rudder  id
+      ::  only the share page and its resources are public
+      ::
       ?.  |(=(src our):bowl ?=([%spots %share *] site.query))
         (paint:rudder %auth url.request)
       ?+  site.query  (issue:rudder 404 ~)
@@ -978,6 +979,7 @@
     ::
         %kick
       :_  this
+      ::TODO  %watch-as for future compat?
       [%pass wire %agent [src dap]:bowl %watch /live/(scot %p our.bowl)]~
     ::
         %fact

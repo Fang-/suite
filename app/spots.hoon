@@ -38,6 +38,7 @@
 /=  home   /app/spots/home
 /=  share  /app/spots/share
 /=  club   /app/spots/club
+/=  club-setup  /app/spots/club-setup
 ::
 |%
 ++  config
@@ -558,6 +559,24 @@
             %.  bums.bevy
             :(cork bums:enjs:spots en:json:html as-octs:mimes:html some)
           (spout:rudder id (paint:rudder (club bid bevy)))
+        ::
+            [%setup ~]
+          :_  this
+          %+  spout:rudder  id
+          %-  paint:rudder
+          %+  club-setup
+            [src.bowl secure (need (get-header:http 'host' header-list.request)) eny.bowl]
+          [bid bevy]
+        ::
+            [%nuke ~]
+          =+  uid=(scot %p src.bowl)
+          ?.  (~(has by bums.bevy) uid)
+            :_  this
+            (spout:rudder id [200 ~] `(as-octs:mimes:html 'non-existent'))
+          =.  bums.bevy  (~(del by bums.bevy) uid)
+          =.  pets  (~(put by pets) bid bevy)
+          :_  this
+          (spout:rudder id [200 ~] `(as-octs:mimes:html 'removed!'))
         ==
       ::
       :_  this

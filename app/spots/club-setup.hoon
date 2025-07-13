@@ -73,6 +73,10 @@
         bid
         '/post'
     ==
+  =/  pass=@t
+    ?^  b=(~(get by bums) (scot %p src))
+      pas.u.b
+    (crip ((w-co:co 1) (end 7 eny)))
   %-  ~(gas by *(map @t json))
   :~  :-  '_type'         s+'configuration'
       :-  'auth'          b+&
@@ -80,7 +84,7 @@
       :-  'mode'          n+'3'  ::  http mode
       :-  'url'           s+url
       :-  'username'      s+(scot %p src)
-      :-  'password'      s+(crip ((w-co:co 1) (end 6 eny)))
+      :-  'password'      s+pass
   ==
 ::
 ++  style

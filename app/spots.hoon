@@ -46,8 +46,8 @@
   ++  stale  ~m5
   --
 ::
-+$  state-2
-  $:  %2
++$  state-3
+  $:  %3
       ::  mine: personal devices  ::TODO  support guest devices?
       ::  ways: personal trigger zones
       ::  news: unsent updates for devices
@@ -291,7 +291,7 @@
 %-  agent:dbug
 %+  verb  |
 ::
-=|  state-2
+=|  state-3
 =*  state  -
 ::
 |_  =bowl:gall
@@ -318,10 +318,30 @@
       =+  old=!<(state-any ole)
       =?  old  ?=(%0 -.old)  (state-0-to-1 old)
       =?  old  ?=(%1 -.old)  (state-1-to-2 old)
-      ?>  ?=(%2 -.old)
+      =?  old  ?=(%2 -.old)  (state-2-to-3 old)
+      ?>  ?=(%3 -.old)
       [~ this(state old)]
   ::
-  +$  state-any  $%(state-0 state-1 state-2)
+  +$  state-any  $%(state-0 state-1 state-2 state-3)
+  ::
+  +$  state-2
+    $:  %2
+        mine=(map @t device)  ::TODO  card override
+        ways=(map @da zone)
+        news=(jug @t news-key)
+        cars=(map @p [name=@t face=[url=@t dat=(unit octs)]])
+        auth=@t
+        open=(map @ta [did=@t fro=@da til=(unit @da)])
+        hunt=(mip @p @t [now=(unit node) bat=(unit batt)])
+        bait=(jug @p @t)
+        line=(jug @t @p)
+        dogs=(set @p)
+    ==
+  ::
+  ++  state-2-to-3
+    |=  state-2
+    ^-  state-3
+    [%3 mine ways news cars auth open pets=~ hunt bait line dogs]
   ::
   +$  state-1  _%*(. *state-2 - %1)
   ::

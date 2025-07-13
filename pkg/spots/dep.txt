@@ -11,7 +11,8 @@ epic.hoon
 #resource.hoon
 #< landscape-apps/landscape-dev/sur
 #metadata-store.hoon
-#> mar
-#< urbit/pkg/arvo/mar
-#json.hoon
+> mar
+< urbit/pkg/arvo/mar
+js.hoon
+css.hoon
 

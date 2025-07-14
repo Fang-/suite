@@ -85,6 +85,7 @@
       :-  'url'           s+url
       :-  'username'      s+(scot %p src)
       :-  'password'      s+pass
+      :-  'monitoring'    n+'1'  ::  significant changes
   ==
 ::
 ++  style

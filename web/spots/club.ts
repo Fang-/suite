@@ -1,4 +1,4 @@
-import { pollJson, tweenOverlayPosition, div, a, gElement } from './utils';
+import { pollJson, tweenOverlayPosition, div, a, gElement, renderTimestamp } from './utils';
 import { useGeographic } from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
@@ -16,7 +16,7 @@ type bum = {
   lon: number,
   acc: number | null,
   bat: number | null,
-  wen: string, //TODO
+  wen: number,
 }
 
 let our: string;
@@ -51,10 +51,9 @@ function setFocus(did: string | null, pan = true) {
     //
     focusView.classList.add('focus');
     const k = focusView.children;
-    console.log('setting focus deets', bums[did].wen);
     k[0].textContent = bums[did].nom.slice(0, 2);
     k[1].textContent = bums[did].nom;
-    k[2].textContent = bums[did].wen;
+    k[2].textContent = renderTimestamp(bums[did].wen);
     k[3].textContent = bums[did].bat ? (bums[did].bat?.toString()+'%') : '??%';
     const locString = bums[did].lat + ',' + bums[did].lon;
     k[4].replaceChildren(

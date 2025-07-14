@@ -66,6 +66,13 @@ export function tweenOverlayPosition(
   overlay.spots.animation = window.requestAnimationFrame(step);
 }
 
+export function renderTimestamp(s: number) {
+  console.log('rendering', s);
+  const t = new Date(s*1000);
+  return '~' + t.getFullYear() + '.' + t.getMonth() + '.' + t.getDate()
+    + '..' + t.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/:/g, '.');
+}
+
 //  from grecha.js
 
 export type gElement = HTMLElement & {

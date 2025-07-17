@@ -58,6 +58,11 @@ function tweenOverlayPosition(overlay, position, duration, bonus = null) {
   if (!overlay.spots) overlay.spots = {};
   overlay.spots.animation = window.requestAnimationFrame(step);
 }
+function renderTimestamp(s) {
+  console.log("rendering", s);
+  const t = new Date(s * 1e3);
+  return "~" + t.getFullYear() + "." + t.getMonth() + "." + t.getDate() + ".." + t.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).replace(/:/g, ".");
+}
 function tag(name, ...children) {
   const el = document.createElement(name);
   for (const child of children) {
@@ -86,6 +91,7 @@ export {
   div,
   h1,
   pollJson,
+  renderTimestamp,
   span,
   tweenOverlayPosition
 };

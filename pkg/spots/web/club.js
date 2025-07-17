@@ -58,6 +58,11 @@ function tweenOverlayPosition(overlay, position, duration, bonus = null) {
   if (!overlay.spots) overlay.spots = {};
   overlay.spots.animation = window.requestAnimationFrame(step);
 }
+function renderTimestamp(s) {
+  console.log("rendering", s);
+  const t = new Date(s * 1e3);
+  return "~" + t.getFullYear() + "." + t.getMonth() + "." + t.getDate() + ".." + t.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).replace(/:/g, ".");
+}
 function tag(name, ...children) {
   const el = document.createElement(name);
   for (const child of children) {
@@ -21610,10 +21615,9 @@ function setFocus(did, pan2 = true) {
     items[did].classList.add("focus");
     focusView.classList.add("focus");
     const k = focusView.children;
-    console.log("setting focus deets", bums[did].wen);
     k[0].textContent = bums[did].nom.slice(0, 2);
     k[1].textContent = bums[did].nom;
-    k[2].textContent = bums[did].wen;
+    k[2].textContent = renderTimestamp(bums[did].wen);
     k[3].textContent = bums[did].bat ? bums[did].bat?.toString() + "%" : "??%";
     const locString = bums[did].lat + "," + bums[did].lon;
     k[4].replaceChildren(
@@ -21683,7 +21687,8 @@ function updateBumListItem(did, b) {
   } else if (!items[did]) {
     const i = div(
       div("").att$("class", "shorthand"),
-      div("").att$("class", "name")
+      div("").att$("class", "name"),
+      div("").att$("class", "extra")
     ).att$("class", "item").onclick$(clickBum(did));
     if (did === our) {
       i.att$("class", "item our");
@@ -21692,8 +21697,16 @@ function updateBumListItem(did, b) {
     console.log("appending child", did, panel);
     panel.prepend(i);
   }
-  items[did].children[0].innerText = b.nom.slice(0, 2);
-  items[did].children[1].innerText = b.nom;
+  items[did].children[0].textContent = b.nom.slice(0, 2);
+  items[did].children[1].textContent = b.nom;
+  if (did === our) {
+    items[did].children[2].textContent = "(you)";
+  } else if (bums[our]) {
+    const dist = getDistance(bumCoord(bums[our]), bumCoord(bums[did]));
+    items[did].children[2].textContent = dist < 1e3 ? Math.floor(dist) + "m" : Math.floor(dist / 100) / 10 + "km";
+  } else {
+    items[did].children[2].textContent = "";
+  }
 }
 function updateBum(did, b) {
   if (b) {

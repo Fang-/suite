@@ -8,6 +8,7 @@ import { Coordinate } from 'ol/coordinate';
 import { boundingExtent } from 'ol/extent';
 import Overlay from 'ol/Overlay';
 import Control from 'ol/control/Control';
+import { getDistance } from 'ol/sphere';
 
 type bums = { [did: string]: bum };
 type bum = {
@@ -139,7 +140,8 @@ function updateBumListItem(did: string, b: bum | null) {
   if (!items[did]) {
     const i = div(
       div('').att$('class', 'shorthand'),
-      div('').att$('class', 'name')
+      div('').att$('class', 'name'),
+      div('').att$('class', 'extra')
     ).att$('class', 'item').onclick$(clickBum(did));
     if (did === our) {
       i.att$('class', 'item our');
@@ -149,10 +151,19 @@ function updateBumListItem(did: string, b: bum | null) {
     panel.prepend(i);
   }
   //  edit
-  //@ts-ignore
-  items[did].children[0].innerText = b.nom.slice(0, 2);
-  //@ts-ignore
-  items[did].children[1].innerText = b.nom;
+  items[did].children[0].textContent = b.nom.slice(0, 2);
+  items[did].children[1].textContent = b.nom;
+  if (did === our) {
+    items[did].children[2].textContent = '(you)';
+  } else
+  if (bums[our]) {
+    const dist = getDistance(bumCoord(bums[our]), bumCoord(bums[did]));
+    items[did].children[2].textContent = (dist < 1000)
+      ? Math.floor(dist)+'m'
+      : (Math.floor(dist/100)/10)+'km';
+  } else {
+    items[did].children[2].textContent = '';
+  }
 }
 
 function updateBum(did: string, b: bum | null) {

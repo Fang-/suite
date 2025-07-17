@@ -143,6 +143,11 @@
     font-weight: bold;
     margin-left: 0.5em;
   }
+  .item .extra {
+    margin-left: 0.5em;
+    color: grey;
+    font-size: 0.8em;
+  }
   '''
 ::
 ++  script

@@ -93,7 +93,7 @@
       [%hunt who=@p]
       [%bait who=@p did=@t show=?]
     ::
-      [%pets id=@ta desc=@t]
+      [%pets id=@ta desc=(unit @t)]
   ==
 ::
 +$  card  $+(card card:agent:gall)
@@ -480,9 +480,11 @@
     ::
         %pets
       =-  [~ this(pets -)]
+      ?~  desc.act
+        (~(del by pets) id.act)
       ?.  (~(has by pets) id.act)
-        (~(put by pets) id.act %*(. *bevy desc desc.act))
-      (~(jab by pets) id.act |=(b=bevy b(desc desc.act)))
+        (~(put by pets) id.act %*(. *bevy desc u.desc.act))
+      (~(jab by pets) id.act |=(b=bevy b(desc u.desc.act)))
     ==
   ::
     ::  %handle-http-request: incoming from eyre

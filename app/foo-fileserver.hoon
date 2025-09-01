@@ -18,7 +18,6 @@
 ::TODO  mb refactor as library that you just call with config args?
 ::TODO  load config from separate file? (for easier agent updating)
 ::TODO  auth optionality
-::TODO  set tombstoning policy on file-root
 ::TODO  populate cache eagerly?
 ::
 |%
@@ -42,6 +41,13 @@
   =;  =task:clay
     [%pass [%clay %next foot] %arvo %c task]
   [%warp our desk ~ %next %z da+now foot]
+::
+++  set-norm
+  |=  [[our=@p =desk] foot=path keep=?]
+  ^-  card
+  =;  =task:clay
+    [%pass [%clay %norm foot] %arvo %c task]
+  [%tomb %norm our desk (~(put of *norm:clay) foot keep)]
 --
 ::
 =|  state-0
@@ -57,9 +63,11 @@
   =.  woot  web-root
   :_  this
   ::  set up the binding,
+  ::  the relevant tombstoning policy,
   ::  and await next file change
   ::
   :~  [%pass /eyre/connect %arvo %e %connect [~ woot] dap.bowl]
+      (set-norm [our q.byk]:bowl foot |)
       (read-next [our q.byk now]:bowl foot)
   ==
 ::
@@ -71,25 +79,43 @@
   ^-  (quip card _this)
   =/  old  !<(state-0 ole)
   :_  this(foot file-root, woot web-root, cash ~)
-  ::  await next change on our file root
-  ::  (don't care if we double-request (though clay probably dedupes?), since
-  ::  all we do on-notify rn is wipe the cache)
-  ::
-  :-  (read-next [our q.byk now]:bowl file-root)
-  ::  always clear old cache entries, in case we changed something about
-  ::  the way we serve
-  ::
-  %+  weld
-    (turn ~(tap in cash.old) (curr store ~))
-  ::  if the web root changed, we must re-set our binding
-  ::
-  ^-  (list card)
-  ?:  =(woot.old web-root)  ~
-  ::NOTE  re-bind first to avoid duct shenanigans.
-  ::      remove this when eyre stops restricting %disconnect to the og duct.
-  :~  [%pass /eyre/connect %arvo %e %connect [~ woot.old] dap.bowl]
-      [%pass /eyre/connect %arvo %e %disconnect [~ woot.old]]
-      [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+  %-  zing
+  ^-  (list (list card))
+  :~  ::  if the file root changed, set the new root up for tombstoning.
+      ::  we do this ahead of the %pick, to do clean-up on new root right away.
+      ::
+      ?:  =(foot.old file-root)  ~
+      [(set-norm [our q.byk]:bowl file-root |)]~
+    ::
+      ::  always await next change on our file root
+      ::  (don't care if we double-request (though clay probably dedupes?), since
+      ::  all we do on-notify rn is wipe the cache)
+      ::
+      :-  (read-next [our q.byk now]:bowl file-root)
+      ::  always trigger clay tombstoning, for both old and new file roots.
+      ::
+      :-  [%pass /clay/tomb %arvo %c %tomb %pick ~]
+      ::  always clear old cache entries, in case we changed something about
+      ::  the way we serve
+      ::
+      (turn ~(tap in cash.old) (curr store ~))
+    ::
+      ::  if the file root changed, remove tombstoning from the old root.
+      ::  we do this after the %pick, so that the old root gets left "clean".
+      ::
+      ?:  =(foot.old file-root)  ~
+      [(set-norm [our q.byk]:bowl foot.old &)]~
+    ::
+      ::  if the web root changed, we must re-set our binding
+      ::
+      ^-  (list card)
+      ?:  =(woot.old web-root)  ~
+      ::NOTE  re-bind first to avoid duct shenanigans.
+      ::      remove this when eyre stops restricting %disconnect to the og duct.
+      :~  [%pass /eyre/connect %arvo %e %connect [~ woot.old] dap.bowl]
+          [%pass /eyre/connect %arvo %e %disconnect [~ woot.old]]
+          [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+      ==
   ==
 ::
 ++  on-poke

@@ -2,21 +2,31 @@
 ::
 ::    for copying into desks as a standalone %deskname-fileserver agent.
 ::
-::  v edit this for configuration changes v
+::    ** in general, you should not need to modify this file directly. **
+::    instead this agent will read configuration parameters from a
+::    /app/fileserver/config.hoon. this file must produce a core
+::    with at least a +web-root arm. all other overrides for the
+::    default configuration (see below) are optional.
 ::
+/=  config  /app/fileserver/config
+::
+::TODO  restructure so config can take a byk.bowl argument?
 |%
-::  +file-root: path on this desk under which files live
-::  +web-root:  url under which those files must be served
+::  required config parameters:
 ::
-++  file-root  ^-  path       /web
-++  web-root   ^-  (list @t)  /your-root-path/static
+::  +web-root: url under which your files will be served
+::
+++  web-root   ^-  (list @t)  web-root:config
+::
+::  optional config parameters, with default:
+::
+::  +file-root: path on this desk under which the files to serve live
+::
+++  file-root  ^-  path
+  !@  file-root:config  file-root:config
+  /web
 --
 ::
-::  ^ edit that for configuration changes ^
-::  ----- do not edit below this line -----
-::
-::TODO  mb refactor as library that you just call with config args?
-::TODO  load config from separate file? (for easier agent updating)
 ::TODO  auth optionality
 ::TODO  populate cache eagerly?
 ::

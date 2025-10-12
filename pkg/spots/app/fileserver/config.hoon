@@ -1,0 +1,3 @@
+|%
+++  web-root  /spots/static
+--

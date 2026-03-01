@@ -13,6 +13,7 @@
 ::    tuple order respects the order in which elements and described in the
 ::    docs, which is mostly but not fully in alphabetical order.
 ::
+/+  header-auth
 !:
 ::TODO  look into using +mu, +re
 =,  dejs-soft:format
@@ -143,6 +144,24 @@
   %-  as-octs:mimes:html
   %-  en:json:html
   o+(~(put by config) '_type' s+'configuration')
+::
+++  extract-request
+  |=  [=header-list:http body=(unit octs)]
+  ^-  (each request ?(%bad-auth %bad-deid %bad-body))
+  =/  auth
+    %+  biff
+      (get-header:http 'authorization' header-list)
+    extract-basic:header-auth
+  ?~  auth   |+%bad-auth
+  ?~  did=(get-header:http 'x-limit-d' header-list)
+             |+%bad-deid
+  =;  mes=(unit (unit message))
+    ?~  mes  |+%bad-body
+    &+[u.auth u.did u.mes]
+  ?~  body  `~
+  ?~  jon=(de:json:html q.u.body)  ~
+  ?~  mes=(message:dejs u.jon)  ~
+  `mes
 ::
 ++  dejs
   |%

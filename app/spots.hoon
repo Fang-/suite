@@ -30,7 +30,7 @@
 ::    - certainly just set tid to first 2 chars of username
 ::
 /-  *spots
-/+  spots, ot=owntracks, *pal, rudder, math, header-auth,
+/+  spots, ot=owntracks, *pal, rudder, math,
     co=contacts,
     dbug, verb, default-agent
 ::
@@ -253,33 +253,6 @@
     %+  mul  .~1000  ::  km ->  m
     (distance [lat lon]:zon)  ::  km
   (sun rad.zon)  ::  m
-::
-++  extract-request
-  |=  [=header-list:http body=(unit octs)]
-  ^-  %+  each
-        ::  valid, containing any of:
-        ::
-        $:  auth=[user=@t pass=@t]
-            did=@t
-            mes=(unit message:ot)
-        ==
-      ::  invalid, due to:
-      ::
-      ?(%no-auth %no-device-id %bad-body)
-  =/  auth
-    %+  biff
-      (get-header:http 'authorization' header-list)
-    extract-basic:header-auth
-  ?~  auth  |+%no-auth
-  ?~  did=(get-header:http 'x-limit-d' header-list)
-    |+%no-device-id
-  =/  mes=(unit (unit message:ot))
-    ?~  body  `~
-    ?~  jon=(de:json:html q.u.body)  ~
-    ?~  mes=(message:dejs:ot u.jon)  ~
-    `mes
-  ?~  mes  |+%bad-body
-  &+[u.auth u.did u.mes]
 ::
 ::TODO  systematize
 ++  store  ::  set cache entry
@@ -696,15 +669,15 @@
         ?+  t.t.t.site.query  fof
             [%post ~]
           =/  req
-            (extract-request [header-list body]:request)
+            (extract-request:ot [header-list body]:request)
           ?:  ?=(%| -.req)
             :_  this
             %+  spout:rudder  id
             %-  issue:rudder
             ?-  p.req
-              %no-auth       [403 'unauthorized']
-              %no-device-id  [400 'no device id']
-              %bad-body      [400 'bunk payload']
+              %bad-auth  [403 'unauthorized']
+              %bad-deid  [400 'no device id']
+              %bad-body  [400 'bunk payload']
             ==
           =,  p.req
           ::  check provided auth.
@@ -867,21 +840,21 @@
         ==
       ==
     =/  req
-      (extract-request [header-list body]:request)
+      (extract-request:ot [header-list body]:request)
     ::  check auth validity
     ::NOTE  we *must* check here, instead of relying on %owntracks-request
     ::      handling's auth check, because we still want to serve a response
     ::      if auth is bad.
     ::
     =?  req  &(?=(%& -.req) !=(auth.p.req [(scot %p our.bowl) auth]))
-      [%| %no-auth]
+      [%| %bad-auth]
     ?:  ?=(%| -.req)
       :_  this
       %+  spout:rudder  id
       ?-  p.req
-        %no-auth       [[403 ~] `(as-octs:mimes:html 'unauthorized')]
-        %no-device-id  [[400 ~] `(as-octs:mimes:html 'no device id')]
-        %bad-body      [[400 ~] `(as-octs:mimes:html 'bunk payload')]
+        %bad-auth  [[403 ~] `(as-octs:mimes:html 'unauthorized')]
+        %bad-deid  [[400 ~] `(as-octs:mimes:html 'no device id')]
+        %bad-body  [[400 ~] `(as-octs:mimes:html 'bunk payload')]
       ==
     =^  caz-roq  this
       $(mark %owntracks-request, vase !>(`request:ot`p.req))

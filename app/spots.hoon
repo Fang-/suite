@@ -891,8 +891,9 @@
         (~(gut by mine) did *device)
       =/  stale=?
         ?|  ?=(~ log.dev)
+        ?&  (gte tst.u.mes msg.wen.i.log.dev)  ::NOTE  avoid +sub underflow
             (gth (sub tst.u.mes msg.wen.i.log.dev) stale:config)
-        ==
+        ==  ==
       ?-  event.u.mes
           %enter
         ::  if the device location is stale, and we know the zone that it

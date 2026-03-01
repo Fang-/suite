@@ -17,6 +17,12 @@
 ::TODO  look into using +mu, +re
 =,  dejs-soft:format
 |%
++$  request  ::REVIEW
+  $:  auth=[user=@t pass=@t]
+      did=@t
+      mes=(unit message)
+  ==
+::
 +$  message  ::TODO  fully support all message types
   $%  [%beacon json]
       [%card card]

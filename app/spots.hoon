@@ -487,6 +487,195 @@
       (~(jab by pets) id.act |=(b=bevy b(desc u.desc.act)))
     ==
   ::
+    ::  %owntracks-request: incoming device data
+    ::
+      %owntracks-request
+    =+  !<(request:ot vase)
+    ::TODO  support auth from guests?
+    ?>  =(user.auth (scot %p src.bowl))
+    ?>  =(auth [(scot %p our.bowl) ^auth])
+    ::  if this device is new, everything is news to it
+    ::
+    =?  news  !(~(has by mine) did)
+      ::  everything is news to it, generate a set of news-keys for this
+      ::  device based on everything we have in state, and request that they
+      ::  send us waypoints/zones if they have any
+      ::
+      %+  ~(put by news)  did
+      =;  nes
+        %-  ~(gas in nes)
+        :~  [%send-ways ~]
+            [%ways ~(key by ways)]
+        ==
+      %+  roll  ~(tap by hunt)
+      |=  [[who=@p des=(map @t [now=(unit) *])] nes=(set news-key)]
+      %+  roll  ~(tap by des)
+      |=  [[did=@t now=(unit) *] =_nes]
+      =?  nes  (~(has by cars) who)
+        (~(put in nes) [%hunt-card who did])
+      =?  nes  ?=(^ now)
+        (~(put in nes) [%hunt-spot who did])
+      nes
+    ::  no message, nothing to do
+    ::
+    ?~  mes  [~ this]
+    ::  process whole message, may be recursive
+    ::
+    =|  caz=(list card)
+    |-  ^+  [caz this]  ::NOTE  take care to include .caz in every product!
+    ?+  -.u.mes  [caz this]
+        %location
+      =/  dev
+        (~(gut by mine) did *device)
+      =/  had=[(unit node) (unit batt)]
+        [?~(log.dev ~ `i.log.dev) bat.dev]
+      ::TODO  add it as news to all our other devices
+      =.  log.dev
+        =/  new=node
+          =,  u.mes
+          :-  [lat lon acc [alt vac]]
+          [[tst (fall created-at tst)] vel]
+        |-  ^+  log.dev
+        ?~  log.dev  [new]~
+        ::  once we've moved to the right place in history, store the node
+        ::
+        ?:  (gte msg.wen.new msg.wen.i.log.dev)
+          ::  if the new node is identical, skip it entirely
+          ::
+          ?:  =(new i.log.dev)  log.dev  ::NOTE  odd case, but happens in practice
+          ::  if the gps data is different, store as-is
+          ::
+          ?.  =(-.new -.i.log.dev)  [new log.dev]
+          ::  if the gps data is the same, only keep oldest & newest
+          ::
+          ?~  t.log.dev  [new log.dev]
+          ?.  =(-.new -.i.t.log.dev)  [new log.dev]
+          ::  so, here, replace latest with this new one
+          ::NOTE  assumes most-recently-processed is newer
+          ::TODO  should we set velocity in latest to zero? looks like vel
+          ::      might be sticky in stale/reused gps fixes
+          ::
+          [new t.log.dev]
+        [i.log.dev $(log.dev t.log.dev)]
+      =.  bat.dev
+        (make-batt:spots [batt bs]:u.mes)
+      ::TODO  want to factor out zone status logic once they support foreign devices too
+      ::  trigger zone diffs
+      ::
+      =/  now-zones
+        (find-zones ways [lat lon]:(snag 0 log.dev))
+      =/  new-zones=(set @da)
+        (~(dif in now-zones) now.dev)
+      =/  gone-zones=(set @da)
+        (~(dif in now.dev) now-zones)
+      ::  update zone state to reflect device change
+      ::
+      =.  now.dev  now-zones
+      =?  ways  |(!=(~ new-zones) !=(~ gone-zones))
+        %-  ~(urn by ways)
+        |=  [wid=@da =zone]
+        ?:  (~(has in new-zones) wid)
+          zone(now (~(put in now.zone) did))
+        ?:  (~(has in gone-zones) wid)
+          zone(now (~(del in now.zone) did))
+        zone
+      ::
+      :-  ;:  weld
+            caz
+            ::  zone leave notifications
+            ::
+            %+  turn  ~(tap in gone-zones)
+            (curr send-zone [[our.bowl did] %leave])
+          ::
+            ::  zone enter notifications
+            ::
+            %+  turn  ~(tap in new-zones)
+            (curr send-zone [[our.bowl did] %enter])
+          ::
+            ::  location update, if location changed
+            ::
+            ^-  (list card)
+            =/  new  [`(snag 0 log.dev) bat.dev]
+            ?:  =(had new)  ~
+            [(send-live (~(get ju line) did) did new)]~
+          ==
+      ::  finalize
+      ::
+      this(mine (~(put by mine) did dev))
+    ::
+        %waypoint
+      ::TODO  if we already have a waypoint with this id, check for changes.
+      ::      if it truly changed, re-run zone-presence checks for devices.
+      =.  news
+        ::TODO  doesn't dedupe cleanly, ideally want them all in a single %ways,
+        ::      but these commands are additive, so nbd
+        (put-news news ~(key by mine) [%ways tst.u.mes ~ ~])
+      ::TODO  do we need to clearWaypoints to propagate deletions?
+      ::      if we don't do that, waypoints might be annoying to delete in
+      ::      multi-device setups...
+      :-  caz
+      ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes) ?=(^ rad.u.mes))
+        ~&  [%unsupported-waypoint u.mes]
+        this
+      ::NOTE  we ignore rid.u.mes. it's not consistently set, and we don't
+      ::      care about its presence in inrids (or inregions) in %location
+      ::      messages, since we calculate region/zone presence by hand
+      this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
+    ::
+        %waypoints
+      |-  ^+  [caz this]
+      ?~  +.u.mes  [caz this]
+      =^  cas  this  ^$(u.mes [%waypoint i.u.mes])
+      =.  caz  (weld caz cas)
+      $(+.u.mes t.u.mes)
+    ::
+        %transition
+      ::NOTE  we intentionally don't update zone presence state in response
+      ::      to these, instead relying on locally-calculated zone presence.
+      ::      this is more reliable and flexible.
+      =/  dev
+        (~(gut by mine) did *device)
+      =/  stale=?
+        ?|  ?=(~ log.dev)
+        ?&  (gte tst.u.mes msg.wen.i.log.dev)  ::NOTE  avoid +sub underflow
+            (gth (sub tst.u.mes msg.wen.i.log.dev) stale:config)
+        ==  ==
+      ?-  event.u.mes
+          %enter
+        ::  if the device location is stale, and we know the zone that it
+        ::  entered, treat this as a normal location update (with a potentially
+        ::  large accuracy radius)
+        ::
+        ?.  ?&(stale (~(has by ways) wtst.u.mes))
+          [caz this]
+        =/  =zone  (~(got by ways) wtst.u.mes)
+        =;  loc=location:ot
+          $(u.mes [%location loc])
+        =,  u.mes
+        %:  make-fake-zone-location
+          (fall lat lat.zone)   ::NOTE  this behaves Very Bad if client misbehaves
+          (fall lon lon.zone)   ::NOTE  "
+          ?~(lat rad.zone acc)  ::NOTE  "
+          tst
+          bat.dev
+        ==
+      ::
+          %leave
+        ::  if the device location is stale, treat this as a location update
+        ::  if the message has coordinates, or simply clear outward-presenting
+        ::  location status if it doesn't
+        ::
+        ?.  stale  [caz this]
+        ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes))
+          ::TODO  update zone presence state even though location didn't change?
+          [[(send-live (~(get ju line) did) did ~ bat.dev) caz] this]
+        =;  loc=location:ot
+          $(u.mes [%location loc])
+        =,  u.mes
+        (make-fake-zone-location u.lat u.lon acc tst bat.dev)
+      ==
+    ==
+  ::
     ::  %handle-http-request: incoming from eyre
     ::
       %handle-http-request
@@ -680,6 +869,9 @@
     =/  req
       (extract-request [header-list body]:request)
     ::  check auth validity
+    ::NOTE  we *must* check here, instead of relying on %owntracks-request
+    ::      handling's auth check, because we still want to serve a response
+    ::      if auth is bad.
     ::
     =?  req  &(?=(%& -.req) !=(auth.p.req [(scot %p our.bowl) auth]))
       [%| %no-auth]
@@ -691,245 +883,65 @@
         %no-device-id  [[400 ~] `(as-octs:mimes:html 'no device id')]
         %bad-body      [[400 ~] `(as-octs:mimes:html 'bunk payload')]
       ==
-    =+  mes=mes.p.req
-    =+  did=did.p.req
-    ::  if this device is new, everything is news to it
+    =^  caz-roq  this
+      $(mark %owntracks-request, vase !>(`request:ot`p.req))
+    =*  did  did.p.req
+    ::  construct and send response,
+    ::  include (and then forget) news if we had it for this device
     ::
-    =?  news  !(~(has by mine) did)
-      ::  everything is news to it, generate a set of news-keys for this
-      ::  device based on everything we have in state, and request that they
-      ::  send us waypoints/zones if they have any
-      ::
-      %+  ~(put by news)  did
-      =;  nes
-        %-  ~(gas in nes)
-        :~  [%send-ways ~]
-            [%ways ~(key by ways)]
-        ==
-      %+  roll  ~(tap by hunt)
-      |=  [[who=@p des=(map @t [now=(unit) *])] nes=(set news-key)]
-      %+  roll  ~(tap by des)
-      |=  [[did=@t now=(unit) *] =_nes]
-      =?  nes  (~(has by cars) who)
-        (~(put in nes) [%hunt-card who did])
-      =?  nes  ?=(^ now)
-        (~(put in nes) [%hunt-spot who did])
-      nes
-    ::  send (and then forget) updates if we have them for this device
+    :_  this(news (~(del by news) did))
+    =-  (weld - caz-roq)
+    %+  spout:rudder  id
+    :-  [200 ['content-type' 'application/json']~]
+    %-  some
+    %-  as-octs:mimes:html
+    %-  en:json:html
+    %-  responses:enjs:ot
+    %+  murn  ~(tap in (~(get ju news) did))
+    |=  k=news-key
+    ^-  (unit response:ot)
+    ?-  -.k
+        %hunt-spot
+      ?~  hun=(~(get bi hunt) +.k)  ~
+      ?~  now.u.hun  ~  ::TODO  disappear the node instead? or live flag?
+      (some %location (make-ot-location +.k [u.now bat]:u.hun))
     ::
-    =/  caz
-      %+  spout:rudder  id
-      :-  [200 ['content-type' 'application/json']~]
+        %hunt-card
+      ?~  car=(~(get by cars) who.k)  ~
       %-  some
-      %-  as-octs:mimes:html
-      %-  en:json:html
-      %-  responses:enjs:ot
-      %+  murn  ~(tap in (~(get ju news) did))
-      |=  k=news-key
-      ^-  (unit response:ot)
-      ?-  -.k
-          %hunt-spot
-        ?~  hun=(~(get bi hunt) +.k)  ~
-        ?~  now.u.hun  ~  ::TODO  disappear the node instead? or live flag?
-        (some %location (make-ot-location +.k [u.now bat]:u.hun))
-      ::
-          %hunt-card
-        ?~  car=(~(get by cars) who.k)  ~
-        %-  some
-        :^  %card
-            %-  some
-            %^  rap  3
-              name.u.car
-            ?:  ?=([* ~ ~] (~(gut by hunt) who.k ~))
-              ~  ::  only one device, no need to specify
-            [' (' did.k ')' ~]
-          dat.face.u.car
-        (make-tid:ot +.k)
-      ::
-          %ways
-        ?:  =(~ waz.k)  ~
-        %-  some
-        :+  %cmd
-          %set-waypoints
-        %+  murn  ~(tap in waz.k)
-        |=  wid=@da
-        ^-  (unit waypoint:ot)
-        ?~  way=(~(get by ways) wid)  ~
-        %-  some
-        :*  desc=nom.u.way
-            `lat.u.way
-            `lon.u.way
-            `rad.u.way
-            tst=wid
-            uuid=~
-            major=~
-            minor=~
-            rid=~
-        ==
-      ::
-          %send-ways
-        `[%cmd %waypoints ~]
+      :^  %card
+          %-  some
+          %^  rap  3
+            name.u.car
+          ?:  ?=([* ~ ~] (~(gut by hunt) who.k ~))
+            ~  ::  only one device, no need to specify
+          [' (' did.k ')' ~]
+        dat.face.u.car
+      (make-tid:ot +.k)
+    ::
+        %ways
+      ?:  =(~ waz.k)  ~
+      %-  some
+      :+  %cmd
+        %set-waypoints
+      %+  murn  ~(tap in waz.k)
+      |=  wid=@da
+      ^-  (unit waypoint:ot)
+      ?~  way=(~(get by ways) wid)  ~
+      %-  some
+      :*  desc=nom.u.way
+          `lat.u.way
+          `lon.u.way
+          `rad.u.way
+          tst=wid
+          uuid=~
+          major=~
+          minor=~
+          rid=~
       ==
-    =.  news
-      (~(del by news) did)
-    ?~  mes  [caz this]
-    ::NOTE  take care to include .caz in every product!
-    |-  ^+  [caz this]
-    ?+  -.u.mes  [caz this]
-        %location
-      ~&  [%location tid=tid.u.mes topic=topic.u.mes did=did tst=tst.u.mes ca=created-at.u.mes]
-      =/  dev
-        (~(gut by mine) did *device)
-      =/  had=[(unit node) (unit batt)]
-        [?~(log.dev ~ `i.log.dev) bat.dev]
-      ::TODO  add it as news to all our other devices
-      =.  log.dev
-        =/  new=node
-          =,  u.mes
-          :-  [lat lon acc [alt vac]]
-          [[tst (fall created-at tst)] vel]
-        |-  ^+  log.dev
-        ?~  log.dev  [new]~
-        ::  once we've moved to the right place in history, store the node
-        ::
-        ?:  (gte msg.wen.new msg.wen.i.log.dev)
-          ::  if the new node is identical, skip it entirely
-          ::
-          ?:  =(new i.log.dev)  log.dev  ::NOTE  odd case, but happens in practice
-          ::  if the gps data is different, store as-is
-          ::
-          ?.  =(-.new -.i.log.dev)  [new log.dev]
-          ::  if the gps data is the same, only keep oldest & newest
-          ::
-          ?~  t.log.dev  [new log.dev]
-          ?.  =(-.new -.i.t.log.dev)  [new log.dev]
-          ::  so, here, replace latest with this new one
-          ::NOTE  assumes most-recently-processed is newer
-          ::TODO  should we set velocity in latest to zero? looks like vel
-          ::      might be sticky in stale/reused gps fixes
-          ::
-          [new t.log.dev]
-        [i.log.dev $(log.dev t.log.dev)]
-      =.  bat.dev
-        (make-batt:spots [batt bs]:u.mes)
-      ::TODO  want to factor out zone status logic once they support foreign devices too
-      ::  trigger zone diffs
-      ::
-      =/  now-zones
-        (find-zones ways [lat lon]:(snag 0 log.dev))
-      =/  new-zones=(set @da)
-        (~(dif in now-zones) now.dev)
-      =/  gone-zones=(set @da)
-        (~(dif in now.dev) now-zones)
-      ::  update zone state to reflect device change
-      ::
-      =.  now.dev  now-zones
-      =?  ways  |(!=(~ new-zones) !=(~ gone-zones))
-        %-  ~(urn by ways)
-        |=  [wid=@da =zone]
-        ?:  (~(has in new-zones) wid)
-          zone(now (~(put in now.zone) did))
-        ?:  (~(has in gone-zones) wid)
-          zone(now (~(del in now.zone) did))
-        zone
-      ::
-      :-  ;:  weld
-            caz
-            ::  zone leave notifications
-            ::
-            %+  turn  ~(tap in gone-zones)
-            (curr send-zone [[our.bowl did] %leave])
-          ::
-            ::  zone enter notifications
-            ::
-            %+  turn  ~(tap in new-zones)
-            (curr send-zone [[our.bowl did] %enter])
-          ::
-            ::  location update, if location changed
-            ::
-            ^-  (list card)
-            =/  new  [`(snag 0 log.dev) bat.dev]
-            ?:  =(had new)  ~
-            [(send-live (~(get ju line) did) did new)]~
-          ==
-      ::  finalize
-      ::
-      this(mine (~(put by mine) did dev))
     ::
-        %waypoint
-      ::TODO  if we already have a waypoint with this id, check for changes.
-      ::      if it truly changed, re-run zone-presence checks for devices.
-      =.  news
-        ::TODO  doesn't dedupe cleanly, ideally want them all in a single %ways,
-        ::      but these commands are additive, so nbd
-        (put-news news ~(key by mine) [%ways tst.u.mes ~ ~])
-      ::TODO  do we need to clearWaypoints to propagate deletions?
-      ::      if we don't do that, waypoints might be annoying to delete in
-      ::      multi-device setups...
-      :-  caz
-      ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes) ?=(^ rad.u.mes))
-        ~&  [%unsupported-waypoint u.mes]
-        this
-      ::NOTE  we ignore rid.u.mes. it's not consistently set, and we don't
-      ::      care about its presence in inrids (or inregions) in %location
-      ::      messages, since we calculate region/zone presence by hand
-      this(ways (~(put by ways) tst.u.mes [desc [u.lat u.lon u.rad] ~]:u.mes))
-    ::
-        %waypoints
-      |-  ^+  [caz this]
-      ?~  +.u.mes  [caz this]
-      =^  cas  this  ^$(u.mes [%waypoint i.u.mes])
-      =.  caz  (weld caz cas)
-      $(+.u.mes t.u.mes)
-    ::
-        %transition
-      ::NOTE  we intentionally don't update zone presence state in response
-      ::      to these, instead relying on locally-calculated zone presence.
-      ::      this is more reliable and flexible.
-      ~&  [%transition did=did]
-      =/  dev
-        (~(gut by mine) did *device)
-      =/  stale=?
-        ?|  ?=(~ log.dev)
-        ?&  (gte tst.u.mes msg.wen.i.log.dev)  ::NOTE  avoid +sub underflow
-            (gth (sub tst.u.mes msg.wen.i.log.dev) stale:config)
-        ==  ==
-      ?-  event.u.mes
-          %enter
-        ::  if the device location is stale, and we know the zone that it
-        ::  entered, treat this as a normal location update (with a potentially
-        ::  large accuracy radius)
-        ::
-        ?.  ?&(stale (~(has by ways) wtst.u.mes))
-          [caz this]
-        =/  =zone  (~(got by ways) wtst.u.mes)
-        =;  loc=location:ot
-          ~&  %pretending-transition-is-location
-          $(u.mes [%location loc])
-        =,  u.mes
-        %:  make-fake-zone-location
-          (fall lat lat.zone)   ::NOTE  this behaves Very Bad if client misbehaves
-          (fall lon lon.zone)   ::NOTE  "
-          ?~(lat rad.zone acc)  ::NOTE  "
-          tst
-          bat.dev
-        ==
-      ::
-          %leave
-        ::  if the device location is stale, treat this as a location update
-        ::  if the message has coordinates, or simply clear outward-presenting
-        ::  location status if it doesn't
-        ::
-        ?.  stale  [caz this]
-        ?.  &(?=(^ lat.u.mes) ?=(^ lon.u.mes))
-          ::TODO  update zone presence state even though location didn't change?
-          [[(send-live (~(get ju line) did) did ~ bat.dev) caz] this]
-        =;  loc=location:ot
-          ~&  %pretending-transition-is-location
-          $(u.mes [%location loc])
-        =,  u.mes
-        (make-fake-zone-location u.lat u.lon acc tst bat.dev)
-      ==
+        %send-ways
+      `[%cmd %waypoints ~]
     ==
   ==
 ::

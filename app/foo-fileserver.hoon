@@ -11,7 +11,13 @@
 ::
 /=  config  /app/fileserver/config
 ::
+::TODO  operate on +web-root consistently, only use .woot when referring to previous
+::      likewise for +file-root
+::TODO  feels like there's a way (mb switching up the config paths back and forth?)
+::      that gets this into a state where the cache entries no longer update...
 ::TODO  restructure so config can take a byk.bowl argument?
+::TODO  populate cache eagerly? and/or be smart about busting, check %cz hashes?
+::
 |%
 ++  web-root   ^-  (list @t)
   web-root:config
@@ -24,9 +30,11 @@
     !@(auth:config & auth:config)
   ?@  val  (~(put by *(map path ?)) / val)
   (~(gas by *(map path ?)) [/ -.val] +.val)
---
 ::
-::TODO  populate cache eagerly?
+::TODO  index file configuration, for / or */$ requests?
+::TODO  configurable cache headers in the response?
+::TODO  custom to-mime conversions?
+--
 ::
 |%
 +$  state-0
@@ -76,6 +84,7 @@
   ::
   :~  [%pass /eyre/connect %arvo %e %connect [~ woot] dap.bowl]
       (set-norm [our q.byk]:bowl foot |)
+      ::TODO  and %tomb %pick ??
       (read-next [our q.byk now]:bowl foot)
   ==
 ::
@@ -96,8 +105,8 @@
       [(set-norm [our q.byk]:bowl file-root |)]~
     ::
       ::  always await next change on our file root
-      ::  (don't care if we double-request (though clay probably dedupes?), since
-      ::  all we do on-notify rn is wipe the cache)
+      ::  (don't care if we double-request (though clay probably dedupes?),
+      ::  since all we do on-notify rn is wipe the cache)
       ::
       :-  (read-next [our q.byk now]:bowl file-root)
       ::  always trigger clay tombstoning, for both old and new file roots.
@@ -148,6 +157,8 @@
         ["" (trip (rap 3 '++  ' arm '  ' ~)) ""]
       [(sell (slap !>(..web-root) %wing arm ~))]~
     [~ this]
+  ::  our purpose is to serve
+  ::
   ~|  mark=mark
   ?>  ?=(%handle-http-request mark)
   =+  !<([rid=@ta inbound-request:eyre] vase)
@@ -160,6 +171,10 @@
       =?  pay  &(?=([%& %&] sav) !authenticated)
         [[403 ~] `(as-octs:mimes:html 'unauthorized')]
       =?  data.pay  ?=(%'HEAD' method.request)
+        ::NOTE  runtime cache doesn't respond to HEAD requests yet, so
+        ::      we may hit this even after putting the full payload in cache.
+        ::      wasteful, but we'll wait on runtime improvement rather than
+        ::      contorting ourselves for edge-case performance gains.
         ~
       =/  =path  /http-response/[rid]
       :~  [%give %fact ~[path] [%http-response-header !>(response-header.pay)]]

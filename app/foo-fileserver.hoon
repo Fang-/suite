@@ -148,6 +148,8 @@
       ::
       =?  pay  &(?=([%& %&] sav) !authenticated)
         [[403 ~] `(as-octs:mimes:html 'unauthorized')]
+      =?  data.pay  ?=(%'HEAD' method.request)
+        ~
       =/  =path  /http-response/[rid]
       :~  [%give %fact ~[path] [%http-response-header !>(response-header.pay)]]
           [%give %fact ~[path] [%http-response-data !>(data.pay)]]
@@ -160,7 +162,9 @@
     :_  this(cash (~(put in cash) url.request))
     %+  snoc  serve
     (store url.request ~ auth=auth.sav %payload pay)
-  ?.  ?=(%'GET' method.request)
+  ::  don't handle illegible requests (non-read method, unknown site path)
+  ::
+  ?.  ?=(?(%'GET' %'HEAD') method.request)
     [%| [405 ~] `(as-octs:mimes:html 'read-only resource')]
   =+  ^-  [[ext=(unit @ta) site=(list @t)] args=(list [key=@t value=@t])]
     =-  (fall - [[~ ~] ~])
@@ -201,6 +205,7 @@
   =+  !<(=mime (tube file))
   :_  `q.mime
   ::TODO  cache headers?
+  ::TODO  content-length?
   [200 ['content-type' (rsh 3^1 (spat p.mime))]~]
 ::
 ++  on-watch

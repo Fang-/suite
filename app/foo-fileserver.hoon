@@ -137,6 +137,25 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
+  ::  dbug without /lib/dbug dependency
+  ::
+  ?:  ?=(%dbug mark)
+    ~&  state=state
+    %-  %-  slog
+      :-  '  config:'
+      %+  turn  (sloe -:!>(config))
+      |=  arm=term
+      :+  %rose
+        ["" (trip (rap 3 '++  ' arm '  ' ~)) ""]
+      [(sell (slap !>(config) %wing arm ~))]~
+    %-  %-  slog
+      :-  '  effective:'
+      %+  turn  (sloe -:!>(..web-root))
+      |=  arm=term
+      :+  %rose
+        ["" (trip (rap 3 '++  ' arm '  ' ~)) ""]
+      [(sell (slap !>(..web-root) %wing arm ~))]~
+    [~ this]
   ~|  mark=mark
   ?>  ?=(%handle-http-request mark)
   =+  !<([rid=@ta inbound-request:eyre] vase)

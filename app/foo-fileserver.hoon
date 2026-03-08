@@ -23,11 +23,17 @@
 ::  +file-root: path on this desk under which the files to serve live
 ::
 ++  file-root  ^-  path
-  !@  file-root:config  file-root:config
-  /web
+  !@  file-root:config  /web  ::NOTE  order for 409!
+  file-root:config
+::
+++  auth  ^~  ^-  (map path ?)
+  =/  val=$@(? [? (list [path ?])])
+    !@  auth:config  %&
+    auth:config
+  ?@  val  (~(put by *(map path ?)) / val)
+  (~(gas by *(map path ?)) [/ -.val] +.val)
 --
 ::
-::TODO  auth optionality
 ::TODO  populate cache eagerly?
 ::
 |%
@@ -134,32 +140,47 @@
   ~|  mark=mark
   ?>  ?=(%handle-http-request mark)
   =+  !<([rid=@ta inbound-request:eyre] vase)
-  =;  [sav=? pay=simple-payload:http]
+  ::
+  =;  [sav=$@(%| [%& auth=?]) pay=simple-payload:http]
     =/  serve=(list card)
+      ::  if auth is required but requester doesn't have it,
+      ::  make sure to _serve_ 403, but keep original .pay for the cache
+      ::
+      =?  pay  &(?=([%& %&] sav) !authenticated)
+        [[403 ~] `(as-octs:mimes:html 'unauthorized')]
       =/  =path  /http-response/[rid]
       :~  [%give %fact ~[path] [%http-response-header !>(response-header.pay)]]
           [%give %fact ~[path] [%http-response-data !>(data.pay)]]
           [%give %kick ~[path] ~]
       ==
-    ?.  sav  [serve this]
+    ?:  ?=(%| sav)  [serve this]
+    ::  if we put the response in cache, track that we did so,
+    ::  we will clear the entry on desk change
+    ::
     :_  this(cash (~(put in cash) url.request))
     %+  snoc  serve
-    (store url.request ~ auth=| %payload pay)
-  ::TODO  configurable auth requirement
-  :: ?.  authenticated
-  ::   [[403 ~] `(as-octs:mimes:html 'unauthenticated')]
+    (store url.request ~ auth=auth.sav %payload pay)
   ?.  ?=(%'GET' method.request)
-    [| [405 ~] `(as-octs:mimes:html 'read-only resource')]
+    [%| [405 ~] `(as-octs:mimes:html 'read-only resource')]
   =+  ^-  [[ext=(unit @ta) site=(list @t)] args=(list [key=@t value=@t])]
     =-  (fall - [[~ ~] ~])
     (rush url.request ;~(plug apat:de-purl:html yque:de-purl:html))
   ?.  =(woot (scag (lent woot) site))
-    [| [500 ~] `(as-octs:mimes:html 'bad route')]
+    [%| [500 ~] `(as-octs:mimes:html 'bad route')]
+  =.  site  (slag (lent woot) site)
   ::  all of the below responses get put into cache on first-request,
   ::  even if we can't serve real content. we'll clear cache and retry
   ::  whenever file-root contents change.
   ::
-  :-  &
+  :-  :-  %&
+      ::  get auth flag from longest prefix
+      ::
+      ::NOTE  since this goes into cache after computing once,
+      ::      we don't care about this search being sub-optimal
+      |-
+      ?:  =(/ site)  (~(got by auth) /)
+      %-  (bond |.(^$(site (snip site))))
+      (~(get by auth) site)
   ?~  ext
     ~&  [dap.bowl %not-found-extless]
     [[404 ~] `(as-octs:mimes:html 'not found')]
@@ -167,7 +188,7 @@
     :*  (scot %p our.bowl)
         q.byk.bowl
         (scot %da now.bowl)
-        (weld foot (snoc (slag (lent woot) site) u.ext))
+        (weld foot (snoc site u.ext))
     ==
   ?.  .^(? %cu path)
     ~&  [dap.bowl %not-found path=path]

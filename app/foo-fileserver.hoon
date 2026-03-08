@@ -4,32 +4,24 @@
 ::
 ::    ** in general, you should not need to modify this file directly. **
 ::    instead this agent will read configuration parameters from a
-::    /app/fileserver/config.hoon. this file must produce a core
-::    with at least a +web-root arm. all other overrides for the
-::    default configuration (see below) are optional.
+::    /app/fileserver/config.hoon. that file must produce a core with
+::    at least a +web-root arm. all other overrides for the defaults
+::    are optional.
+::    see the example /app/fileserver/config.hoon for further documentation.
 ::
 /=  config  /app/fileserver/config
 ::
 ::TODO  restructure so config can take a byk.bowl argument?
 |%
-::  required config parameters:
-::
-::  +web-root: url under which your files will be served
-::
-++  web-root   ^-  (list @t)  web-root:config
-::
-::  optional config parameters, with default:
-::
-::  +file-root: path on this desk under which the files to serve live
+++  web-root   ^-  (list @t)
+  web-root:config
 ::
 ++  file-root  ^-  path
-  !@  file-root:config  /web  ::NOTE  order for 409!
-  file-root:config
+  !@(file-root:config /web file-root:config)  ::NOTE  order for 409!
 ::
 ++  auth  ^~  ^-  (map path ?)
   =/  val=$@(? [? (list [path ?])])
-    !@  auth:config  %&
-    auth:config
+    !@(auth:config & auth:config)
   ?@  val  (~(put by *(map path ?)) / val)
   (~(gas by *(map path ?)) [/ -.val] +.val)
 --

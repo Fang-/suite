@@ -1,7 +1,7 @@
 ::  config: example config file & docs for foo-fileserver
 ::
 ::    do not modify /app/foo-fileserver directly.
-::    copy it into /app/yourname-fileserver instead.
+::    copy it into /app/yourname-fileserver and
 ::    provide at least a minimal /app/fileserver/config,
 ::    containing |%  ++  web-root  /yourname  --
 ::
@@ -31,6 +31,8 @@
 ::
 ::  +file-root: path on this desk under which the files to serve live
 ::
+::    all clay files with this path prefix will be served.
+::    files' marks are expected to have a %mime mark conversion available.
 ::    if +tombstone is enabled, clay history for this path gets obliterated.
 ::
 ::    default: /web
@@ -56,7 +58,7 @@
 ::    true for "local auth required", false for "publicly accessible".
 ::    if just a flag is provided, it applies globally.
 ::    if a path-flag list is also provided, longest matching prefix applies.
-::    all paths are under the +web-root.
+::    all paths are relative to the +web-root.
 ::
 ::    default: true, "local auth required"
 ::

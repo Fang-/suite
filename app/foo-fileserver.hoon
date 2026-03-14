@@ -3,7 +3,7 @@
 ::    for copying into desks as a standalone %deskname-fileserver agent.
 ::
 ::    ** in general, you should not need to modify this file directly. **
-::    instead this agent will read configuration parameters from a
+::    instead this agent will read configuration parameters from an
 ::    /app/fileserver/config.hoon. that file must produce a core with
 ::    at least a +web-root arm. all other overrides for the defaults
 ::    are optional.
@@ -11,30 +11,36 @@
 ::
 /=  config  /app/fileserver/config
 ::
+|%
+++  web-root     ^-  (list @t)                  web-root:config
+::
+++  defaults
+  |%
+  ++  file-root  ^-  path                       /web
+  ++  tombstone  ^-  ?                          |
+  ++  auth       ^-  $@(? [? (list [path ?])])  &
+  --
+::
+++  file-root  ^-  path
+  !@(file-root:config file-root:defaults file-root:config)
+::
+++  tombstone  ^-  ?
+  !@(tombstone:config tombstone:defaults tombstone:config)
+::
+++  auth  ^~  ^-  (map path ?)
+  =/  val=$@(? [? (list [path ?])])
+    !@(auth:config auth:defaults auth:config)
+  ?@  val  (~(put by *(map path ?)) / val)
+  (~(gas by *(map path ?)) [/ -.val] +.val)
+::
+::TODO  make runtime caching disable-able
+::TODO  index file configuration, for / or */$ requests? deafult to index.html
+::TODO  configurable (cache) headers in the response?
+::
 ::TODO  feels like there's a way (mb switching up the config paths back and forth?)
 ::      that gets this into a state where the cache entries no longer update...
 ::TODO  restructure so config can take a byk.bowl argument?
 ::TODO  populate cache eagerly? and/or be smart about busting, check %cz hashes?
-::
-|%
-++  web-root   ^-  (list @t)
-  web-root:config
-::
-++  file-root  ^-  path
-  !@(file-root:config /web file-root:config)  ::NOTE  order for 409!
-::
-++  tombstone  ^-  ?
-  !@(tombstone:config | tombstone:config)
-::
-++  auth  ^~  ^-  (map path ?)
-  =/  val=$@(? [? (list [path ?])])
-    !@(auth:config & auth:config)
-  ?@  val  (~(put by *(map path ?)) / val)
-  (~(gas by *(map path ?)) [/ -.val] +.val)
-::
-::TODO  index file configuration, for / or */$ requests?
-::TODO  configurable cache headers in the response?
-::TODO  custom to-mime conversions?
 --
 ::
 |%

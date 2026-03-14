@@ -62,6 +62,10 @@
   =;  =task:clay
     [%pass [%clay %norm path] %arvo %c task]
   [%tomb %norm our desk (~(put of *norm:clay) path keep)]
+::
+++  run-tombstone
+  ^-  card
+  [%pass /clay/tomb %arvo %c %tomb %pick ~]
 --
 ::
 =|  state-0
@@ -82,7 +86,7 @@
   ::
   :~  [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
       (set-norm [our q.byk]:bowl file-root |)
-      ::TODO  and %tomb %pick !
+      run-tombstone
       (read-next [our q.byk now]:bowl file-root)
   ==
 ::
@@ -109,7 +113,7 @@
       :-  (read-next [our q.byk now]:bowl file-root)
       ::  always trigger clay tombstoning, for both old and new file roots.
       ::
-      :-  [%pass /clay/tomb %arvo %c %tomb %pick ~]
+      :-  run-tombstone
       ::  always clear old cache entries, in case we changed something about
       ::  the way we serve
       ::
@@ -264,7 +268,8 @@
     ::  it will get refilled on first request for each file.
     ::
     :_  this(cash ~)
-    :-  (read-next [our q.byk now]:bowl file-root)
+    :+  run-tombstone
+      (read-next [our q.byk now]:bowl file-root)
     (turn ~(tap in cash) (curr store ~))
   ==
 ::

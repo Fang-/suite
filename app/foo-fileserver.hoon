@@ -11,8 +11,6 @@
 ::
 /=  config  /app/fileserver/config
 ::
-::TODO  operate on +web-root consistently, only use .woot when referring to previous
-::      likewise for +file-root
 ::TODO  feels like there's a way (mb switching up the config paths back and forth?)
 ::      that gets this into a state where the cache entries no longer update...
 ::TODO  restructure so config can take a byk.bowl argument?
@@ -52,18 +50,18 @@
   [%pass /eyre/cache %arvo %e %set-response url entry]
 ::
 ++  read-next
-  |=  [[our=@p =desk now=@da] foot=path]
+  |=  [[our=@p =desk now=@da] =path]
   ^-  card
   =;  =task:clay
-    [%pass [%clay %next foot] %arvo %c task]
-  [%warp our desk ~ %next %z da+now foot]
+    [%pass [%clay %next path] %arvo %c task]
+  [%warp our desk ~ %next %z da+now path]
 ::
 ++  set-norm
-  |=  [[our=@p =desk] foot=path keep=?]
+  |=  [[our=@p =desk] =path keep=?]
   ^-  card
   =;  =task:clay
-    [%pass [%clay %norm foot] %arvo %c task]
-  [%tomb %norm our desk (~(put of *norm:clay) foot keep)]
+    [%pass [%clay %norm path] %arvo %c task]
+  [%tomb %norm our desk (~(put of *norm:clay) path keep)]
 --
 ::
 =|  state-0
@@ -82,10 +80,10 @@
   ::  the relevant tombstoning policy,
   ::  and await next file change
   ::
-  :~  [%pass /eyre/connect %arvo %e %connect [~ woot] dap.bowl]
-      (set-norm [our q.byk]:bowl foot |)
-      ::TODO  and %tomb %pick ??
-      (read-next [our q.byk now]:bowl foot)
+  :~  [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+      (set-norm [our q.byk]:bowl file-root |)
+      ::TODO  and %tomb %pick !
+      (read-next [our q.byk now]:bowl file-root)
   ==
 ::
 ++  on-save
@@ -195,9 +193,9 @@
   =+  ^-  [[ext=(unit @ta) site=(list @t)] args=(list [key=@t value=@t])]
     =-  (fall - [[~ ~] ~])
     (rush url.request ;~(plug apat:de-purl:html yque:de-purl:html))
-  ?.  =(woot (scag (lent woot) site))
+  ?.  =(web-root (scag (lent web-root) site))
     [%| [500 ~] `(as-octs:mimes:html 'bad route')]
-  =.  site  (slag (lent woot) site)
+  =.  site  (slag (lent web-root) site)
   ::  all of the below responses get put into cache on first-request,
   ::  even if we can't serve real content. we'll clear cache and retry
   ::  whenever file-root contents change.
@@ -218,7 +216,7 @@
     :*  (scot %p our.bowl)
         q.byk.bowl
         (scot %da now.bowl)
-        (weld foot (snoc site u.ext))
+        (weld file-root (snoc site u.ext))
     ==
   ?.  .^(? %cu path)
     ~&  [dap.bowl %not-found path=path]
@@ -259,14 +257,14 @@
       [%clay %next *]
     ::  ignore if it's for a previous file-root
     ::
-    ?.  =(t.t.wire foot)  [~ this]
+    ?.  =(t.t.wire file-root)  [~ this]
     ~|  sign=+<.sign
     ?>  ?=(%writ +<.sign)
     ::  request the next change, and clear the cache.
     ::  it will get refilled on first request for each file.
     ::
     :_  this(cash ~)
-    :-  (read-next [our q.byk now]:bowl foot)
+    :-  (read-next [our q.byk now]:bowl file-root)
     (turn ~(tap in cash) (curr store ~))
   ==
 ::

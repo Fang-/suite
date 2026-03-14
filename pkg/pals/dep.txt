@@ -1,14 +1,3 @@
-> sur
-< landscape-apps/desk/sur
-contacts.hoon
-epic.hoon
-groups.hoon
-meta.hoon
-group-store.hoon
-group.hoon
-resource.hoon
-< landscape-apps/landscape-dev/sur
-metadata-store.hoon
 > mar
 < urbit/pkg/arvo/mar
 json.hoon

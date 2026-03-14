@@ -47,6 +47,19 @@
 ::
 +$  card  card:agent:gall
 ::
++$  cart  $@(~ $^((lest card) $%([~ card] card)))
+++  zang
+  |=  a=(list cart)
+  ^-  (list card)
+  %-  zing
+  %+  turn  a
+  |=  b=cart
+  ^-  (list card)
+  ?~  b  ~
+  ?^  -.b  b
+  ?~  -.b  [+.b]~
+  [b]~
+::
 ++  store  ::  set cache entry
   |=  [url=@t entry=(unit cache-entry:eyre)]
   ^-  card
@@ -102,19 +115,18 @@
   ^-  (quip card _this)
   =/  old  !<(state-0 ole)
   :_  this(foot file-root, woot web-root, cash ~)
-  %-  zing
-  ^-  (list (list card))
+  %-  zang
   :~  ::  if the file root changed,
       ::  await the next file change on the new root
       ::
       ?:  =(foot.old file-root)  ~
-      [(read-next [our q.byk now]:bowl file-root)]~
+      (read-next [our q.byk now]:bowl file-root)
     ::
       ::  if tombstoning is disabled,
       ::  remove it from the old root (in case we had turned it on)
       ::
       ?.  tombstone
-        [(set-norm [our q.byk]:bowl foot.old &)]~
+        (set-norm [our q.byk]:bowl foot.old &)
       ::  if tombstoning is enabled,
       ::  (re-)configure tombstoning for the file root (disables it for old),
       ::  and trigger clean-up right away
@@ -130,7 +142,6 @@
     ::
       ::  if the web root changed, we must re-set our binding
       ::
-      ^-  (list card)
       ?:  =(woot.old web-root)  ~
       ::NOTE  re-bind first to avoid duct shenanigans.
       ::      remove this when eyre stops restricting %disconnect to the og duct.
@@ -267,20 +278,15 @@
     ?.  =(t.t.wire file-root)  [~ this]
     ~|  sign=+<.sign
     ?>  ?=(%writ +<.sign)
-    ::  request the next change, and clear the cache.
+    ::  if we're tombstoning, trigger clay-side clean-up.
+    ::  always request the next change, and clear the cache,
     ::  it will get refilled on first request for each file.
     ::
     :_  this(cash ~)
-    %-  zing
-    ^-  (list (list card))
-    :~  ::  if we're tombstoning, trigger garbage collection
-        ::
-        ?.  tombstone  ~
-        [run-tombstone]~
-      ::
-        :-  (read-next [our q.byk now]:bowl file-root)
-        (turn ~(tap in cash) (curr store ~))
-    ==
+    %-  zang
+    :+  ?:(tombstone ~ run-tombstone)
+      (read-next [our q.byk now]:bowl file-root)
+    (turn ~(tap in cash) (curr store ~))
   ==
 ::
 ++  on-leave  |=(* [~ this])

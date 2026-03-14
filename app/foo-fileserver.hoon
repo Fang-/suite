@@ -23,6 +23,9 @@
 ++  file-root  ^-  path
   !@(file-root:config /web file-root:config)  ::NOTE  order for 409!
 ::
+++  tombstone  ^-  ?
+  !@(tombstone:config | tombstone:config)
+::
 ++  auth  ^~  ^-  (map path ?)
   =/  val=$@(? [? (list [path ?])])
     !@(auth:config & auth:config)
@@ -81,13 +84,14 @@
   =.  woot  web-root
   :_  this
   ::  set up the binding,
-  ::  the relevant tombstoning policy,
-  ::  and await next file change
+  ::  and await next file change.
+  ::  if we're tombstoning, set the policy and trigger clean-up
   ::
-  :~  [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
-      (set-norm [our q.byk]:bowl file-root |)
+  :+  [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+    (read-next [our q.byk now]:bowl file-root)
+  ?.  tombstone  ~
+  :~  (set-norm [our q.byk]:bowl file-root |)
       run-tombstone
-      (read-next [our q.byk now]:bowl file-root)
   ==
 ::
 ++  on-save
@@ -100,30 +104,29 @@
   :_  this(foot file-root, woot web-root, cash ~)
   %-  zing
   ^-  (list (list card))
-  :~  ::  if the file root changed, set the new root up for tombstoning.
-      ::  we do this ahead of the %pick, to do clean-up on new root right away.
+  :~  ::  if the file root changed,
+      ::  await the next file change on the new root
       ::
       ?:  =(foot.old file-root)  ~
-      [(set-norm [our q.byk]:bowl file-root |)]~
+      [(read-next [our q.byk now]:bowl file-root)]~
     ::
-      ::  always await next change on our file root
-      ::  (don't care if we double-request (though clay probably dedupes?),
-      ::  since all we do on-notify rn is wipe the cache)
+      ::  if tombstoning is disabled,
+      ::  remove it from the old root (in case we had turned it on)
       ::
-      :-  (read-next [our q.byk now]:bowl file-root)
-      ::  always trigger clay tombstoning, for both old and new file roots.
+      ?.  tombstone
+        [(set-norm [our q.byk]:bowl foot.old &)]~
+      ::  if tombstoning is enabled,
+      ::  (re-)configure tombstoning for the file root (disables it for old),
+      ::  and trigger clean-up right away
       ::
-      :-  run-tombstone
+      :~  (set-norm [our q.byk]:bowl file-root |)
+          run-tombstone
+      ==
+    ::
       ::  always clear old cache entries, in case we changed something about
       ::  the way we serve
       ::
       (turn ~(tap in cash.old) (curr store ~))
-    ::
-      ::  if the file root changed, remove tombstoning from the old root.
-      ::  we do this after the %pick, so that the old root gets left "clean".
-      ::
-      ?:  =(foot.old file-root)  ~
-      [(set-norm [our q.byk]:bowl foot.old &)]~
     ::
       ::  if the web root changed, we must re-set our binding
       ::
@@ -268,9 +271,16 @@
     ::  it will get refilled on first request for each file.
     ::
     :_  this(cash ~)
-    :+  run-tombstone
-      (read-next [our q.byk now]:bowl file-root)
-    (turn ~(tap in cash) (curr store ~))
+    %-  zing
+    ^-  (list (list card))
+    :~  ::  if we're tombstoning, trigger garbage collection
+        ::
+        ?.  tombstone  ~
+        [run-tombstone]~
+      ::
+        :-  (read-next [our q.byk now]:bowl file-root)
+        (turn ~(tap in cash) (curr store ~))
+    ==
   ==
 ::
 ++  on-leave  |=(* [~ this])

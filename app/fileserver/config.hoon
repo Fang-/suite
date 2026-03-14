@@ -31,10 +31,26 @@
 ::
 ::  +file-root: path on this desk under which the files to serve live
 ::
+::    if +tombstone is enabled, clay history for this path gets obliterated.
+::
 ::    default: /web
 ::
 ++  file-root  ^-  path
   /web
+::  +tombstone: whether to tombstone +file-root's history
+::
+::    careful! this hard-sets the tombstoning policy for the desk the
+::    fileserver is running on, and may clobber any other policies configured
+::    for that desk.
+::    careful! turning this on immediately obliterates *all* clay history
+::    at and under the configured +file-root.
+::    whenever files under +file-root change, the fileserver will trigger
+::    clay's tombstoning/garbage collection.
+::
+::    default: false
+::
+++  tombstone  ^-  ?
+  |
 ::  +auth: whether authentication is required to access the files
 ::
 ::    true for "local auth required", false for "publicly accessible".

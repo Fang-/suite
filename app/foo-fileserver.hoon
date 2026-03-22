@@ -18,6 +18,7 @@
   |%
   ++  file-root  ^-  path                       /web
   ++  tombstone  ^-  ?                          |
+  ++  index      ^-  $@(~ [~ path])             `/index/html
   ++  auth       ^-  $@(? [? (list [path ?])])  &
   --
 ::
@@ -27,6 +28,9 @@
 ++  tombstone  ^-  ?
   !@(tombstone:config tombstone:defaults tombstone:config)
 ::
+++  index  ^-  $@(?(~ %apache) [~ u=path])
+  !@(index:config index:defaults index:config)
+::
 ++  auth  ^~  ^-  (map path ?)
   =/  val=$@(? [? (list [path ?])])
     !@(auth:config auth:defaults auth:config)
@@ -34,7 +38,6 @@
   (~(gas by *(map path ?)) [/ -.val] +.val)
 ::
 ::TODO  make runtime caching disable-able
-::TODO  index file configuration, for / or */$ requests? deafult to index.html
 ::TODO  configurable (cache) headers in the response?
 ::
 ::TODO  feels like there's a way (mb switching up the config paths back and forth?)
@@ -233,28 +236,140 @@
       ?:  =(/ site)  (~(got by auth) /)
       %-  (bond |.(^$(site (snip site))))
       (~(get by auth) site)
-  ?~  ext
-    ~&  [dap.bowl %not-found-extless]
+  ::  construct the relative target path,
+  ::  falling back to the index file or page where applicable
+  ::
+  =/  target=$@(?(~ %apache) [pax=path ext=@ta])
+    ::TODO  no ext should do index also? maybe?
+    ?.  &(?=(~ ext) ?=([%$ *] (flop site)))
+      ?~  ext  [site (rear site)]
+      [(snoc site u.ext) u.ext]
+    =+  index=index
+    ?@  index  index
+    [(weld (snip site) u.index) (rear u.index)]
+  ::  bad targets get treated as not-founds
+  ::
+  ?~  target
     [[404 ~] `(as-octs:mimes:html 'not found')]
-  =/  =path
-    :*  (scot %p our.bowl)
-        q.byk.bowl
-        (scot %da now.bowl)
-        (weld file-root (snoc site u.ext))
+  ::  if we can resolve to a specific file, try to serve from it
+  ::
+  =/  bas=path
+    /(scot %p our.bowl)/[q.byk.bowl]/(scot %da now.bowl)
+  ?^  target
+    =/  =path
+      :(weld bas file-root pax.target)
+    ?.  .^(? %cu path)
+      ~&  [dap.bowl %not-found path=path]
+      [[404 ~] `(as-octs:mimes:html 'not found')]
+    =+  .^(file=^vase %cr path)
+    ::NOTE  this sucks. we really cannot do better than potentially crash here...
+    ::      clay should have mark fallback behavior to/from mime always...
+    =+  ~|  [%no-mime-conversion from=ext.target]
+        .^(=tube:clay %cc (weld bas /[ext.target]/mime))
+    =+  !<(=mime (tube file))
+    :_  `q.mime
+    ::TODO  cache headers?
+    ::TODO  content-length? or does runtime add that even for cached responses?
+    [200 ['content-type' (rsh 3^1 (spat p.mime))]~]
+  ::  construct an index page
+  ::
+  ?>  ?=(%apache target)
+  :-  [200 ['content-type' 'text/html;charset=UTF-8']~]
+  =/  =spur  (weld file-root (snip site))  ::TODO  awkward, want to get from .target
+  =/  l=@ud  (lent spur)
+  =+  %+  roll
+        =,  bowl
+        .^((list path) %ct (scot %p our) q.byk (scot %da now) spur)
+      |=  [pax=path fiz=(list [nom=@t ext=@t]) diz=(list @ta)]
+      =.  pax  (slag l pax)
+      ?+  pax  [fiz diz]
+        [@ @ ~]  [[[i i.t]:pax fiz] diz]
+        [@ @ ^]  [fiz ?~(diz [i.pax]~ ?:(=(i.pax i.diz) diz [i.pax diz]))]
+      ==
+  =.  site  (snip site)  ::  remove trailing %$
+  =/  spit  (weld web-root site)
+  %-  some
+  %-  as-octt:mimes:html
+  %-  en-xml:html
+  |^  ^-  manx
+      page
+  ++  page
+    ;html
+      ;head
+        ;title:"Index of {(spud spit)}"
+      ==
+      ;body
+        ;h1:"Index of {(spud spit)}"
+        ;table  ;tbody
+          ;tr  ;th:""
+               ;th:"Name"
+               ;th:"Last modified"
+               ;th:"Description"
+          ==
+        ::
+          ;tr  ;th(colspan "4")  ;hr;  ==  ==
+        ::
+          ;*  ?:  =(~ site)  ~  :_  ~
+          ;tr  ;td:"↖️"  ;td
+            ;a/"{(spud (snip spit))}/":"Parent Directory"
+          ==  ;td
+            ; ~
+          ==  ==
+        ::
+          ::  directories
+          ::
+          ;*  %+  turn  (flop diz)
+          |=  dir=@ta
+          =/  las=@da  (path-date /[dir])
+          ;tr  ;td:"📁"  ;td
+            ;a/"{(trip dir)}/":"{(trip dir)}/"
+          ==  ;td
+            ;+  :/"{(rend-date las)}"
+          ==  ;*  ?:(=(dir 0v6urr6) [;td:"fileserver!"]~ ~)  ==
+        ::
+          ::  files
+          ::
+          ;*  %+  turn  (flop fiz)
+          |=  [nom=@t ext=@t]
+          =/  fil=@t  (rap 3 nom '.' ext ~)
+          =/  las=@da  (path-date (welp site nom ext ~))
+          =/  moj=tape
+            ?+  ext  "📄"
+              ?(%png %jpg %jpeg %gif %tiff %bmp %svg)  "🖼️"
+              %hoon  "📜"
+              %js  "📃"
+              ?(%jam %zip %tar %gz %rar)  "📦"
+            ==
+          ;tr  ;td:"{moj}"  ;td
+            ;a/"{(trip fil)}":"{(trip fil)}"
+          ==  ;td
+            ;+  :/"{(rend-date las)}"
+          ==  ==
+        ::
+          ;tr  ;th(colspan "4")  ;hr;  ==  ==
+        ==  ==
+        ;address:"Apache Server at Port {(a-co:co our.bowl)}"
+      ==
     ==
-  ?.  .^(? %cu path)
-    ~&  [dap.bowl %not-found path=path]
-    [[404 ~] `(as-octs:mimes:html 'not found')]
-  =+  .^(file=^vase %cr path)
-  ::TODO  this sucks. can we really not do better than crash during request handling?
-  ::      we could hard-code conversions for different file types here, but that sucks too...
-  =+  ~|  [%no-mime-conversion from=u.ext]
-      .^(=tube:clay %cc (scot %p our.bowl) q.byk.bowl (scot %da now.bowl) /[u.ext]/mime)
-  =+  !<(=mime (tube file))
-  :_  `q.mime
-  ::TODO  cache headers?
-  ::TODO  content-length?
-  [200 ['content-type' (rsh 3^1 (spat p.mime))]~]
+  ::
+  ++  path-date
+    ::NOTE  can get slow due to scry overhead
+    |=  pax=path
+    =+  bax=:(weld bas spur pax)
+    =+  .^(cas=cass:clay %cw bax)
+    =+  .^(haz=@uv %cz bax)
+    |-  ^-  @da
+    ?:  (lte ud.cas 1)  da.cas
+    =.  bax  bax(&3 (scot %ud (dec ud.cas)))
+    =/  had  .^(had=@uv %cz bax)
+    ?.  =(haz had)  da.cas
+    $(cas =>([bax=(scag 3 bax) cass=cass:clay] ~+(.^(cass %cw bax))))
+  ::
+  ++  rend-date  ::  2013-12-16 09:41
+    |=  =@da  =,  co
+    =+  (yore da)
+    "{(a-co y)}-{(y-co m)}-{(y-co d.t)} {(y-co h.t)}:{(y-co m.t)}"
+  --
 ::
 ++  on-watch
   |=  =path

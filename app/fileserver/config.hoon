@@ -53,6 +53,18 @@
 ::
 ++  tombstone  ^-  ?
   |
+::  +index: file to serve on requests with trailing /
+::
+::    requests coming in on paths like /foo/ will never resolve to a file
+::    directly, because they would resolve to clay files with the %$ mark.
+::    if +index is ~, such requests will receive a 404 response.
+::    if +index specifies a path, such requests will serve from
+::    /foo/[index-path] instead (even if that still 404s).
+::
+::    default: `/index/html
+::
+++  index  ^-  $@(~ [~ path])
+  `/index/php
 ::  +auth: whether authentication is required to access the files
 ::
 ::    true for "local auth required", false for "publicly accessible".

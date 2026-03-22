@@ -65,6 +65,22 @@
 ::
 ++  index  ^-  $@(~ [~ path])
   `/index/php
+::  +extension: how to treat the absence of a file extension
+::
+::    all clay files have a mark, and knowledge of the mark is required for
+::    the fileserver to serve the file. a request url like /foo.txt routes
+::    to the clay file /foo/txt (under the +file-root). however, what should
+::    the fileserver do if there is no file extension on the request url?
+::    (paths like /foo/ are not affected, trailing / always hits the +index.)
+::
+::    %need: serve 404
+::    %path: use the last path segment as the mark, ie /foo/txt -> /foo.txt
+::    %fall: resolve to the +index, ie /foo -> /foo/index/html
+::
+::    default: %need
+::
+++  extension  ^-  ?(%need %path %fall)
+  %fall
 ::  +auth: whether authentication is required to access the files
 ::
 ::    true for "local auth required", false for "publicly accessible".

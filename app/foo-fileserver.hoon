@@ -19,6 +19,7 @@
   ++  file-root  ^-  path                       /web
   ++  tombstone  ^-  ?                          |
   ++  index      ^-  $@(~ [~ path])             `/index/html
+  ++  extension  ^-  ?(%need %path %fall)       %need
   ++  auth       ^-  $@(? [? (list [path ?])])  &
   --
 ::
@@ -30,6 +31,9 @@
 ::
 ++  index  ^-  $@(?(~ %apache) [~ u=path])
   !@(index:config index:defaults index:config)
+::
+++  extension  ^-  ?(%need %path %fall)
+  !@(extension:config extension:defaults extension:config)
 ::
 ++  auth  ^~  ^-  (map path ?)
   =/  val=$@(? [? (list [path ?])])
@@ -240,13 +244,21 @@
   ::  falling back to the index file or page where applicable
   ::
   =/  target=$@(?(~ %apache) [pax=path ext=@ta])
-    ::TODO  no ext should do index also? maybe?
-    ?.  &(?=(~ ext) ?=([%$ *] (flop site)))
-      ?~  ext  [site (rear site)]
-      [(snoc site u.ext) u.ext]
-    =+  index=index
-    ?@  index  index
-    [(weld (snip site) u.index) (rear u.index)]
+    ::  if trailing /, resolve according to +index
+    ::  if extension, resolve normally
+    ::  if no extension, resolve according to +extension
+    ::
+    |-
+    ?:  &(?=(~ ext) ?=([%$ *] (flop site)))
+      =+  index=index
+      ?@  index  index
+      [(weld (snip site) u.index) (rear u.index)]
+    ?^  ext  [(snoc site u.ext) u.ext]
+    ?-  =<(. extension)
+      %need  ~
+      %path  [site (rear site)]
+      %fall  $(site (snoc site %$))
+    ==
   ::  bad targets get treated as not-founds
   ::
   ?~  target

@@ -180,8 +180,10 @@
       [(sell (slap !>(config) %wing arm ~))]~
     %-  %-  slog
       :-  '  effective:'
-      %+  turn  (sloe -:!>(..web-root))
+      %+  murn  (sloe -:!>(..web-root))
       |=  arm=term
+      ?:  =(%defaults arm)  ~
+      %-  some
       :+  %rose
         ["" (trip (rap 3 '++  ' arm '  ' ~)) ""]
       [(sell (slap !>(..web-root) %wing arm ~))]~

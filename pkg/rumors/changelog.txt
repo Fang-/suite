@@ -1,5 +1,8 @@
 rumors
 
+v1.2.9, ~2026.03.30
+- display tweaks.
+
 v1.2.8, ~2024.11.09
 - update widget styling for latest public profile page.
 

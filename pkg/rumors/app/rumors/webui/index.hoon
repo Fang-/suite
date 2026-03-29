@@ -1,1 +1,0 @@
-../../../../../app/rumors/webui/index.hoon

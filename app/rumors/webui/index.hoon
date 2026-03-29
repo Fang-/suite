@@ -3,6 +3,8 @@
 /-  *rumors
 /+  rudder
 ::
+/*  shader  %txt  /app/rumors/webui/shader/txt
+::
 ^-  (page:rudder [rumors @t (list @t) (map)] [~ @t])
 |_  [bowl:gall order:rudder =rumors @t avoid=(list @t) (map)]
 ++  argue
@@ -32,7 +34,7 @@
       ==
   ^-  reply:rudder
   =/  title=tape
-    ?:  &((gth now ~2024.12.24..18.00.00) (lth now ~2024.12.27))
+    ?:  &((gth now ~2026.12.24..18.00.00) (lth now ~2026.12.27))
       "tidings and greetings"
     "rumors and gossip"
   |^  [%page page]
@@ -42,7 +44,7 @@
       %^  cat  3  s
       ?:  &((gth now ~2025.4.1) (lth now ~2025.4.2..06.00.00))
         'body{background-image:linear-gradient(345deg, #99eaea, #8fdb78, #a0a0e5, #7bdfdf);}'
-      ?:  &((gth now ~2024.12.24..18.00.00) (lth now ~2024.12.27))
+      ?:  &((gth now ~2026.12.24..18.00.00) (lth now ~2026.12.27))
         'body{background-image:linear-gradient(345deg, lightgreen, green, red, orange);}'
       ''
     '''
@@ -108,6 +110,14 @@
       text-shadow: 1px 1px 3px rgb(0 0 0 / 15%);
       letter-spacing: 0.1px;
     }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      image-rendering: pixelated;
+    }
     '''
   ::
   ++  page
@@ -129,6 +139,11 @@
 
         ;+  input
         ;+  listing
+
+        ;*  ?.  &((gth now ~2026.4.1) (lth now ~2026.4.2..06.00.00))  ~
+            :~  ;canvas#c;
+                ;script:"{(trip (of-wain:format shader))}"
+            ==
       ==
     ==
   ::
@@ -157,6 +172,7 @@
       (trip v.i.arg)
     ;form(method "post")
       ;input
+        =id            "rumor"
         =type          "text"
         =name          "rumor"
         =required      ""

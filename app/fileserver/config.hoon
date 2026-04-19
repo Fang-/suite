@@ -53,6 +53,20 @@
 ::
 ++  tombstone  ^-  ?
   |
+::  +cache: whether to put responses into the eyre response cache
+::
+::    if enabled, when a response gets served by the fileserver agent (even
+::    when it's a 404, but not when 405 or 500), the agent adds the response
+::    into the eyre cache, allowing the runtime to serve it without hitting
+::    the event loop.
+::    +auth continues to apply. 403 responses will still put the "real"
+::    response into cache behind the appropriate auth flag.
+::
+::    default: true
+::
+++  cache  ^-  ?
+  &
+::
 ::  +index: file to serve on requests with trailing /
 ::
 ::    requests coming in on paths like /foo/ will never resolve to a file

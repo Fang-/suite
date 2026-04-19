@@ -18,6 +18,7 @@
   |%
   ++  file-root  ^-  path                       /web
   ++  tombstone  ^-  ?                          |
+  ++  cache      ^-  ?                          &
   ++  index      ^-  $@(~ [~ path])             `/index/html
   ++  extension  ^-  ?(%need %path %fall)       %need
   ++  auth       ^-  $@(? [? (list [path ?])])  &
@@ -28,6 +29,9 @@
 ::
 ++  tombstone  ^-  ?
   !@(tombstone:config tombstone:defaults tombstone:config)
+::
+++  cache  ^-  ?
+  !@(cache:config cache:defaults cache:config)
 ::
 ++  index  ^-  $@(?(~ %apache) [~ u=path])
   !@(index:config index:defaults index:config)
@@ -41,7 +45,6 @@
   ?@  val  (~(put by *(map path ?)) / val)
   (~(gas by *(map path ?)) [/ -.val] +.val)
 ::
-::TODO  make runtime caching disable-able
 ::TODO  configurable (cache) headers in the response?
 ::
 ::TODO  feels like there's a way (mb switching up the config paths back and forth?)
@@ -213,6 +216,8 @@
           [%give %kick ~[path] ~]
       ==
     ?:  ?=(%| sav)  [serve this]
+    ?.  cache       [serve this]
+    ::
     ::  if we put the response in cache, track that we did so,
     ::  we will clear the entry on desk change
     ::

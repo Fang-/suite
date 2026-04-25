@@ -197,12 +197,12 @@
   ?>  ?=(%handle-http-request mark)
   =+  !<([rid=@ta inbound-request:eyre] vase)
   ::
-  =;  [sav=$@(%| [%& auth=?]) pay=simple-payload:http]
+  =;  [sav=$@(%| [%& url=@t auth=?]) pay=simple-payload:http]
     =/  serve=(list card)
       ::  if auth is required but requester doesn't have it,
       ::  make sure to _serve_ 403, but keep original .pay for the cache
       ::
-      =?  pay  &(?=([%& %&] sav) !authenticated)
+      =?  pay  &(?=([%& @ %&] sav) !authenticated)
         [[403 ~] `(as-octs:mimes:html 'unauthorized')]
       =?  data.pay  ?=(%'HEAD' method.request)
         ::NOTE  runtime cache doesn't respond to HEAD requests yet, so
@@ -215,15 +215,21 @@
           [%give %fact ~[path] [%http-response-data !>(data.pay)]]
           [%give %kick ~[path] ~]
       ==
-    ?:  ?=(%| sav)  [serve this]
-    ?.  cache       [serve this]
+    ::  even if caching is enabled, if we think we already cached, don't
+    ::  set-response again. this prevents cache revision bloat. if there were
+    ::  query params, we leave them out when setting the cache entry.
     ::
+    ?:  ?|  ?=(%| sav)
+            !cache
+            (~(has in cash) url.sav)
+        ==
+      [serve this]
     ::  if we put the response in cache, track that we did so,
     ::  we will clear the entry on desk change
     ::
-    :_  this(cash (~(put in cash) url.request))
+    :_  this(cash (~(put in cash) url.sav))
     %+  snoc  serve
-    (store url.request ~ auth=auth.sav %payload pay)
+    (store url.sav ~ auth=auth.sav %payload pay)
   ::  don't handle illegible requests (non-read method, unknown site path)
   ::
   ?.  ?=(?(%'GET' %'HEAD') method.request)
@@ -233,12 +239,17 @@
     (rush url.request ;~(plug apat:de-purl:html yque:de-purl:html))
   ?.  =(web-root (scag (lent web-root) site))
     [%| [500 ~] `(as-octs:mimes:html 'bad route')]
+  ::  construct a "clean url" string from the request url w/o params
+  ::
+  =/  clean-url=@t
+    ?~  ext  (spat site)
+    (rap 3 (spat site) '.' u.ext ~)
   =.  site  (slag (lent web-root) site)
   ::  all of the below responses get put into cache on first-request,
   ::  even if we can't serve real content. we'll clear cache and retry
   ::  whenever file-root contents change.
   ::
-  :-  :-  %&
+  :-  :+  %&  clean-url
       ::  get auth flag from longest prefix
       ::
       ::NOTE  since this goes into cache after computing once,

@@ -1,6 +1,6 @@
 ::  gossip: data sharing with pals (and pals of pals, etc)
 ::
-::      v1.1.0: sneaky whisper
+::      v1.1.1: sneaky whisper
 ::
 ::    automates using /app/pals for peer & content discovery,
 ::    letting the underlying agent focus on handling the data.
@@ -169,8 +169,8 @@
   ^-  $-(agent:gall agent:gall)
   |^  agent
   ::
-  +$  state-2
-    $:  %2
+  +$  state-3
+    $:  %3
         manner=config                  ::  latest config
         memory=(set hash)              ::  datums seen (by inner agent)
         shared=(set hash)              ::  datums shared (as fact)
@@ -182,7 +182,7 @@
   +$  card  card:agent:gall
   ::
   ++  helper
-    |_  [=bowl:gall state-2]
+    |_  [=bowl:gall state-3]
     +*  state  +<+
         pals   ~(. lp bowl)
     ++  en-cage
@@ -455,7 +455,7 @@
   ::
   ++  agent
     |=  inner=agent:gall
-    =|  state-2
+    =|  state-3
     =*  state  -
     %+  verb  |
     %-  agent:dbug
@@ -473,7 +473,7 @@
       =^  cards   state  (play-cards:up cards)
       [(weld watch-pals:up cards) this]
     ::
-    ++  on-save  !>([[%gossip state] on-save:og])
+    ++  on-save  (slop !>([%gossip state]) on-save:og)
     ++  on-load
       |=  ole=vase
       ^-  (quip card _this)
@@ -483,17 +483,36 @@
         =^  cards   state  (play-cards:up cards)
         [(weld watch-pals:up cards) this]
       ::
-      |^  =+  !<([[%gossip old=state-any] ile=vase] ole)
+      |^  =+  !<([%gossip old=state-any] (slot 2 ole))
+          =/  ile=vase                   (slot 3 ole)
           =?  old  ?=(%0 -.old)  (state-0-to-1 old)
           =?  old  ?=(%1 -.old)  (state-1-to-2 old)
-          ?>  ?=(%2 -.old)
+          ::  before version 3, we stored the inner +on-save vase inside
+          ::  our own +on-save vase. undoing this double-vasing coincided
+          ::  with the h135 type-of-type upgrade.
+          ::
+          =?  ile  ?=(%2 -.old)  (next-vase:h136 !<(vase:h136 ile))
+          =?  old  ?=(%2 -.old)  (state-2-to-3 old)
+          ?>  ?=(%3 -.old)
           =.  state  old
           =^  cards  inner  (on-load:og ile)
           =^  cards  state  (play-cards:up cards)
           ::TODO  for later versions, add :future retry logic as needed
           [cards this]
       ::
-      +$  state-any  $%(state-0 state-1 state-2)
+      +$  state-any  $%(state-0 state-1 state-2 state-3)
+      ::
+      +$  state-2
+        $:  %2
+            manner=config
+            memory=(set hash)
+            shared=(set hash)
+            passed=(map hash [rumor @da])
+            misses=(set ship)
+            future=(list rumor)
+        ==
+      ++  state-2-to-3
+        |=(s=state-2 s(- %3))
       ::
       +$  state-1
         $:  %1

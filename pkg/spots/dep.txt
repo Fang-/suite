@@ -1,18 +1,8 @@
 > lib
 < urbit/pkg/arvo/lib
 math.hoon
-> sur
-< landscape-apps/desk/sur
-epic.hoon
-#groups.hoon
-#meta.hoon
-#group-store.hoon
-#group.hoon
-#resource.hoon
-#< landscape-apps/landscape-dev/sur
-#metadata-store.hoon
 > mar
 < urbit/pkg/arvo/mar
 js.hoon
+map.hoon
 css.hoon
-

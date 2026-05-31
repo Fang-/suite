@@ -28,7 +28,7 @@
 ::  /x/stat/[ship]/[file-id]     %noun  stats for ship on file
 ::
 /+  benc, torn, *pal,
-    server, default-agent, verb, dbug
+    rudder, default-agent, verb, dbug
 ::
 |%
 +$  state-0
@@ -324,8 +324,8 @@
   ^-  (quip card _state)
   ::  parse request url into path and query args
   ::
-  =/  ,request-line:server
-    (parse-request-line:server url.request.inbound-request)
+  =/  ,query:rudder
+    (purse:rudder url.request.inbound-request)
   ::
   =;  [[status=@ud res=value:benc] =_state]
     :_  state
@@ -574,7 +574,7 @@
 ++  give-bencoded-response
   |=  [status=@ud =eyre-id response=value:benc]
   ^-  (list card)
-  %+  give-simple-payload:app:server
+  %+  spout:rudder
     eyre-id
   :-  [status ~]
   ?:  =(~ response)  ~
@@ -676,4 +676,3 @@
       ["name" [%byt (trip u.name)]]~
   ==
 --
-

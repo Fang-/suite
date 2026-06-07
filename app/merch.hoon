@@ -110,6 +110,10 @@
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
         ;meta(property "og:image", content "https://pal.dev/props/tmp-mc/shirt-crop.png");
+        ;meta(name "twitter:card", content "summary_large_image");
+        ;meta(name "twitter:title", content "~paldev merch (LIMITED)");
+        ;meta(name "twitter:description", content "to celebrate ten years on urbit");
+        ;meta(name "twitter:image", content "https://pal.dev/props/tmp-mc/shirt-crop.png");
       ==
       ;body
       ;main

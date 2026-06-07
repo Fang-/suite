@@ -138,7 +138,7 @@
         ;h2:"➡️ Phase 1: order collection"
 
         ;blink
-          *Live now! Closes July 27!*
+          *Live now! Closes ~2026.07.27!*
         ==
 
         _{(a-co:co ~(wyt by dez))} orders received._
@@ -148,8 +148,8 @@
         you are entitled to a free Merch Product.
 
         To place an order, fill in the form below. A sales representative will
-        reach out to you to complete the order. You are free to update form
-        details until the end of Phase 1.
+        reach out to finalize your order. You are free to update form details
+        until the end of Phase 1.
 
         _If EAuth does not work with your setup, or you are ordering on behalf
         of someone else, please put your own `@p` into the comments field._
@@ -178,7 +178,7 @@
           ==
 
           ;fieldset
-            ;legend:"Clothing color preference (no guarantee about final product)"
+            ;legend:"Clothing color preference (no guarantee for final product)"
             ;*  =/  a
               %+  cork
                 (bart:lp %checked)

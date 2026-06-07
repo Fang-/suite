@@ -64,6 +64,7 @@
         border-radius: 2px;
         background-color: white;
         font-family: sans-serif;
+        line-height: 1.3em;
       }
       img.preview {
         border: 1px solid black;
@@ -92,6 +93,10 @@
       input[type="radio"] {
         margin-right
       }
+      textarea {
+        width: calc(100% - 2em);
+        max-width: 100%;
+      }
       footer {
         color: #777;
         text-align: center;
@@ -102,6 +107,9 @@
       ;head
         ;title:"~paldev merch (LIMITED)"
         ;style:"{style}"
+        ;meta(charset "utf-8");
+        ;meta(name "viewport", content "width=device-width, initial-scale=1");
+        ;meta(property "og:image", content "https://pal.dev/props/tmp-mc/shirt-crop.png");
       ==
       ;body
       ;main
@@ -115,10 +123,11 @@
           merch.
         ==
 
-        I do not have a Merch Product yet to take photographs of, so the lead
-        time will be a bit stretched here. But there is
+        Despite
         [proven demand](https://x.com/mdfang/status/1668726773633228800)
-        for this. The final Product will probably not be too far off the mockup
+        I do not yet have a real Merch Product to take photographs of. So,
+        expect significant lead time and the attendant surprises.
+        The final Product will probably not be too far off from the mockup
         presented here, but know that your order does not come with any
         guarantees beyond "receiving something, eventually".
 
@@ -183,7 +192,6 @@
                 =id  "address"
                 =name  "address"
                 =placeholder  "62 West Wallaby Street,\0aWigan WN1 1PD\0aUnited Kingdom"
-                =cols  "40"
                 =rows  "3"
                 =autocomplete  "off"
               ; {(trip address.deets)}
@@ -196,7 +204,6 @@
                 =id  "comments"
                 =name  "comments"
                 =placeholder  "🌱"
-                =cols  "40"
                 =autocomplete  "off"
               ; {(trip comments.deets)}
             ==
@@ -221,7 +228,7 @@
 
         You will receive a track-and-trace link when your order ships!
       ==  ;footer
-        powered, always and forever, by urbit
+        powered (always and forever) by urbit
       ==  ==
     ==
   ::

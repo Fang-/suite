@@ -155,7 +155,7 @@
         of someone else, please put your own `@p` into the comments field._
 
         ;form(method "post")
-          *Hi {(cite:title src.bowl)}! (Not you? Please [log in](/~/login?eauth).)*
+          *Hi {(cite:title src.bowl)}! (Not you? Please [log in](/~/login?eauth&redirect=/merch).)*
 
           ;*  ?~  err  ~  :_  ~
           ;p.err:"{(trip u.err)}"

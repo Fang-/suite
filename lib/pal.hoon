@@ -111,4 +111,17 @@
   =.  v  (add v i.all)
   ?:  (gth v rad)  i
   $(i +(i), all t.all)
+::
+::  xml utils
+::
+++  bart                                                ::  apply boolean attr
+  |=  n=mane
+  |=  [f=? m=manx]
+  ?.  f  m
+  m(a.g [[n "true"] a.g.m])
+::
+++  mort                                                ::  apply attributes
+  |=  a=mart
+  |=  m=manx
+  m(a.g (weld a a.g.m))
 --

@@ -117,7 +117,11 @@
   ++  on-watch
     |=  =path
     ^-  (quip card _this)
-    ?>  =(our.bowl src.bowl)
+    ::NOTE  deliberately no =(our src) assertion here. eyre subscribes to
+    ::      /http-response on our behalf using the _requester's_ identity,
+    ::      which for a logged-out visitor is a synthesized comet. asserting
+    ::      crashes the subscription, 500s every unauthenticated request, and
+    ::      makes the login redirect in +on-poke unreachable.
     ?+  path  (on-watch:def path)
       [%http-response *]  [~ this]
     ==
@@ -140,6 +144,68 @@
   --
 ::
 |%
+::  +ctype: content type for marks we know cast to %mime
+::
+::    membership doubles as the allowlist for building a mark->mime tube.
+::    there is no way to ask clay whether a cast exists without building it,
+::    and a failed build crashes uncatchably, so an explicit list is the only
+::    crash-free option. marks absent here still download via +raw; they just
+::    don't get a tube. covers %base and %yard as of 408K.
+::
+++  ctype
+  |=  =mark
+  ^-  (unit mite)
+  ?+  mark  ~
+    ::  text
+    %txt         `/text/plain
+    %hoon        `/text/x-hoon
+    %css         `/text/css
+    %js          `/text/javascript
+    %json        `/application/json
+    %html        `/text/html
+    %hymn        `/text/html
+    %xml         `/text/xml
+    %csv         `/text/csv
+    ::  '+' isn't a legal knot character, so this one can't be a path literal
+    %svg         [~ `mite`~['image' 'svg+xml']]
+    ::  images
+    %png         `/image/png
+    %jpg         `/image/jpeg
+    %jpeg        `/image/jpeg
+    %gif         `/image/gif
+    %bmp         `/image/bmp
+    %ico         `/image/x-icon
+    %tiff        `/image/tiff
+    %webp        `/image/webp
+    ::  audio
+    %mp3         `/audio/mpeg
+    %wav         `/audio/wav
+    %ogg         `/audio/ogg
+    %oga         `/audio/ogg
+    %flac        `/audio/flac
+    %aac         `/audio/aac
+    %weba        `/audio/webm
+    %mid         `/audio/midi
+    ::  video
+    %mp4         `/video/mp4
+    %webm        `/video/webm
+    %ogv         `/video/ogg
+    %mpeg        `/video/mpeg
+    %avi         `/video/x-msvideo
+    ::  fonts
+    %ttf         `/font/ttf
+    %otf         `/font/otf
+    %woff2       `/font/woff2
+    ::  documents
+    %pdf         `/application/pdf
+    %pem         `/application/x-pem-file
+    %wasm        `/application/wasm
+    ::  urbit-native, rendered as text
+    ?(%atom %bill %kelvin %noun %ship %snip %story)  `/text/plain
+    ?(%docket-0 %jam %map %udon %umd %urb)           `/text/plain
+    %noun-autodiff                                   `/text/plain
+  ==
+::
 ++  work
   |_  [bowl:gall =mode =beam]
   ++  arch  ~+  .^(^arch %cy rend)
@@ -148,8 +214,26 @@
   ++  last  ~+  ud:.^(cass:clay %cw rend(r.beam da+now))
   ++  rend  ~+  (en-beam beam)
   ::
-  ++  have  ?=(^ [fil:arch])  ::TODO  why are the [] needed?
+  ++  fils  ?=(^ [fil:arch])  ::TODO  why are the [] needed?
+  ++  have  &(fils live)      ::  a file whose data we can still read
+  ++  gone  &(fils !live)     ::  a file whose data has been tombstoned
   ++  peak  ?=(~ s.beam)
+  ::
+  ::  +live: whether this node's data is still in the store
+  ::
+  ::    a tombstoned file still shows up in the %cy arch with its lobe
+  ::    intact, but %cx/%cq on it crashes -- and that crash bails the whole
+  ::    event, escaping virtualization, so it cannot be caught with +mule.
+  ::    we have to ask before reading.
+  ::
+  ++  live  ~+
+    ^-  ?
+    ?.  fils  |
+    .^  ?  %cx
+        %+  weld
+          `path`[(scot %p our) %$ (scot %da now) %tomb ~]
+        rend
+    ==
   ::
   ++  free
     %+  turn  (sort ~(tap in ~(key by dir:arch)) aor)
@@ -178,11 +262,18 @@
   ::
   ++  show  ~+
     ^-  (unit mime)
-    ~|  %shouldnt-have-shown
-    ?.  ?=(^ [fil:arch])  ~
+    ?.  have  ~  ::  absent, or tombstoned
     =/  =mark  (rear s.beam)
+    ::  %mime needs no mark build at all, clay special-cases it
+    ::
     ?:  =(%mime mark)  `.^(mime %cx rend)
-    ::TODO  want to detect tube scry failures ahead of time somehow?
+    ::  detect tube scry failures ahead of time, per the TODO that used to
+    ::  live here. building a mark the desk doesn't carry, or one with no
+    ::  mime cast, crashes uncatchably (see +live), so we never build one
+    ::  we aren't confident in, and read typelessly instead.
+    ::
+    ?.  &(?=(^ (ctype mark)) .^(? %cu rend(r.beam da+now, s.beam /mar/[mark]/hoon)))
+      (raw mark)
     =;  =tube:clay
       `!<(mime (tube .^(vase %cr rend)))
     ::NOTE  because %c scries crash on older revisions, we do a best-effort
@@ -190,6 +281,19 @@
     ::      eventually, clay should be patched to support historic %c,
     ::      and this should be updated to not use da+now.
     .^(tube:clay %cc rend(r.beam da+now, s.beam /[mark]/mime))
+  ::
+  ::  +raw: typeless read, for files whose mark we can't safely build
+  ::
+  ::    %cq hands back the stored noun without touching marks, so it works
+  ::    on any desk. atom-shaped marks (most binary formats) serve directly;
+  ::    anything structured we decline to render rather than guess.
+  ::
+  ++  raw
+    |=  =mark
+    ^-  (unit mime)
+    =/  dat  .^(* %cq rend)
+    ?.  ?=(@ dat)  ~
+    `[(fall (ctype mark) /application/octet-stream) [(met 3 dat) dat]]
   ::
   ::
   ++  view
@@ -201,8 +305,10 @@
   ++  edit
     |=  request:http
     ^-  (each simple-payload:http [loc=@t (list card)])
-    ~|  [%edit-must-be-now r.beam]
-    ?>  =(da+now r.beam)
+    ::  editing only makes sense against the head of the desk. now that
+    ::  historical cases render, this is reachable by hand, so decline it
+    ::  politely instead of crashing.
+    ?.  =(da+now r.beam)  [%& wack]
     ?+  method  [%& deny]
       %'GET'   [%& (page ~)]
     ::
@@ -396,8 +502,13 @@
                        + this.value +
                        '{(spud (slag 2 spot))}';
                        """
+            ::NOTE  pinned to now: clay's empty-desk fast path only applies at
+            ::       [%da now], and off it this scry crashes the whole event.
+            ::       the desk list is a property of the ship, not of the
+            ::       revision being browsed, so now is also the correct case.
             ;*  %+  turn
-                  (sort ~(tap in .^((set desk) %cd rend(q.beam %$, s.beam ~))) aor)
+                  =/  bem  rend(q.beam %$, r.beam da+now, s.beam ~)
+                  (sort ~(tap in .^((set desk) %cd bem)) aor)
                 |=  d=desk
                 =+  p=(trip d)
                 ?.  =(d q.beam)
@@ -451,6 +562,8 @@
                   =title  "view this file"
                   ; 📄
                 ==
+              ::  only the head of the desk is editable
+              ?.  =(da+now r.beam)  :/""
               ;a/"{sput(mode %edit)}"
                 =id  "edit"
                 =title  "edit this file"
@@ -503,6 +616,10 @@
             ==
           ==
         ==
+      ?:  gone
+        ;section.fail
+          ; this file's data has been tombstoned
+        ==
       ?.  have
         ?^  [dir:arch]  :/""
         ;section.fail
@@ -518,15 +635,24 @@
     ::
     ++  meta
       ^-  manx
+      =/  bod=(unit mime)  show
       ::TODO  need to find a nice way to do conditional inline text
       ;footer
         ;span(title "case")
           ; rev {(scow %ud ud:cass)} @
           ; {(scow %da =+(da:cass (sub - (mod - ~s1))))},
         ==
-        ;+  ?:  have
+        ;+  ?^  bod
               ;span(title "size")
-                ; {(scow %ud p.q:(need show))} bytes
+                ; {(scow %ud p.q.u.bod)} bytes
+              ==
+            ?:  gone
+              ;span(title "state")
+                ; tombstoned
+              ==
+            ?:  fils
+              ;span(title "state")
+                ; unreadable
               ==
             ;span(title "tree")
               ; {(scow %ud ~(wyt by dir:arch))} items

@@ -1,2 +1,51 @@
 > lib
 urbit/pkg/base-dev/lib/server.hoon
+urbit/pkg/base-dev/lib/cram.hoon
+
+# marks, so cliff can render/serve common file types on its own desk and can
+# install them into a target desk on demand when an upload needs one.
+# sourced from %yard, which tracks 408K.
+> mar
+yard/desk/mar/txt-diff.hoon
+yard/desk/mar/aac.hoon
+yard/desk/mar/atom.hoon
+yard/desk/mar/avi.hoon
+yard/desk/mar/bmp.hoon
+yard/desk/mar/css.hoon
+yard/desk/mar/csv.hoon
+yard/desk/mar/flac.hoon
+yard/desk/mar/gif.hoon
+yard/desk/mar/html.hoon
+yard/desk/mar/ico.hoon
+yard/desk/mar/jam.hoon
+yard/desk/mar/jpeg.hoon
+yard/desk/mar/jpg.hoon
+yard/desk/mar/js.hoon
+yard/desk/mar/json.hoon
+yard/desk/mar/map.hoon
+yard/desk/mar/mid.hoon
+yard/desk/mar/mp3.hoon
+yard/desk/mar/mp4.hoon
+yard/desk/mar/mpeg.hoon
+yard/desk/mar/oga.hoon
+yard/desk/mar/ogg.hoon
+yard/desk/mar/ogv.hoon
+yard/desk/mar/otf.hoon
+yard/desk/mar/pdf.hoon
+yard/desk/mar/pem.hoon
+yard/desk/mar/png.hoon
+yard/desk/mar/svg.hoon
+yard/desk/mar/tiff.hoon
+yard/desk/mar/ttf.hoon
+yard/desk/mar/wav.hoon
+yard/desk/mar/weba.hoon
+yard/desk/mar/webm.hoon
+yard/desk/mar/webp.hoon
+yard/desk/mar/woff2.hoon
+yard/desk/mar/xml.hoon
+yard/desk/mar/hymn.hoon
+yard/desk/mar/ship.hoon
+yard/desk/mar/snip.hoon
+yard/desk/mar/urb.hoon
+yard/desk/mar/udon.hoon
+yard/desk/mar/umd.hoon

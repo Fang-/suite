@@ -12,6 +12,7 @@
 +$  mode
   ::TODO  %tree view?
   $?  %view  %edit  ::  w/ wrapper ui
+      %perm         ::  w/ wrapper ui, permissions
       %down  %load  ::  raw down/upload
   ==
 ::
@@ -109,6 +110,7 @@
       ?-  mode
         %view  [%& (view:go request.inbound-request)]
         %edit  (edit:go request.inbound-request)
+        %perm  [%& (perm:go request.inbound-request)]
         %down  [%& (down:go request.inbound-request)]
         %load  (load:go request.inbound-request)
       ==
@@ -210,6 +212,67 @@
 ::          committing something enormous into a desk
 ::
 ++  limit  (bex 23)  ::  8MiB
+::
+::  +walk: how many paths we'll check for explicit rules in one page
+::
+::    a %cp costs around 2ms, and a desk root can easily have several hundred
+::    candidate paths, so this is bounded and the page says when it truncated.
+::
+++  walk  512
+::
+::  +ships: "~zod, ~nec", for rule membership
+::
+++  ships
+  |=  who=(set ship)
+  ^-  tape
+  ::  sorted on the rendered name, not the raw @p, so the order reads the way
+  ::  it looks
+  =/  nam=(list tape)
+    %+  sort  `(list tape)`(turn ~(tap in who) |=(p=ship (scow %p p)))
+    aor
+  |-  ^-  tape
+  ?~  nam    ""
+  ?~  t.nam  i.nam
+  :(weld i.nam ", " $(nam t.nam))
+::
+::  +dull: the rule clay falls back to when nothing is set anywhere
+::
+++  dull  `real:clay`[%white ~ ~]
+::
+::  +owns: whether a rule is really set at pax, as opposed to inherited
+::
+::    a dict's src is the path its rule was found at, so src == pax normally
+::    means "set here".  the exception is the desk root: clay hands back
+::    src=/ with a hardcoded empty whitelist when no rule exists anywhere,
+::    which is indistinguishable from someone having set that same rule at /.
+::    we call the ambiguous case unset -- it's the weaker claim, and the two
+::    are identical in effect regardless.
+::
+++  owns
+  |=  [pax=path =dict:clay]
+  ^-  ?
+  ?.  =(pax src.dict)  |
+  !&(?=(~ pax) =(rul.dict dull))
+::
+::  +gist: what a resolved rule actually means, in one phrase
+::
+::    an empty whitelist admits no one and an empty blacklist admits everyone,
+::    which is easy to read backwards off the raw noun -- hence spelling it out.
+::
+++  gist
+  |=  rul=real:clay
+  ^-  tape
+  =/  shp=@ud  ~(wyt in p.who.rul)
+  =/  cru=@ud  ~(wyt by q.who.rul)
+  ?:  &(=(0 shp) =(0 cru))
+    ?:(=(%black mod.rul) "public" "private")
+  =/  who=tape
+    ;:  weld
+      ?:(=(0 shp) "" "{(scow %ud shp)} ship{?:(=(1 shp) "" "s")}")
+      ?:(|(=(0 shp) =(0 cru)) "" " and ")
+      ?:(=(0 cru) "" "{(scow %ud cru)} crew{?:(=(1 cru) "" "s")}")
+    ==
+  ?:(=(%black mod.rul) "everyone except {who}" "only {who}")
 ::
 ::  +kin: the marks a given mark needs in order to build, dependencies first
 ::
@@ -367,6 +430,12 @@
     ?.  ?=(%'GET' method)  deny
     (page ~)
   ::
+  ++  perm
+    |=  request:http
+    ^-  simple-payload:http
+    ?.  ?=(%'GET' method)  deny
+    (page ~)
+  ::
   ++  edit
     |=  request:http
     ^-  (each simple-payload:http [loc=@t (list card)])
@@ -412,6 +481,47 @@
     ?~  m  miss
     :_  `q.u.m
     [200 ['content-type'^(en-mite:mimes:html p.u.m)]~]
+  ::
+  ::  +pear: read and write permissions in force at this node
+  ::
+  ::    pinned to now on purpose. clay's %cp ignores the case entirely --
+  ::    +read-p takes only a path -- so permissions are always current state,
+  ::    never historical. asking at the browsed case would imply a history
+  ::    clay doesn't keep, so we ask at now and label it as such in the ui.
+  ::
+  ++  pear  ~+
+    ^-  [red=dict:clay wit=dict:clay]
+    .^([dict:clay dict:clay] %cp rend(r.beam da+now))
+  ::
+  ::  +sown: explicit rules at or under this node
+  ::
+  ::    clay exposes no way to enumerate its regs, so we reconstruct them: a
+  ::    dict's src is the path its rule was found at, so src == path is
+  ::    exactly "there's an explicit rule here". candidates are every prefix
+  ::    of every file at or below us, which misses rules set on paths with no
+  ::    files under them -- the only blind spot, and not one clay lets us fix.
+  ::
+  ++  sown  ~+
+    ^-  [more=? out=(list [=path red=(unit real:clay) wit=(unit real:clay)])]
+    =/  wid=@ud  (lent s.beam)
+    =/  can=(list path)
+      %~  tap  in
+      %-  ~(gas in *(set path))
+      %-  zing
+      %+  turn  tree
+      |=  p=path
+      ^-  (list path)
+      ?.  (gte (lent p) wid)  ~
+      (turn (gulf wid (lent p)) |=(n=@ud (scag n p)))
+    :-  (gth (lent can) walk)
+    %+  murn  (scag walk (sort can aor))
+    |=  p=path
+    ^-  (unit [path (unit real:clay) (unit real:clay)])
+    =/  d  .^([red=dict:clay wit=dict:clay] %cp rend(r.beam da+now, s.beam p))
+    =/  red=(unit real:clay)  ?:((owns p red.d) `rul.red.d ~)
+    =/  wit=(unit real:clay)  ?:((owns p wit.d) `rul.wit.d ~)
+    ?:  &(?=(~ red) ?=(~ wit))  ~
+    `[p red wit]
   ::
   ::  +want: which of a mark's dependencies the target desk is missing
   ::
@@ -643,6 +753,46 @@
         font-size: 0.8em;
       }
 
+      section.perm h3 {
+        margin: 0 0 0.2em 0;
+        font-size: 1em;
+      }
+
+      section.perm .rule, section.perm .sown {
+        margin-bottom: 1.5em;
+      }
+
+      section.perm .gist {
+        font-size: 1.2em;
+      }
+
+      section.perm .from, footer .from {
+        color: grey;
+      }
+
+      section.perm .warn {
+        color: #841;
+      }
+
+      section.perm ul.who {
+        margin: 0.3em 0;
+        padding-left: 1.5em;
+      }
+
+      section.perm table {
+        border-collapse: collapse;
+      }
+
+      section.perm th, section.perm td {
+        text-align: left;
+        padding: 0.1em 1.5em 0.1em 0;
+      }
+
+      section.perm th {
+        color: grey;
+        font-weight: normal;
+      }
+
       section.note {
         flex-grow: 0;
         flex-basis: auto;
@@ -803,9 +953,102 @@
       ==
     ::
     ::TODO  display appropriate message if case is in the future
+    ::  +folk: who a rule names, ships then crews with their membership
+    ::
+    ++  folk
+      |=  rul=real:clay
+      ^-  manx
+      ?:  &(=(~ p.who.rul) =(~ q.who.rul))  :/""
+      =/  cru=(list [nom=@ta mem=(set ship)])
+        %+  sort  ~(tap by q.who.rul)
+        |=  [a=[nom=@ta mem=(set ship)] b=[nom=@ta mem=(set ship)]]
+        (aor nom.a nom.b)
+      ;ul.who
+        ;+  ?:  =(~ p.who.rul)  :/""
+            ;li:"{(ships p.who.rul)}"
+        ;*  %+  turn  cru
+            |=  [nom=@ta mem=(set ship)]
+            ^-  manx
+            ;li
+              ; \%{(trip nom)}
+              ;+  ?:  =(~ mem)  :/" - empty, so it admits no one"
+                  ;span.crew:" - {(ships mem)}"
+            ==
+      ==
+    ::
+    ::  +rite: one rule, with where it came from
+    ::
+    ++  rite
+      |=  [wat=tape =dict:clay]
+      ^-  manx
+      ;div.rule
+        ;h3:"{wat}"
+        ;p.gist:"{(gist rul.dict)}"
+        ;p.from
+          ;+  ?:  (owns s.beam dict)
+                :/"set on this node"
+              ?:  &(?=(~ src.dict) =(rul.dict dull))
+                :/"clay's default - no rule is set anywhere on this desk"
+              :/"inherited from {?:(=(~ src.dict) "/" (spud src.dict))}"
+        ==
+        ;+  (folk rul.dict)
+      ==
+    ::
+    ::  +hold: the permissions view
+    ::
+    ++  hold
+      ^-  manx
+      =/  d  pear
+      =/  s  sown
+      ;section.perm
+        ;+  (rite "read" red.d)
+        ;+  (rite "write" wit.d)
+        ;p.warn
+          ; clay stores write rules and inherits them, but never consults
+          ; them: +may-write has no callers at all as of 408K.  the write
+          ; rule is a record, not a control.  call your local core dev
+          ; before relying on it for anything.
+        ==
+        ;div.sown
+          ;h3:"explicit rules here and below"
+          ;+  ?~  out.s
+                ;p.from:"none - everything here inherits"
+              ;table
+                ;tr
+                  ;th:"path"
+                  ;th:"read"
+                  ;th:"write"
+                ==
+                ;*  %+  turn  out.s
+                    |=  [p=path red=(unit real:clay) wit=(unit real:clay)]
+                    ;tr
+                      ;td
+                        ;a/"{sput(s.beam p)}"
+                          ; {?:(=(~ p) "/" (spud p))}
+                        ==
+                      ==
+                      ;td:"{?~(red "-" (gist u.red))}"
+                      ;td:"{?~(wit "-" (gist u.wit))}"
+                    ==
+              ==
+          ;+  ?.  more.s  :/""
+              ;p.warn
+                ; more than {(scow %ud walk)} paths sit under this node; only
+                ; the first {(scow %ud walk)} were checked, so there may be
+                ; rules below that aren't listed.  navigate downwards to see
+                ; them.
+              ==
+        ==
+        ;p.from
+          ; permissions are not versioned - clay keeps only the current rules,
+          ; so these are as of now even when browsing an older revision.
+        ==
+      ==
+    ::
     ++  body
       ^-  manx
       =/  bod=(unit mime)  show
+      ?:  =(%perm mode)  hold
       ?:  edit
         ;section.body.edit
           ;form(method "post")
@@ -862,6 +1105,11 @@
             ;span(title "tree")
               ; {(scow %ud ~(wyt by dir:arch))} items
             ==
+        ;
+        ;a/"{sput(mode %perm)}"
+          =title  "read permissions in force here, as of now"
+          ; read: {(gist rul.red:pear)}
+        ==
       ==
     --
   --

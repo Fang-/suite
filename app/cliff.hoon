@@ -9,6 +9,26 @@
 |%
 +$  state-0  [%0 pend=(map eyre-id [=mode =beam])]  ::  posts pending response
 ::
+::  state-1: mirrors of clay's permission groups
+::
+::    clay answers %crew and %crow with gifts and exposes no scry for either,
+::    so there is no way to read the crews during a page render.  we keep a
+::    copy instead, and refresh it whenever we change one.  going stale is
+::    possible if crews are edited elsewhere (dojo), hence the reload button.
+::
+::    cez: every crew, by name.
+::    use: which desks and paths name each crew, so deleting one can say what
+::         it is about to affect.  clay strips a deleted crew from every rule,
+::         which tightens a whitelist but *loosens* a blacklist.
+::
++$  state-1
+  $:  %1
+      cez=(map @ta crew:clay)
+      use=(map @ta (map desk [r=regs:clay w=regs:clay]))
+  ==
+::
++$  versioned-state  $%(state-0 state-1)
+::
 +$  mode
   ::TODO  %tree view?
   $?  %view  %edit  ::  w/ wrapper ui
@@ -21,7 +41,7 @@
 +$  eyre-id  @ta
 --
 ::
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %-  agent:dbug
@@ -35,16 +55,21 @@
   ++  on-init
     ^-  (quip card _this)
     :_  this
-    [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
+    :-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+    mirror
   ::
   ++  on-save  !>(state)
   ::
   ++  on-load
     |=  ole=vase
     ^-  (quip card _this)
-    =/  old=state-0  !<(state-0 ole)
-    =.  pend.old  ~
-    [~ this(state old)]
+    =/  old=versioned-state  !<(versioned-state ole)
+    =/  new=state-1
+      ?-  -.old
+        %1  old
+        %0  [%1 ~ ~]  ::  pend was always cleared here and never written
+      ==
+    [mirror this(state new)]
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -106,11 +131,11 @@
       ?:  &(!=(~ path) =(~ (rear path)))  invalid  ::  reject trailing /
       ::
       =*  beam  [[ship desk case] path]
-      =+  go=~(. work bowl mode beam)
+      =+  go=~(. work bowl mode beam state)
       ?-  mode
         %view  [%& (view:go request.inbound-request)]
         %edit  (edit:go request.inbound-request)
-        %perm  [%& (perm:go request.inbound-request)]
+        %perm  (perm:go request.inbound-request)
         %down  [%& (down:go request.inbound-request)]
         %load  (load:go request.inbound-request)
       ==
@@ -137,6 +162,19 @@
       ~?  !accepted.sign-arvo
         [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
       [~ this]
+    ::
+    ::  the crew mirror.  %cruz carries every crew; %croz carries usage but
+    ::  not the crew it describes, so the name rides on the wire.
+    ::
+        [%perm %crew ~]
+      ?>  ?=([%clay %cruz *] sign-arvo)
+      :_  this(cez cez.sign-arvo, use ~)
+      %+  turn  ~(tap in ~(key by `(map @ta crew:clay)`cez.sign-arvo))
+      |=(nom=@ta ^-(card [%pass /perm/crow/[nom] %arvo %c %crow nom]))
+    ::
+        [%perm %crow @ ~]
+      ?>  ?=([%clay %croz *] sign-arvo)
+      [~ this(use (~(put by use) i.t.t.wire rus.sign-arvo))]
     ==
   ::
   ++  on-leave  on-leave:def
@@ -234,6 +272,45 @@
   ?~  nam    ""
   ?~  t.nam  i.nam
   :(weld i.nam ", " $(nam t.nam))
+::
+::  +mirror: ask clay for the crews.  it answers with a gift, in on-arvo
+::
+++  mirror  ^-((list card:agent:gall) [%pass /perm/crew %arvo %c %crew ~]~)
+::
+::  +words: split free text on whitespace and commas
+::
+++  words
+  |=  t=@t
+  ^-  (list @t)
+  =/  sep  ;~(pose ace com (just '\0a') (just '\0d') (just '\09'))
+  =/  raw=(list tape)
+    %+  fall
+      `(unit (list tape))`(rush t (more sep (star ;~(less sep next))))
+    ~
+  %+  murn  raw
+  |=(s=tape ^-((unit @t) ?~(s ~ `(crip s))))
+::
+::  +tally: "a, b, c" from a list of cords
+::
+++  tally
+  |=  wor=(list @t)
+  ^-  tape
+  =/  nam=(list tape)  (turn wor |=(w=@t (trip w)))
+  |-  ^-  tape
+  ?~  nam    ""
+  ?~  t.nam  i.nam
+  :(weld i.nam ", " $(nam t.nam))
+::
+::  +fleet: parse ships out of free text, keeping what didn't parse
+::
+++  fleet
+  |=  t=@t
+  ^-  [bad=(list @t) out=(set ship)]
+  %+  roll  (words t)
+  |=  [w=@t acc=[bad=(list @t) out=(set ship)]]
+  ^-  [bad=(list @t) out=(set ship)]
+  ?~  p=(slaw %p w)  [[w bad.acc] out.acc]
+  [bad.acc (~(put in out.acc) u.p)]
 ::
 ::  +dull: the rule clay falls back to when nothing is set anywhere
 ::
@@ -335,7 +412,7 @@
   `[nam ext]
 ::
 ++  work
-  |_  [bowl:gall =mode =beam]
+  |_  [bowl:gall =mode =beam sat=state-1]
   ++  arch  ~+  .^(^arch %cy rend)
   ++  tree  ~+  .^((list path) %ct rend)
   ++  cass  ~+  .^(cass:clay %cw rend)
@@ -432,9 +509,23 @@
   ::
   ++  perm
     |=  request:http
-    ^-  simple-payload:http
-    ?.  ?=(%'GET' method)  deny
-    (page ~)
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    ?+  method  [%& `simple-payload:http`deny]
+      %'GET'  [%& (page ~)]
+    ::
+        %'POST'
+      ::  permissions aren't versioned, so editing from an older case would
+      ::  imply we were changing that revision's rules.  we aren't.
+      ?.  =(da+now r.beam)
+        [%& (oops "permissions can only be changed at now")]
+      =/  are=(unit (map @t @t))
+        ?~  body  ~
+        %+  bind
+          (rush q.u.body yquy:de-purl:html)
+        ~(gas by *(map @t @t))
+      ?~  are  [%& (oops "couldn't read the form")]
+      (deed u.are)
+    ==
   ::
   ++  edit
     |=  request:http
@@ -522,6 +613,114 @@
     =/  wit=(unit real:clay)  ?:((owns p wit.d) `rul.wit.d ~)
     ?:  &(?=(~ red) ?=(~ wit))  ~
     `[p red wit]
+  ::
+  ++  fire
+    |=  [red=? new=(unit rule:clay)]
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    :+  %|  (crip sput)
+    :_  ~
+    :+  %pass  /perm/set
+    :+  %arvo  %c
+    :+  %perm  q.beam
+    :-  s.beam
+    `rite:clay`?:(red [%r new] [%w new])
+  ::
+  ++  crew-save
+    |=  arm=(map @t @t)
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    =/  nom=@t  (~(gut by arm) 'name' '')
+    ?:  =('' nom)  [%& (oops "a crew needs a name")]
+    ?.  =(nom (safe nom))
+      :-  %&
+      %-  oops
+      "that will not do as a crew name - lowercase, digits and hyphens"
+    =/  shp  (fleet (~(gut by arm) 'members' ''))
+    ?^  bad.shp  [%& (oops "not a ship: {(tally bad.shp)}")]
+    ?:  =(~ out.shp)
+      [%& (oops "a crew with no members deletes it - use delete if you meant that")]
+    :+  %|  (crip sput)
+    :~  [%pass /perm/cred %arvo %c %cred `@ta`nom out.shp]
+        [%pass /perm/crew %arvo %c %crew ~]
+    ==
+  ::
+  ++  crew-kill
+    |=  arm=(map @t @t)
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    =/  nom=@t  (~(gut by arm) 'name' '')
+    ?.  (~(has by cez.sat) `@ta`nom)  [%& (oops "no such crew")]
+    :+  %|  (crip sput)
+    :~  [%pass /perm/cred %arvo %c %cred `@ta`nom ~]
+        [%pass /perm/crew %arvo %c %crew ~]
+    ==
+  ::
+  ++  named
+    |=  t=@t
+    ^-  [bad=(list @t) out=(set @ta)]
+    %+  roll  (words t)
+    |=  [w=@t acc=[bad=(list @t) out=(set @ta)]]
+    ^-  [bad=(list @t) out=(set @ta)]
+    ?.  (~(has by cez.sat) `@ta`w)  [[w bad.acc] out.acc]
+    [bad.acc (~(put in out.acc) `@ta`w)]
+  ::
+  ++  grant
+    |=  [arm=(map @t @t) keep=?]
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    =/  wat=@t  (~(gut by arm) 'kind' '')
+    ?.  ?|(=('r' wat) =('w' wat))  [%& (oops "which rule was that?")]
+    =/  red=?  =('r' wat)
+    ::  a ~ rule deletes the entry, so the node inherits from its parent again
+    ?.  keep  (fire red ~)
+    =/  shp  (fleet (~(gut by arm) 'ships' ''))
+    =/  cru  (named (~(gut by arm) 'crews' ''))
+    ?^  bad.shp
+      [%& (oops "not a ship: {(tally bad.shp)}")]
+    ?^  bad.cru
+      :-  %&
+      %-  oops
+      ;:  weld
+        "no such crew: {(tally bad.cru)}.  clay ignores a rule naming a crew "
+        "it doesn't have -- it acks the poke and changes nothing -- so this "
+        "was not sent.  create the crew first, below."
+      ==
+    =/  who=(list whom:clay)
+      %+  weld
+        `(list whom:clay)`(turn ~(tap in out.shp) |=(s=ship `whom:clay`[%& s]))
+      `(list whom:clay)`(turn ~(tap in out.cru) |=(n=@ta `whom:clay`[%| n]))
+    %-  fire
+    :-  red
+    :-  ~
+    :-  ?:(=('black' (~(gut by arm) 'mode' 'white')) %black %white)
+    (~(gas in *(set whom:clay)) who)
+  ::  +cited: where a crew is referenced, from the %crow mirror
+  ::
+  ++  cited
+    |=  nom=@ta
+    ^-  tape
+    =/  rus=(list [=desk r=regs:clay w=regs:clay])
+      ~(tap by (~(gut by use.sat) nom *(map desk [r=regs:clay w=regs:clay])))
+    ?~  rus  "nowhere"
+    =/  dez=@ud  (lent rus)
+    =/  n=@ud
+      =/  lit=(list [=desk r=regs:clay w=regs:clay])  rus
+      |-  ^-  @ud
+      ?~  lit  0
+      :(add ~(wyt by r.i.lit) ~(wyt by w.i.lit) $(lit t.lit))
+    ;:  weld
+      "{(scow %ud n)} rule"  ?:(=(1 n) "" "s")
+      " across {(scow %ud dez)} desk"  ?:(=(1 dez) "" "s")
+    ==
+  ::
+  ::  +deed: dispatch a POST from one of the permission forms
+  ::
+  ++  deed
+    |=  arm=(map @t @t)
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    ?:  (~(has by arm) 'reload')     [%| (crip sput) mirror]
+    ?:  (~(has by arm) 'crew-save')  (crew-save arm)
+    ?:  (~(has by arm) 'crew-kill')  (crew-kill arm)
+    ?:  (~(has by arm) 'clear')      (grant arm |)
+    ?:  (~(has by arm) 'save')       (grant arm &)
+    [%& (oops "unrecognised form")]
   ::
   ::  +want: which of a mark's dependencies the target desk is missing
   ::
@@ -994,6 +1193,101 @@
         ;+  (folk rul.dict)
       ==
     ::
+    ::  +sets: the editor for one side of the rule pair
+    ::
+    ++  sets
+      |=  [wat=tape red=? =dict:clay]
+      ^-  manx
+      ?.  =(da+now r.beam)  :/""
+      =/  kin=tape  ?:(red "r" "w")
+      =/  shp=tape  (ships p.who.rul.dict)
+      =/  cru=tape  (tally `(list @t)`~(tap in ~(key by q.who.rul.dict)))
+      =/  wit=?     =(%white mod.rul.dict)
+      ;form.rules(method "post")
+        ;input(type "hidden", name "kind", value kin);
+        ;label
+          ; mode
+          ;select(name "mode")
+            ;+  ?:  wit
+                  ;option(value "white", selected ""):"whitelist - only these"
+                ;option(value "white"):"whitelist - only these"
+            ;+  ?:  wit
+                  ;option(value "black"):"blacklist - all but these"
+                ;option(value "black", selected ""):"blacklist - all but these"
+          ==
+        ==
+        ;label
+          ; ships
+          ;textarea(name "ships", rows "2", placeholder "~zod ~nec")
+            ; {shp}
+          ==
+        ==
+        ;label
+          ; crews
+          ;textarea(name "crews", rows "2", placeholder "friends")
+            ; {cru}
+          ==
+        ==
+        ;button(type "submit", name "save"):"set {wat} here"
+        ;button(type "submit", name "clear"):"clear - inherit from parent"
+      ==
+    ::
+    ::  +crews: the crew list and its editor.  crews are per-ship, not per
+    ::          desk, so this is the same content wherever you are
+    ::
+    ++  crews
+      ^-  manx
+      ;div.crews
+        ;h3:"crews"
+        ;+  ?:  =(~ cez.sat)
+              ;p.from:"none yet"
+            ;table
+              ;tr
+                ;th:"name"
+                ;th:"members"
+                ;th:"referenced"
+                ;th:""
+              ==
+              ;*  %+  turn  `(list @ta)`(sort ~(tap in ~(key by cez.sat)) aor)
+                  |=  nom=@ta
+                  ^-  manx
+                  =/  mem=(set ship)  (~(gut by cez.sat) nom *crew:clay)
+                  =/  nam=tape        (trip nom)
+                  ;tr
+                    ;td:"\%{(trip nom)}"
+                    ;td:"{?:(=(~ mem) "empty - admits no one" (ships mem))}"
+                    ;td:"{(cited nom)}"
+                    ;td
+                      ;+  ?.  =(da+now r.beam)  :/""
+                          ;form(method "post")
+                            ;input(type "hidden", name "name", value nam);
+                            ;button(type "submit", name "crew-kill"):"delete"
+                          ==
+                    ==
+                  ==
+            ==
+        ;+  ?.  =(da+now r.beam)  :/""
+            ;form.crew-new(method "post")
+              ;label
+                ; name
+                ;input(name "name", placeholder "friends");
+              ==
+              ;label
+                ; members
+                ;textarea(name "members", rows "2", placeholder "~zod ~nec");
+              ==
+              ;button(type "submit", name "crew-save"):"save crew"
+            ==
+        ;p.from
+          ; deleting a crew strips it from every rule that names it.  that
+          ; tightens a whitelist, but it loosens a blacklist - the ships it
+          ; was excluding are no longer excluded.
+        ==
+        ;form(method "post")
+          ;button(type "submit", name "reload"):"reload crews from clay"
+        ==
+      ==
+    ::
     ::  +hold: the permissions view
     ::
     ++  hold
@@ -1002,7 +1296,9 @@
       =/  s  sown
       ;section.perm
         ;+  (rite "read" red.d)
+        ;+  (sets "read" & red.d)
         ;+  (rite "write" wit.d)
+        ;+  (sets "write" | wit.d)
         ;p.warn
           ; clay stores write rules and inherits them, but never consults
           ; them: +may-write has no callers at all as of 408K.  the write
@@ -1039,6 +1335,7 @@
                 ; them.
               ==
         ==
+        ;+  crews
         ;p.from
           ; permissions are not versioned - clay keeps only the current rules,
           ; so these are as of now even when browsing an older revision.

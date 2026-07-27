@@ -206,6 +206,71 @@
     %noun-autodiff                                   `/text/plain
   ==
 ::
+::  +limit: largest upload we'll accept, to keep a stray POST from
+::          committing something enormous into a desk
+::
+++  limit  (bex 23)  ::  8MiB
+::
+::  +kin: the marks a given mark needs in order to build, dependencies first
+::
+::    a mark written as `++grad %foo` delegates its diff to mark %foo, and
+::    clay builds %foo to build it -- so installing one means installing the
+::    other. a mark whose ++grad is an inline core is terminal, even when its
+::    ++form names another mark: %txt says `++form %txt-diff` but builds fine
+::    without mar/txt-diff, because the name is never resolved as a mark.
+::    that makes every chain here exactly one deep.
+::
+::    derived from the marks cliff vendors, so this arm and
+::    pkg/cliff/dep.txt have to move together.
+::
+++  kin
+  |=  =mark
+  ^-  (list ^mark)
+  ?+  mark  ~[%mime mark]  ::  the large majority grad to %mime
+    ::  inline ++grad cores: nothing further to build
+    ?(%mime %noun %txt)                                ~[mark]
+    ::  ++grad %noun
+    ?(%bill %docket-0 %hymn %kelvin %ship %snip %urb)  ~[%noun mark]
+    %txt-diff                                          ~[%noun mark]
+    ::  ++grad %txt
+    ?(%hoon %udon %umd)                                ~[%txt mark]
+  ==
+::
+::  +safe: coerce arbitrary text into something usable as a path element
+::
+++  safe
+  |=  t=@t
+  ^-  @ta
+  %-  crip
+  %+  turn  (trip t)
+  |=  c=@tD
+  ^-  @tD
+  ?:  &((gte c 'A') (lte c 'Z'))  (add c 32)
+  ?:  ?|  &((gte c 'a') (lte c 'z'))
+          &((gte c '0') (lte c '9'))
+          =('-' c)
+      ==
+    c
+  '-'
+::
+::  +splt: filename -> [name mark], as clay path elements
+::
+::    clay has no notion of an extension: foo.png is the file /foo/png, whose
+::    mark is png. so the extension is load-bearing, and a file without one
+::    leaves us no mark to write it under.
+::
+++  splt
+  |=  fil=@t
+  ^-  (unit [nam=@ta =mark])
+  =/  t=tape  (trip fil)
+  ::  split on the last dot
+  ?~  dex=(find "." (flop t))  ~  ::  no extension, so no mark
+  =/  cut=@ud  (sub (lent t) +(u.dex))
+  =/  nam=@ta  (safe (crip (scag cut t)))
+  =/  ext=@ta  (safe (crip (slag +(cut) t)))
+  ?:  |(=('' ext) =('' nam))  ~
+  `[nam ext]
+::
 ++  work
   |_  [bowl:gall =mode =beam]
   ++  arch  ~+  .^(^arch %cy rend)
@@ -348,21 +413,139 @@
     :_  `q.u.m
     [200 ['content-type'^(en-mite:mimes:html p.u.m)]~]
   ::
+  ::  +want: which of a mark's dependencies the target desk is missing
+  ::
+  ++  want
+    |=  =mark
+    ^-  (list ^mark)
+    %+  skip  (kin mark)
+    |=  m=^mark
+    .^(? %cu rend(r.beam da+now, s.beam /mar/[m]/hoon))
+  ::
+  ::  +vend: source for a mark cliff carries, to install on another desk
+  ::
+  ++  vend
+    |=  =mark
+    ^-  (unit @t)
+    =/  pax=path  /(scot %p our)/[q.byk]/(scot %da now)/mar/[mark]/hoon
+    ?.  .^(? %cu pax)  ~
+    `.^(@t %cx pax)
+  ::
   ++  load
     |=  request:http
     ^-  (each simple-payload:http [loc=@t (list card)])
     ?.  ?=(%'POST' method)  [%& `simple-payload:http`deny]
-    ~|  [%edit-must-be-now r.beam]
-    ?>  =(da+now r.beam)
-    =/  are=(unit (map @t part:multipart))
-      %+  bind
-        (de-request:multipart header-list body)
-      ~(gas by *(map @t part:multipart))
-    !!  ::TODO  implement
+    ::  uploads only make sense against the head of the desk
+    ?.  =(da+now r.beam)  [%& `simple-payload:http`wack]
+    ?~  par=(de-request:multipart header-list body)
+      [%& (oops "expected a multipart/form-data upload")]
+    (take (~(gas by *(map @t part:multipart)) u.par))
+  ::
+  ::  +take: commit an uploaded file, with the marks it needs
+  ::
+  ::    clay validates every changed file at commit time, building its mark to
+  ::    do so, so a file can't land on a desk that doesn't carry its mark. we
+  ::    put the marks and the file in a single %info, which commits atomically:
+  ::    either the desk gains a working file or it gains nothing.
+  ::
+  ++  take
+    |=  arm=(map @t part:multipart)
+    ^-  (each simple-payload:http [loc=@t (list card)])
+    ?~  fil=(~(get by arm) 'file')
+      [%& (oops "no file was submitted")]
+    ?~  file.u.fil
+      [%& (oops "the upload had no filename")]
+    =*  nom  (trip u.file.u.fil)
+    ?:  =(0 size.u.fil)
+      [%& (oops "{nom} is empty")]
+    ?:  (gth size.u.fil limit)
+      [%& (oops "{nom} is larger than the {(scow %ud (rsh 3^10 limit))}KiB limit")]
+    ?~  spl=(splt u.file.u.fil)
+      [%& (oops "can't derive a mark from {nom} - it needs an extension")]
+    =*  nam  nam.u.spl
+    =*  mak  mark.u.spl
+    ::  a mark over a bare atom cannot hold trailing NUL bytes -- an atom has
+    ::  no high-order zeros, so they're gone the moment we hand them over, and
+    ::  the mark's ++grow recomputes the length with +met on the way back out.
+    ::  %mime is the exception: it stores octs, which carry the length. refuse
+    ::  rather than quietly hand back a shorter file than we were given.
+    ::
+    =/  nul=@ud  (sub size.u.fil (met 3 body.u.fil))
+    ?:  &(!=(%mime mak) !=(0 nul))
+      :-  %&
+      %-  oops
+      ;:  weld
+        "{nom} ends in {(scow %ud nul)} NUL byte"  ?:(=(1 nul) "" "s")
+        ", which the %{(trip mak)} mark can't store - marks over a bare atom "
+        "have no high-order zeros.  rename it to end in .mime to store it "
+        "byte-for-byte instead."
+      ==
+    ::  marks the target desk is missing, and whether we may add them
+    ::
+    =/  gap=(list mark)  (want mak)
+    =/  yea=?            (~(has by arm) 'marks')
+    ?:  &(?=(^ gap) !yea)
+      :-  %&
+      %-  oops
+      ;:  weld
+        "%{(trip q.beam)} doesn't carry "
+        (mark-list gap)
+        ", which {nom} needs.  "
+        "tick \"install missing marks\" to add "
+        ?:(?=([* ~] gap) "it" "them")  " to the desk."
+      ==
+    =/  new=(list [=mark src=@t])
+      %+  murn  gap
+      |=(m=mark ^-((unit [mark @t]) ?~(s=(vend m) ~ `[m u.s])))
+    ?.  =((lent new) (lent gap))
+      :-  %&
+      %-  oops
+      "cliff has no source for {(mark-list gap)}, so it can't install {?:(?=([* ~] gap) "it" "them")}."
+    ::
+    =/  tar=path  (weld s.beam /[nam]/[mak])
+    =/  =mime
+      :_  [size body]:u.fil
+      (fall type.u.fil (fall (ctype mak) /application/octet-stream))
+    :-  %|
+    :-  (crip sput(mode %view, s.beam tar))
+    :_  ~
+    :+  %pass  /load/save
+    :+  %arvo  %c
+    :+  %info  q.beam
+    :-  %&
+    %+  weld
+      ^-  soba:clay
+      %+  turn  new
+      |=([m=mark src=@t] ^-([path miso:clay] [/mar/[m]/hoon %ins %hoon !>(src)]))
+    ^-  soba:clay
+    [tar (feel:space:userlib rend(s.beam tar) %mime !>(mime))]~
+  ::
+  ::  +mark-list: "%png and %mime", for error text
+  ::
+  ++  mark-list
+    |=  mus=(list mark)
+    ^-  tape
+    =/  nam=(list tape)  (turn mus |=(m=mark "%{(trip m)}"))
+    |-  ^-  tape
+    ?~  nam        ""
+    ?~  t.nam      i.nam
+    ?~  t.t.nam    "{i.nam} and {i.t.nam}"
+    "{i.nam}, {$(nam t.nam)}"
   ::
   ++  deny  [[405 ~] `(as-octs:mimes:html 'method not allowed')]
   ++  miss  [[404 ~] `(as-octs:mimes:html 'file not found')]
   ++  wack  [[400 ~] `(as-octs:mimes:html 'invalid request')]
+  ::
+  ::  +oops: re-render this node with an error banner
+  ::
+  ::    rendered as %view: we're answering a POST, and the page's own links
+  ::    would otherwise all point back at the POST-only route we came in on.
+  ::
+  ++  oops
+    |=  msg=tape
+    ^-  simple-payload:http
+    =/  pay=simple-payload:http  (page(mode %view) `(crip msg))
+    pay(status-code.response-header 400)
   ::
   ::  page: renders file/directory content alongside metadata
   ::
@@ -451,6 +634,22 @@
         margin: 0.5em;
       }
 
+      form.upload {
+        display: inline;
+        margin-left: 1em;
+      }
+
+      form.upload label {
+        font-size: 0.8em;
+      }
+
+      section.note {
+        flex-grow: 0;
+        flex-basis: auto;
+        color: #841;
+        border-color: #841;
+      }
+
       section.directory > a {
         display: inline-block;
         border: 1px solid grey;
@@ -476,8 +675,11 @@
         ;body
           ;+  site
           ;+  dile
-          ;+  ::TODO  msg
-              body
+          ;+  ?~  msg  :/""
+              ;section.note
+                ; {(trip u.msg)}
+              ==
+          ;+  body
           ;+  meta
         ==
       ==
@@ -569,14 +771,17 @@
                 =title  "edit this file"
                 ; ✏️
               ==
-          ::TODO  support
-          :: ;form(style "display: inline;")
-          ::   =method   "post"
-          ::   =action   sput(mode %load)
-          ::   =enctype  "multipart/form-data"
-          ::   ;input(type "file", name "file");
-          ::   ;button(type "submit"):"⬆️"
-          :: ==
+          ::  upload, into directories at the head of the desk only
+          ;+  ?.  &(!fils =(da+now r.beam))  :/""
+              ;form.upload(method "post", enctype "multipart/form-data")
+                =action  sput(mode %load)
+                ;input(type "file", name "file", required "");
+                ;label(title "cliff carries the mark sources, and can commit the ones this desk lacks")
+                  ;input(type "checkbox", name "marks", value "1");
+                  ; install missing marks
+                ==
+                ;button(type "submit", title "upload into this directory"):"⬆️"
+              ==
         ==
       ==
     ::

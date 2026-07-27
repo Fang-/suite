@@ -135,93 +135,20 @@
         presented here, but know that your order does not come with any
         guarantees beyond "receiving something, eventually".
 
-        ;h2:"➡️ Phase 1: order collection"
+        ;h2:"✅ Phase 1: order collection"
 
-        ;blink
-          *Live now! Closes ~2026.07.27!*
-        ==
+        *Closed*
 
         _{(a-co:co ~(wyt by dez))} orders received._
 
-        Merch Product costs a flat $50 (about 80k sats), shipping included.
-        If you own space in the [Million Dollar Urbit App](/million),
-        you are entitled to a free Merch Product.
-
-        To place an order, fill in the form below. A sales representative will
-        reach out to finalize your order. You are free to update form details
-        until the end of Phase 1.
-
-        _If EAuth does not work with your setup, or you are ordering on behalf
-        of someone else, please put your own `@p` into the comments field._
-
-        ;form(method "post")
-          *Hi {(cite:title src.bowl)}! (Not you? Please [log in](/~/login?eauth&redirect=/merch).)*
-
-          ;*  ?~  err  ~  :_  ~
-          ;p.err:"{(trip u.err)}"
-
-          ;fieldset
-            ;legend:"Shirt size"
-            ;*  =/  a
-              %+  cork
-                (bart:lp %checked)
-              (mort:lp [%type "radio"] [%name "size"] [%autocomplete "off"] ~)
-            :~  (a =(size.deets 'S') ;input(id "small", value "S");)
-                ;label(for "small"):"S"
-                (a =(size.deets 'M') ;input(id "medium", value "M");)
-                ;label(for "medium"):"M"
-                (a =(size.deets 'L') ;input(id "large", value "L");)
-                ;label(for "large"):"L"
-                (a =(size.deets 'XL') ;input(id "xlarge", value "XL");)
-                ;label(for "xlarge"):"XL"
-            ==
-          ==
-
-          ;fieldset
-            ;legend:"Clothing color preference (no guarantee for final product)"
-            ;*  =/  a
-              %+  cork
-                (bart:lp %checked)
-              (mort:lp [%type "radio"] [%name "color"] [%autocomplete "off"] ~)
-            :~  (a =(color.deets 'lighter') ;input(id "lighter", value "lighter");)
-                ;label(for "lighter"):"Lighter colors"
-                (a =(color.deets 'darker') ;input(id "darker", value "darker");)
-                ;label(for "darker"):"Darker colors"
-            ==
-          ==
-
-          ;fieldset
-            ;legend(for "address"):"Mailing address"
-            ;textarea
-                =id  "address"
-                =name  "address"
-                =placeholder  "62 West Wallaby Street,\0aWigan WN1 1PD\0aUnited Kingdom"
-                =rows  "3"
-                =autocomplete  "off"
-              ; {(trip address.deets)}
-            ==
-          ==
-
-          ;fieldset
-            ;legend(for "comments"):"Comments"
-            ;textarea
-                =id  "comments"
-                =name  "comments"
-                =placeholder  "🌱"
-                =autocomplete  "off"
-              ; {(trip comments.deets)}
-            ==
-          ==
-
-          ;button(type "submit"):"Save"
-        ==
+        If you ordered, a sales representative reach out to finalize your order.
 
         In the exceedingly unlikely event this endeavor does not turn out to be
         a loss leader, any profits will be put towards the development of
         ~paldev software and the organization of ~paldev events.
 
-        ;h2:"⏺️ Phase 2: sweatshop arc"
-        ;b:"Timeline TBD."
+        ;h2:"➡️ Phase 2: sweatshop arc"
+        ;b:"Status as of ~2026.07.27: R&D"
 
         We will source high-quality garnments and enhance them with tasteful
         embroidery, or do whatever else it takes to construct a satisfying
@@ -234,19 +161,6 @@
       ==  ;footer
         powered (always and forever) by urbit
       ==  ==
-    ==
-  ::
-      %'POST'
-    ?~  body.request  $(err `'blank submit')
-    =/  args  (frisk:rudder q.u.body.request)
-    ?~  size=(~(get by args) 'size')  $(err `'bad submit')
-    ?~  color=(~(get by args) 'color')  $(err `'bad submit')
-    ?~  address=(~(get by args) 'address')  $(err `'bad submit')
-    ?~  comments=(~(get by args) 'comments')  $(err `'bad submit')
-    ::
-    %_  $
-      dez  (~(put by dez) src.bowl u.size u.color u.address u.comments)
-      method.request  %'GET'
     ==
   ==
 ::

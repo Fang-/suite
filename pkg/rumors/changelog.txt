@@ -1,5 +1,8 @@
 rumors
 
+v1.2.10, ~2026.08.04
+- display tweaks.
+
 v1.2.9, ~2026.03.30
 - display tweaks.
 

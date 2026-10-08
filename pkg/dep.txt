@@ -7,6 +7,7 @@ mar/hoon.hoon
 mar/kelvin.hoon
 mar/mime.hoon
 mar/bill.hoon
+mar/seal.hoon
 mar/txt.hoon
 > sur
 sur/verb.hoon

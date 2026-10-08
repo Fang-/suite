@@ -30,7 +30,7 @@
 ++  on-init
   ^-  (quip card _this)
   :_  this
-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
+  [%pass /eyre/connect %arvo %eyre %connect /[dap.bowl] dap.bowl]~
 ::
 ++  on-save  !>(state)
 ++  on-load
@@ -86,9 +86,10 @@
     secret(counter.wat counter.act)
   ::
       %sav
+    ::TODO  optional permission
     :+  'saved to .urb/put/fafa/export.jam'
-      =+  !>(`dill-blit:dill`[%sag /[dap.bowl]/export/jam keys])
-      [%pass /save %agent [our.bowl %hood] %poke %dill-blit -]~
+      =+  !>([/[dap.bowl]/export/jam (jam keys)])
+      [%pass /save %agent [our.bowl %hood] %poke %drum-put -]~
     keys
   ::
       %get
@@ -138,13 +139,13 @@
   (on-watch:def path)
 ::
 ++  on-arvo
-  |=  [=wire =sign-arvo]
+  |=  [=wire gift=gift-user-v1:agent:gall]
   ^-  (quip card _this)
+  ~|  [wire=wire gift=-.gift]
   ?.  =(/eyre/connect wire)
-    (on-arvo:def wire sign-arvo)
-  ?>  ?=([%eyre %bound *] sign-arvo)
-  ~?  !accepted.sign-arvo
-    [dap.bowl %strange-illegal-bind]
+    (on-arvo:def wire gift)
+  ?>  ?=([%eyre %bound *] gift)
+  ~?  !bound.gift  [dap.bowl %not-bound]
   [~ this]
 ::
 ++  on-leave  on-leave:def

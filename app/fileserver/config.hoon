@@ -8,6 +8,17 @@
 ::    ALWAYS rename the /app/foo-fileserver file, and
 ::    ALWAYS provide a custom +web-root in the config file.
 ::
+::    ALWAYS require at least the following permissions:
+::    - [%eyre %serve web-root]                   ::  serving
+::    - [%clay %local `%z `%your-desk file-root]  ::  file change notifs
+::    - [%reads %c ~ `%your-desk file-root]       ::  file reading
+::    - [%reads %c `%c `%your-desk /]             ::  file conversions to mime
+::
+::    if a non-default configuration option requires additional permissions,
+::    it will be mentioned below.
+::    foo-fileserver DOES NOT check for permission presence.
+::    failing to require the necessary permissions WILL cause crashes.
+::
 ::    this file contains both required and optional configuration,
 ::    so that it can give examples and documentation,
 ::    but you can omit optional arms entirely to use their defaults instead.
@@ -48,6 +59,9 @@
 ::    at and under the configured +file-root.
 ::    whenever files under +file-root change, the fileserver will trigger
 ::    clay's tombstoning/garbage collection.
+::
+::    to enable this, you MUST require the following permission:
+::    [%clay %stone `%your-desk]
 ::
 ::    default: false
 ::

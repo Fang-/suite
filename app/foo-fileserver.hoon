@@ -77,27 +77,23 @@
   [b]~
 ::
 ++  store  ::  set cache entry
-  |=  [url=@t entry=(unit cache-entry:eyre)]
+  |=  [=desk url=@t entry=(unit cache-entry:eyre)]
   ^-  card
-  [%pass /eyre/cache %arvo %e %set-response url entry]
+  [%pass /eyre/cache %arvo %eyre %set-response url entry]
 ::
 ++  read-next
   |=  [[our=@p =desk now=@da] =path]
   ^-  card
-  =;  =task:clay
-    [%pass [%clay %next path] %arvo %c task]
-  [%warp our desk ~ %next %z da+now path]
+  [%pass [%clay %next path] %arvo %clay [%read ~ our desk %next %z da+now path]]
 ::
 ++  set-norm
   |=  [[our=@p =desk] =path keep=?]
   ^-  card
-  =;  =task:clay
-    [%pass [%clay %norm path] %arvo %c task]
-  [%tomb %norm our desk (~(put of *norm:clay) path keep)]
+  [%pass [%clay %norm path] %arvo %clay [%tomb %norm our desk (~(put of *norm:clay) path keep)]]
 ::
 ++  run-tombstone
   ^-  card
-  [%pass /clay/tomb %arvo %c %tomb %pick ~]
+  [%pass /clay/tomb %arvo %clay %tomb %pick ~]
 --
 ::
 =|  state-0
@@ -116,7 +112,7 @@
   ::  and await next file change.
   ::  if we're tombstoning, set the policy and trigger clean-up
   ::
-  :+  [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+  :+  [%pass /eyre/connect %arvo %eyre %connect web-root dap.bowl]
     (read-next [our q.byk now]:bowl file-root)
   ?.  tombstone  ~
   :~  (set-norm [our q.byk]:bowl file-root |)
@@ -154,16 +150,16 @@
       ::  always clear old cache entries, in case we changed something about
       ::  the way we serve
       ::
-      (turn ~(tap in cash.old) (curr store ~))
+      (turn ~(tap in cash.old) (curr (cury store q.byk.bowl) ~))
     ::
       ::  if the web root changed, we must re-set our binding
       ::
       ?:  =(woot.old web-root)  ~
       ::NOTE  re-bind first to avoid duct shenanigans.
       ::      remove this when eyre stops restricting %disconnect to the og duct.
-      :~  [%pass /eyre/connect %arvo %e %connect [~ woot.old] dap.bowl]
-          [%pass /eyre/connect %arvo %e %disconnect [~ woot.old]]
-          [%pass /eyre/connect %arvo %e %connect [~ web-root] dap.bowl]
+      :~  [%pass /eyre/connect %arvo %eyre %connect woot.old dap.bowl]
+          [%pass /eyre/connect %arvo %eyre %disconnect woot.old]
+          [%pass /eyre/connect %arvo %eyre %connect web-root dap.bowl]
       ==
   ==
 ::
@@ -229,7 +225,7 @@
     ::
     :_  this(cash (~(put in cash) url.sav))
     %+  snoc  serve
-    (store url.sav ~ auth=auth.sav %payload pay)
+    (store q.byk.bowl url.sav ~ auth=auth.sav %payload pay)
   ::  don't handle illegible requests (non-read method, unknown site path)
   ::
   ?.  ?=(?(%'GET' %'HEAD') method.request)
@@ -408,18 +404,18 @@
   [~ this]
 ::
 ++  on-arvo
-  |=  [=wire sign=sign-arvo]
+  |=  [=wire gift=gift-user-v1:gall]
   ^-  (quip card _this)
   ~|  wire=wire
   ?+  wire  !!
       [%eyre %connect ~]
-    ~|  sign=+<.sign
-    ?>  ?=(%bound +<.sign)
-    ~?  !accepted.sign  [dap.bowl %binding-rejected binding.sign]
+    ~|  gift=+<.gift
+    ?>  ?=([%eyre %bound *] gift)
+    ~?  !bound.gift  [dap.bowl %binding-rejected binding.gift]
     [~ this]
   ::
       [%eyre %cache ~]
-    ~|  sign=+<.sign
+    ~|  gift=+<.gift
     ~|  %did-not-expect-gift
     !!
   ::
@@ -427,8 +423,8 @@
     ::  ignore if it's for a previous file-root
     ::
     ?.  =(t.t.wire file-root)  [~ this]
-    ~|  sign=+<.sign
-    ?>  ?=(%writ +<.sign)
+    ~|  gift=+<.gift
+    ?>  ?=(%read +<.gift)
     ::  if we're tombstoning, trigger clay-side clean-up.
     ::  always request the next change, and clear the cache,
     ::  it will get refilled on first request for each file.
@@ -437,7 +433,7 @@
     %-  zang
     :+  ?:(tombstone ~ run-tombstone)
       (read-next [our q.byk now]:bowl file-root)
-    (turn ~(tap in cash) (curr store ~))
+    (turn ~(tap in cash) (curr (cury store q.byk.bowl) ~))
   ==
 ::
 ++  on-leave  |=(* [~ this])
@@ -445,8 +441,8 @@
 ++  on-peek   |=(* ~)
 ::
 ++  on-fail
-  |=  [=term =tang]
+  |=  [frag:agent:gall call:agent:gall]
   ^-  (quip card _this)
-  %-  (slog (rap 3 dap.bowl ' +on-fail: ' term ~) tang)
+  %-  (slog (rap 3 dap.bowl ' +on-fail: ' from ~) tang)
   [~ this]
 --

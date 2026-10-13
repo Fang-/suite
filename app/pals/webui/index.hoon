@@ -393,10 +393,13 @@
     (some ship ~)
   ::
   ++  contacts  ~+
-    ::TODO  but only if permission has been granted
     =/  base=path
       /(scot %p our.bowl)/contacts/(scot %da now.bowl)
-    ?.  .^(? %gu (snoc base %$))  *rolodex:contact
+    ?.  ?&  (have:guard:gall peg.bowl %reads %g `%u `%contacts /$)
+            (have:guard:gall peg.bowl %reads %g `%x `%contacts /all)
+            .^(? %gu (snoc base %$))
+        ==
+      *rolodex:contact
     .^(rolodex:contact %gx (weld base /all/noun))
   ::
   ++  sigil

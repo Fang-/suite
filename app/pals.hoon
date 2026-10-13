@@ -81,8 +81,18 @@
   =^  cards  this
     (on-poke %pals-command !>(`command`[%meet ~paldev ~]))
   :_  this
-  :+  [%pass /jael/pubs %arvo %j %public-keys ~]
-    [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]
+  :^    [%pass /jael/pubs %arvo %jael %public-keys `~]
+      [%pass /eyre/connect %arvo %eyre %connect /[dap.bowl] dap.bowl]
+    ::TODO  ask during %1->%2 migration too
+    =-  [%pass /clay/perms %arvo %clay %pine q.byk.bowl & -]
+    %-  ~(gas in *(set perm:gall))
+    :~  [%write `%hark]
+        [%write `%profile]
+        [%reads %g `%u `%hark /$]
+        [%reads %g `%u `%profile /$]
+        [%reads %g `%u `%contacts /$]
+        [%reads %g `%x `%contacts /]
+    ==
   cards
 ::
 ++  on-save  !>(state)
@@ -99,7 +109,7 @@
           ::      the "breached & never re-added you" case, where they
           ::      might not know you need to hear a %bye.
           (on-poke %noun !>(%resend))
-        [[[%pass /jael/pubs %arvo %j %public-keys ~] caz] state]
+        [[[%pass /jael/pubs %arvo %jael %public-keys `~] caz] state]
       ?>  ?=(%1 -.old)
       :_  this(state old)
       (weld caz (update-widget bowl +.old))
@@ -213,7 +223,11 @@
         =/  =cage    [%pals-effect !>(effect)]
         [%give %fact [/leeches]~ cage]
       ::
-        ?.  .^(? %gu /(scot %p our.bowl)/hark/(scot %da now.bowl)/$)  ~
+        ?.  ?&  (have:guard:gall peg.bowl %reads %g `%u `%hark /$)
+                (have:guard:gall peg.bowl %write `%hark)
+                .^(? %gu /(scot %p our.bowl)/hark/(scot %da now.bowl)/$)
+            ==
+          ~
         =/  body
           =-  [ship+ship - ~]
           ?-  -.gesture
@@ -293,22 +307,29 @@
   ==
 ::
 ++  on-arvo
-  |=  [=wire =sign-arvo]
+  |=  [=wire gift=gift-user-v1:gall]
   ^-  (quip card _this)
+  =?  gift  ?=([%syscall *] gift)
+    ::  upgrade gifts from pre-407 resources
+    ::
+    ?+  wire  ~|([dap.bowl %strange-wire wire] !!)
+      [%eyre %connect ~]  ~|(%expected-synchronous !!)
+      [%jael %pubs ~]     ;;([%jael %public-keys public-keys-result:jael] sign-arvo.gift)  ::REVIEW
+    ==
   ?+  wire  ~|([dap.bowl %strange-wire wire] !!)
       [%eyre %connect ~]
-    ?.  ?=([%eyre %bound *] sign-arvo)
-      (on-arvo:def wire sign-arvo)
-    ~?  !accepted.sign-arvo
-      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
+    ?.  ?=([%eyre %bound *] gift)
+      (on-arvo:def wire gift)
+    ~?  !bound.gift
+      [dap.bowl 'eyre bind rejected!' binding.gift]
     [~ this]
   ::
       [%jael %pubs ~]
-    ?.  ?=([%jael %public-keys *] sign-arvo)
-      (on-arvo:def wire sign-arvo)
+    ?.  ?=([%jael %public-keys *] gift)
+      (on-arvo:def wire gift)
     =/  who=(unit ship)
-      =*  pkr  public-keys-result.sign-arvo
-      ?+  -.public-keys-result.sign-arvo  ~
+      =*  pkr  public-keys-result.gift
+      ?+  -.public-keys-result.gift  ~
         %breach  `who.pkr
       ==
     ?~  who  [~ this]
@@ -402,7 +423,10 @@
 ++  update-widget
   |=  [=bowl:gall records]
   ^-  (list card)
-  ?.  .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+  ?.  ?&  (have:guard:gall peg.bowl %reads %g `%u `%profile /$)
+          (have:guard:gall peg.bowl %write `%profile)
+          .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+      ==
     ~
   =;  widget=[%0 desc=@t %marl marl]
     =/  =cage  noun+!>([%command %update-widget %pals %mutuals widget])

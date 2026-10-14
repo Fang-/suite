@@ -20,6 +20,7 @@
   ++  tombstone  ^-  ?                          |
   ++  cache      ^-  ?                          &
   ++  index      ^-  $@(~ [~ path])             `/index/html
+  ++  fallback   ^-  $@(~ [~ path])             ~
   ++  extension  ^-  ?(%need %path %fall)       %need
   ++  auth       ^-  $@(? [? (list [path ?])])  &
   --
@@ -35,6 +36,9 @@
 ::
 ++  index  ^-  $@(?(~ %apache) [~ u=path])
   !@(index:config index:defaults index:config)
+::
+++  fallback  ^-  $@(~ [~ u=path])
+  !@(fallback:config fallback:defaults fallback:config)
 ::
 ++  extension  ^-  ?(%need %path %fall)
   !@(extension:config extension:defaults extension:config)
@@ -286,10 +290,15 @@
   =/  bas=path
     /(scot %p our.bowl)/[q.byk.bowl]/(scot %da now.bowl)
   ?^  target
+    |-
     =/  =path
       :(weld bas file-root pax.target)
     ?.  .^(? %cu path)
-      ~&  [dap.bowl %not-found path=path]
+      ::  if there is a fallback file, try that too
+      ::
+      =+  fallback=fallback
+      ?:  &(?=(^ fallback) !=(pax.target u.fallback))
+        $(pax.target u.fallback)
       [[404 ~] `(as-octs:mimes:html 'not found')]
     =+  .^(file=^vase %cr path)
     ::NOTE  this sucks. we really cannot do better than potentially crash here...

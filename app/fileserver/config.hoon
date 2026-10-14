@@ -93,6 +93,16 @@
 ::
 ++  index  ^-  $@(~ [~ path])
   `/index/php
+::  +fallback: file to serve on requests that would 404
+::
+::    if provided, any request that would serve a 404 will instead resolve
+::    to the file at this path. (that may still 404 in turn.)
+::    landscape's docket used to fall back to /index/html.
+::
+::    default: false
+::
+++  fallback  ^-  $@(~ [~ path])
+  `/index/html
 ::  +extension: how to treat the absence of a file extension
 ::
 ::    all clay files have a mark, and knowledge of the mark is required for

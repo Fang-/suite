@@ -6,6 +6,7 @@
       type=(unit mite)                 ::  content-type
       code=(unit @t)                   ::  content-transfer-encoding
       body=@t                          ::  content
+      size=@ud                         ::  content length, in bytes
   ==
 ::
 ++  de-request
@@ -38,7 +39,14 @@
   ++  dim   (jest (cat 3 '--' del))
   ++  nip   (jest '\0d\0a')
   ++  nab   (more fas (cook (cury rap 3) (plus qit)))
-  ++  nag   (dine ;~(less ;~(plug nip dim) next))
+  ::  content, with its length. we can't recover the length from the atom
+  ::  afterwards: +rep packs bytes least-significant-first, so a file that
+  ::  ends in NUL bytes (a zip's empty comment field, say) would lose them
+  ::  to +met and come back truncated.
+  ++  nag
+    %+  cook
+      |=(l=(list @) ^-([@ @ud] [(rep 3 l) (lent l)]))
+    (star ;~(less ;~(plug nip dim) next))
   ++  nod   (dine ;~(less doq next))
   ++  nom   (dine alp)
   ++  sip   ;~(plug nip nip)

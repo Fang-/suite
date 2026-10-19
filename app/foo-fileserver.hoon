@@ -259,9 +259,11 @@
       %-  (bond |.(^$(site (snip site))))
       (~(get by auth) site)
   ::  construct the relative target path,
-  ::  falling back to the index file or page where applicable
+  ::  falling back to the index file or page where applicable.
+  ::  .ext is always the last element of the pax.target
   ::
   =/  target=$@(?(~ %apache) [pax=path ext=@ta])
+    ::TODO  if empty path, still get index
     ::  if trailing /, resolve according to +index
     ::  if extension, resolve normally
     ::  if no extension, resolve according to +extension
@@ -294,7 +296,7 @@
       ::
       =+  fallback=fallback
       ?:  &(?=(^ fallback) !=(pax.target u.fallback))
-        $(pax.target u.fallback)
+        $(target [u.fallback (rear u.fallback)])
       [[404 ~] `(as-octs:mimes:html 'not found')]
     =+  .^(file=^vase %cr path)
     ::NOTE  this sucks. we really cannot do better than potentially crash here...

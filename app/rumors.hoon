@@ -48,7 +48,13 @@
 ++  on-init
   ^-  (quip card _this)
   :_  this
-  [%pass /eyre/connect %arvo %e %connect [~ /[dap.bowl]] dap.bowl]~
+  :-  [%pass /eyre/connect %arvo %eyre %connect /[dap.bowl] dap.bowl]
+  ::TODO  ask during %4->%5 migration too
+  =-  [%pass /clay/perms %arvo %clay %pine q.byk.bowl & -]~
+  %-  ~(gas in *(set perm:gall))
+  :~  [%write `%profile]
+      [%reads %g `%u `%profile /$]
+  ==
 ::
 ++  on-save  !>(state)
 ::
@@ -244,12 +250,20 @@
   ``noun+!>(fresh)
 ::
 ++  on-arvo
-  |=  [=wire =sign-arvo]
+  |=  [=wire gift=gift-user-v1:gall]
   ^-  (quip card _this)
-  ?+  sign-arvo  (on-arvo:def wire sign-arvo)
+  =?  gift  ?=([%syscall *] gift)
+    ::  upgrade gifts from pre-407 resources
+    ::
+    ?+  wire  ~|([dap.bowl %strange-wire wire] !!)
+      [%eyre %connect *]  =+  ;;([%eyre %bound add=? =binding:eyre] gift)
+                         [%eyre %bound add binding dap.bowl]
+    ==
+  ?>  =(/eyre/connect wire)
+  ?+  gift  (on-arvo:def wire gift)
       [%eyre %bound *]
-    ~?  !accepted.sign-arvo
-      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
+    ~?  !bound.gift
+      [dap.bowl 'eyre bind rejected!' binding.gift]
     [~ this]
   ==
 ::
@@ -261,7 +275,10 @@
 ++  update-widget
   |=  [=bowl:gall rumor=@t]
   ^-  (list card)
-  ?.  .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+  ?.  ?&  (have:guard:gall peg.bowl %reads %g `%u `%contacts /$)
+          (have:guard:gall peg.bowl %write `%profile)
+          .^(? %gu /(scot %p our.bowl)/profile/(scot %da now.bowl)/$)
+      ==
     ~
   =;  widget=[%0 desc=@t %marl marl]
     =/  =cage  noun+!>([%command %update-widget %rumors %latest widget])

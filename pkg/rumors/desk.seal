@@ -1,0 +1,8 @@
+:-  %0  :~
+[%eyre %serve /rumors]
+[%fling ~]
+[%behn %timer ~]
+[%watch `%pals /targets]
+[%watch `%pals /leeches]
+[%reads %g `%u `%pals /$]
+==

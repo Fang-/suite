@@ -302,7 +302,7 @@
       =/  =wire  /~/gossip/passed/(scot %p proxy)/(scot %uv hash)
       =/  =cage  gossip-rumor+!>(rumor)
       :~  [%pass wire %agent [proxy dap.bowl] %poke cage]
-          [%pass wire %arvo %b %wait time]
+          [%pass wire %arvo %behn %wait time]
       ==
     ::
     ++  play-cards
@@ -376,7 +376,7 @@
       |=  [t=@dr p=path]
       ^-  card
       :+  %pass  [%~.~ %gossip %retry p]
-      [%arvo %b %wait (add now.bowl t)]
+      [%arvo %behn %wait (add now.bowl t)]
     ::
     ++  watch-target
       |=  s=ship
@@ -670,7 +670,7 @@
         ::NOTE  emitting rest is cute, but doesn't actually work reliably,
         ::      due to userspace duct shenanigans. %wake logic will have to
         ::      be defensive...
-        =/  rest=card   [%pass wire %arvo %b %rest +.u.rum]
+        =/  rest=card   [%pass wire %arvo %behn %rest +.u.rum]
         ?~  p.sign      [[rest]~ this(passed (~(del by passed) hash))]
         =^  caz  state  (emit-rumor:up -.u.rum)
         [[rest caz] this]
@@ -772,12 +772,14 @@
       [cards this]
     ::
     ++  on-arvo
-      |=  [=wire sign=sign-arvo:agent:gall]
+      |=  [=wire gift=gift-user-v1:gall]
       ^-  (quip card _this)
       ?.  ?=([%~.~ %gossip *] wire)
-        =^  cards  inner  (on-arvo:og wire sign)
+        =^  cards  inner  (on-arvo:og wire gift)
         =^  cards  state  (play-cards:up cards)
         [cards this]
+      =?  gift  ?=(%syscall -.gift)
+        [%behn %wake now.bowl]  ::TODO  tidier lol, but they're all gonna be wakes
       ?+  t.t.wire  ~|(wire !!)
           [%passed ?([@ ~] [@ @ ~])]
         =/  =hash
@@ -800,7 +802,7 @@
         [cards this]
       ::
           [%retry *]
-        ?>  ?=(%wake +<.sign)
+        ?>  ?=([%behn %wake *] gift)
         ?+  t.t.t.wire  ~|(wire !!)
             [%pals *]
           ::NOTE  this might result in subscription wire re-use,
@@ -816,7 +818,7 @@
       ==
     ::
     ++  on-fail
-      |=  [term tang]
+      |=  [frag:agent:gall call:agent:gall]
       ^-  (quip card _this)
       =^  cards  inner  (on-fail:og +<)
       =^  cards  state  (play-cards:up cards)
